@@ -20,6 +20,8 @@ ABBR = "TLC"
 EMAIL_DOMAIN = "demo.example"
 SEED_FILE = Path(__file__).with_name("tlc_demo.json")
 LEAVE_TYPE_NAMES = {"annual": "Phép năm", "sick": "Nghỉ ốm"}
+# TLC levels that work on other people's records: HRMS must not restrict them to their own employee record.
+COMPANY_WIDE_LEVELS = {"director", "cfo", "hr_director", "hr_officer", "period_controller", "payroll_officer"}
 
 
 def load():
@@ -41,16 +43,20 @@ def setup_company(data):
     if frappe.db.exists("Company", COMPANY):
         return
     from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+    from erpnextvn.accounting.chart_of_accounts import ensure_patched
+
+    # erpnextvn registers its charts (TT99, TT200, TT133) only per web request; a CLI run must patch them in first.
+    ensure_patched()
 
     year = getdate(nowdate()).year
-    setup_complete({
+    result = setup_complete({
         "language": "English",
         "country": "Vietnam",
         "timezone": "Asia/Ho_Chi_Minh",
         "currency": "VND",
         "company_name": COMPANY,
         "company_abbr": ABBR,
-        "chart_of_accounts": "Standard",
+        "chart_of_accounts": "Vietnam - Hệ thống tài khoản TT200/2014",
         "fy_start_date": f"{year}-01-01",
         "fy_end_date": f"{year}-12-31",
         "full_name": "Quản trị TLC",
@@ -59,25 +65,35 @@ def setup_company(data):
     })
     frappe.db.commit()
     if not frappe.db.exists("Company", COMPANY):
-        frappe.throw(f"setup wizard finished without creating {COMPANY}")
+        # setup_complete rolls back and only logs on failure: surface the logged traceback.
+        last = frappe.get_all("Error Log", fields=["method", "error"], order_by="creation desc", limit=1)
+        detail = chr(10).join([last[0].method, last[0].error]) if last else "no error log"
+        frappe.throw(chr(10).join([f"setup wizard did not create {COMPANY}: {result}", detail]))
     frappe.db.set_single_value("System Settings", "language", "vi")
 
 
 def holidays(data):
-    """Holiday list of the year: Saturdays and Sundays off plus the demo public holidays; default list of the company."""
-    year = getdate(nowdate()).year
-    name = f"TLC {year}"
-    if not frappe.db.exists("Holiday List", name):
-        holiday_list = frappe.get_doc({"doctype": "Holiday List", "holiday_list_name": name,
-                                       "from_date": f"{year}-01-01", "to_date": f"{year}-12-31"})
-        for day in ("Saturday", "Sunday"):
-            holiday_list.weekly_off = day
-            holiday_list.get_weekly_off_dates()
-        for holiday in data.get("holidays", []):
-            if str(holiday["date"]).startswith(str(year)):
-                holiday_list.append("holidays", {"holiday_date": holiday["date"], "description": holiday["name"]})
-        holiday_list.insert()
-    frappe.db.set_value("Company", COMPANY, "default_holiday_list", name)
+    """Holiday lists of this year and next (Saturdays, Sundays and the demo public holidays), assigned to the company.
+
+    HRMS v16 reads holidays from Holiday List Assignment, not from the company default alone.
+    """
+    this_year = getdate(nowdate()).year
+    for year in (this_year, this_year + 1):
+        name = f"TLC {year}"
+        if not frappe.db.exists("Holiday List", name):
+            holiday_list = frappe.get_doc({"doctype": "Holiday List", "holiday_list_name": name,
+                                           "from_date": f"{year}-01-01", "to_date": f"{year}-12-31"})
+            for day in ("Saturday", "Sunday"):
+                holiday_list.weekly_off = day
+                holiday_list.get_weekly_off_dates()
+            for holiday in data.get("holidays", []):
+                if str(holiday["date"]).startswith(str(year)):
+                    holiday_list.append("holidays", {"holiday_date": holiday["date"], "description": holiday["name"]})
+            holiday_list.insert()
+        if not frappe.db.exists("Holiday List Assignment", {"holiday_list": name, "assigned_to": COMPANY, "docstatus": 1}):
+            frappe.get_doc({"doctype": "Holiday List Assignment", "applicable_for": "Company", "assigned_to": COMPANY,
+                            "holiday_list": name, "from_date": f"{year}-01-01"}).submit()
+    frappe.db.set_value("Company", COMPANY, "default_holiday_list", f"TLC {this_year}")
 
 
 def department_name(code, data):
@@ -135,10 +151,23 @@ def people(data):
             boss = row.get("manager")
             created[row["key"]] = employee_for(row, jobs, data, created.get(boss), by_key.get(boss))
             pending.remove(row)
+    unrestrict_company_wide(rows)
     for dept in data["departments"]:
         head = created.get(dept.get("manager"))
         if head:
             frappe.db.set_value("Department", department_name(dept["code"], data), "tlc_head", head)
+
+
+def is_company_wide(row):
+    return bool(COMPANY_WIDE_LEVELS.intersection(row.get("roles", [])))
+
+
+def unrestrict_company_wide(rows):
+    """Remove the own-record User Permission HRMS adds when an employee is linked to a user, for HR and the directors."""
+    for row in rows:
+        if is_company_wide(row):
+            for name in frappe.get_all("User Permission", filters={"user": email_of(row["key"]), "allow": "Employee"}, pluck="name"):
+                frappe.delete_doc("User Permission", name, ignore_permissions=True)
 
 
 def user_for(row, password):
@@ -171,6 +200,7 @@ def employee_for(row, jobs, data, manager_employee, manager_row):
         "date_of_birth": add_years(getdate("1990-01-01"), -(seq % 15)),
         "date_of_joining": add_days(getdate(nowdate()), -400 - seq % 900),
         "company": COMPANY, "status": "Active", "user_id": email_of(row["key"]),
+        "create_user_permission": 0 if is_company_wide(row) else 1,
         "department": department_name(row["department"], data), "designation": jobs[row["job"]],
         "reports_to": manager_employee, "ctc": row.get("wage", 0) * 12, "salary_currency": "VND",
         "holiday_list": frappe.db.get_value("Company", COMPANY, "default_holiday_list"),

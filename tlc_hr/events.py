@@ -7,7 +7,10 @@ from tlc_hr.setup.install import REJECTED
 
 
 def leave_application_validate(doc, method=None):
-    """A rejected leave request must say why, and nobody may decide on a leave request of their own."""
+    """Fill the approver from the employee, require a reason to reject, and refuse a decision on a request of one's own."""
+    if not doc.get("leave_approver"):
+        # HRMS fills it only in the browser form; requests made through the API or the portal need it too.
+        doc.leave_approver = frappe.db.get_value("Employee", doc.employee, "leave_approver")
     if doc.get("workflow_state") == REJECTED and not (doc.get("tlc_reject_reason") or "").strip():
         frappe.throw(_("Nhập lý do từ chối trước khi từ chối đơn."), title=_("Thiếu lý do từ chối"))
     if doc.has_value_changed("workflow_state") and doc.get("workflow_state") != "Nháp":
