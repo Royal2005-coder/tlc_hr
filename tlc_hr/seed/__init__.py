@@ -174,8 +174,8 @@ def user_for(row, password):
     email = email_of(row["key"])
     if frappe.db.exists("User", email):
         return
-    family, _, given = row["name"].rpartition(" ")
-    user = frappe.get_doc({"doctype": "User", "email": email, "first_name": given, "last_name": family,
+    # Vietnamese names keep their order (family, middle, given): the whole name goes in first_name.
+    user = frappe.get_doc({"doctype": "User", "email": email, "first_name": row["name"],
                            "language": "vi", "time_zone": "Asia/Ho_Chi_Minh", "send_welcome_email": 0,
                            "user_type": "System User"})
     user.flags.no_welcome_mail = True
@@ -192,10 +192,9 @@ def employee_for(row, jobs, data, manager_employee, manager_row):
     existing = frappe.db.get_value("Employee", {"user_id": email_of(row["key"])})
     if existing:
         return existing
-    family, _, given = row["name"].rpartition(" ")
     seq = sum(ord(c) for c in row["key"])
     employee = frappe.get_doc({
-        "doctype": "Employee", "first_name": given, "last_name": family,
+        "doctype": "Employee", "first_name": row["name"],
         "gender": "Female" if " Thị " in row["name"] else "Male",
         "date_of_birth": add_years(getdate("1990-01-01"), -(seq % 15)),
         "date_of_joining": add_days(getdate(nowdate()), -400 - seq % 900),

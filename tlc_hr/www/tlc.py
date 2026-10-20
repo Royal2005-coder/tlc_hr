@@ -8,16 +8,17 @@ from tlc_hr.setup.install import TO_HR, TO_MANAGER
 
 no_cache = 1
 
+HR = ("TLC HR Officer", "TLC HR Lead")
 TILES = [
-    # (role needed or None for everyone, title, link)
-    (None, "Xin nghỉ phép", "/app/leave-application/new"),
-    (None, "Đơn của tôi", "/app/leave-application?employee={employee}"),
-    (None, "Hồ sơ của tôi", "/app/employee/{employee}"),
-    ("TLC Line Manager", "Nhân viên của tôi", "/app/employee?reports_to={employee}"),
-    ("TLC HR Officer", "Danh sách nhân sự", "/app/employee"),
-    ("TLC HR Lead", "Báo cáo số dư phép", "/app/query-report/Employee Leave Balance"),
-    ("TLC Payroll", "Thiết lập lương Việt Nam", "/app/vn-payroll-settings"),
-    ("TLC Director", "Tổng quan nhân sự", "/app/hr"),
+    # (roles that see the tile, empty for every employee; title; link)
+    ((), "Xin nghỉ phép", "/app/leave-application/new"),
+    ((), "Đơn của tôi", "/app/leave-application?employee={employee}"),
+    ((), "Hồ sơ của tôi", "/app/employee/{employee}"),
+    (("TLC Line Manager", "TLC Director"), "Nhân viên của tôi", "/app/employee?reports_to={employee}"),
+    (HR, "Danh sách nhân sự", "/app/employee"),
+    (HR + ("TLC Director",), "Báo cáo số dư phép", "/app/query-report/Employee Leave Balance"),
+    (("TLC Payroll", "TLC HR Lead"), "Thiết lập lương Việt Nam", "/app/vn-payroll-settings"),
+    (("TLC Director",), "Tổng quan nhân sự", "/app/hr"),
 ]
 
 
@@ -34,7 +35,7 @@ def get_context(context):
     context.person = employee
     context.tiles = [
         {"title": title, "link": link.format(employee=emp_name)}
-        for role, title, link in TILES if (role is None and employee) or (role and role in roles)
+        for needed, title, link in TILES if (not needed and employee) or roles.intersection(needed)
     ]
     context.inbox = approvals_inbox(roles)
     context.my_requests = frappe.get_all(
