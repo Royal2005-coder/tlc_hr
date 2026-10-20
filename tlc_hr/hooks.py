@@ -3,7 +3,7 @@
 app_name = "tlc_hr"
 app_title = "TLC HR"
 app_publisher = "TLC HRM team"
-app_description = "TLC HRM on Frappe HR: roles, workflows, Vietnamese rules, /tlc portal, demo seed"
+app_description = "TLC HRM on Frappe HR: roles, workflows, Vietnamese rules, role workspaces, demo seed"
 app_email = "boygia757@gmail.com"
 app_license = "GPL-3.0"
 
@@ -17,5 +17,5 @@ doc_events = {
     "Leave Application": {"validate": "tlc_hr.events.leave_application_validate"},
 }
 
-# Users land on the TLC home after login.
-role_home_page = {"Employee": "tlc"}
+# TLC additions to the standard Leave Application form (decision support for the approver, reason to reject).
+doctype_js = {"Leave Application": "public/js/leave_application.js"}

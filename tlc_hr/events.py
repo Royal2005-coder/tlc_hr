@@ -9,7 +9,7 @@ from tlc_hr.setup.install import REJECTED
 def leave_application_validate(doc, method=None):
     """Fill the approver from the employee, require a reason to reject, and refuse a decision on a request of one's own."""
     if not doc.get("leave_approver"):
-        # HRMS fills it only in the browser form; requests made through the API or the portal need it too.
+        # HRMS fills it in its forms; requests created through the API need it too.
         doc.leave_approver = frappe.db.get_value("Employee", doc.employee, "leave_approver")
     before = doc.get_doc_before_save()
     if doc.get("workflow_state") == REJECTED and before and before.get("workflow_state") != REJECTED:

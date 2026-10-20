@@ -13,7 +13,7 @@ from pathlib import Path
 import frappe
 from frappe.utils import add_days, add_years, getdate, nowdate
 
-from tlc_hr.setup.roles import FRAPPE_ROLES_OF, ensure_roles
+from tlc_hr.setup.roles import FRAPPE_ROLES_OF, SELF_SERVICE, ensure_roles
 
 COMPANY = "TLC Demo"
 ABBR = "TLC"
@@ -33,7 +33,7 @@ def load():
 def run():
     """Create the whole demo step by step; each finished step is committed, so a rerun continues where a failure stopped."""
     data = load()
-    for step in (setup_company, holidays, departments, designations, people, leave):
+    for step in (setup_company, holidays, departments, designations, people, leave, demo_mail):
         step(data)
         frappe.db.commit()
         print("seed:", step.__name__, "done")
@@ -161,11 +161,32 @@ def people(data):
             created[row["key"]] = employee_for(row, jobs, data, created.get(boss), by_key.get(boss))
             pending.remove(row)
     unrestrict_company_wide(rows)
+    route_users(rows)
     fix_user_names(rows)
     for dept in data["departments"]:
         head = created.get(dept.get("manager"))
         if head:
             frappe.db.set_value("Department", department_name(dept["code"], data), "tlc_head", head)
+
+
+# Where a person lands after login: the Frappe HR app for employees, the desk workspace of their role otherwise.
+WORKSPACE_OF = [("TLC Director", "TLC Điều hành"), ("TLC HR Lead", "TLC Nhân sự"), ("TLC HR Officer", "TLC Nhân sự"),
+                ("TLC Line Manager", "TLC Quản lý")]
+
+
+def route_users(rows):
+    for row in rows:
+        user = email_of(row["key"])
+        roles = set(frappe.get_roles(user))
+        workspace = next((w for role, w in WORKSPACE_OF if role in roles), None)
+        if workspace and not frappe.db.exists("Workspace", workspace):
+            workspace = None
+        frappe.db.set_value("User", user, {"default_workspace": workspace, "default_app": "" if workspace else "hrms"})
+        doc = frappe.get_doc("User", user)
+        if workspace and SELF_SERVICE in roles:
+            doc.remove_roles(SELF_SERVICE)
+        elif not workspace and SELF_SERVICE not in roles:
+            doc.add_roles(SELF_SERVICE)
 
 
 def is_company_wide(row):
@@ -253,6 +274,21 @@ def leave(data):
             frappe.get_doc({"doctype": "Leave Allocation", "employee": employee, "leave_type": leave_type,
                             "from_date": f"{year}-01-01", "to_date": f"{year}-12-31",
                             "new_leaves_allocated": allocation["days"]}).submit()
+
+
+def demo_mail(data):
+    """Default outgoing Email Account to the mail catcher of the environment (site config tlc_demo_smtp), so notifications work."""
+    smtp = frappe.conf.get("tlc_demo_smtp")
+    if not smtp:
+        return
+    name = "TLC Demo Mail"
+    values = {"email_account_name": name, "email_id": "hrm@demo.example", "enable_outgoing": 1, "default_outgoing": 1,
+              "smtp_server": smtp["server"], "smtp_port": smtp.get("port", 1025), "use_tls": 0, "use_ssl_for_outgoing": 0,
+              "no_smtp_authentication": 1, "enable_incoming": 0, "awaiting_password": 0, "always_use_account_email_id_as_sender": 1}
+    account = frappe.get_doc("Email Account", name) if frappe.db.exists("Email Account", name) else frappe.new_doc("Email Account")
+    account.update(values)
+    account.flags.ignore_validate = True
+    account.save(ignore_permissions=True) if not account.is_new() else account.insert(ignore_permissions=True)
 
 
 def reset_leave_requests():

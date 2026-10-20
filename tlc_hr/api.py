@@ -76,17 +76,22 @@ def withdraw(name):
     return {"name": name, "deleted": True}
 
 
-@frappe.whitelist(methods=["POST"])
-def preview_leave(leave_type, from_date, to_date, half_day=0):
-    """Working days of a planned request and the balance before and after it, for the request dialog."""
-    from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on, get_number_of_leave_days
+@frappe.whitelist()
+def leave_context(name):
+    """What helps the approver of a leave request decide: balance after approval, who else in the department is away then."""
+    from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
 
-    employee = my_employee()
-    if getdate(to_date) < getdate(from_date):
-        frappe.throw(_("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu."))
-    days = flt(get_number_of_leave_days(employee, leave_type, from_date, to_date, cint(half_day), from_date if cint(half_day) else None))
-    balance = flt(get_leave_balance_on(employee, leave_type, from_date, consider_all_leaves_in_the_allocation_period=True))
-    pending = sum(flt(d) for d in frappe.get_all("Leave Application", filters={"employee": employee, "leave_type": leave_type,
-                                                                              "workflow_state": ["in", (TO_MANAGER, TO_HR)], "docstatus": 0},
-                                                 pluck="total_leave_days"))
-    return {"days": days, "balance": balance - pending, "after": balance - pending - days}
+    doc = frappe.get_doc("Leave Application", name)
+    doc.check_permission("read")
+    balance = flt(get_leave_balance_on(doc.employee, doc.leave_type, doc.from_date, consider_all_leaves_in_the_allocation_period=True))
+    colleagues = frappe.get_all("Employee", filters={"department": doc.department, "status": "Active"}, pluck="name")
+    overlap = frappe.get_all(
+        "Leave Application",
+        filters={"employee": ["in", colleagues or [""]], "name": ["!=", doc.name], "from_date": ["<=", doc.to_date],
+                 "to_date": [">=", doc.from_date], "workflow_state": ["in", ("Đã duyệt", TO_MANAGER, TO_HR)]},
+        fields=["employee_name", "workflow_state"])
+    return {
+        "balance_now": balance, "balance_after": balance - flt(doc.total_leave_days), "team_size": len(colleagues),
+        "site": (doc.department or "").rsplit(" - ", 1)[0],
+        "overlap": [{"name": o.employee_name, "pending": o.workflow_state != "Đã duyệt"} for o in overlap],
+    }

@@ -28,19 +28,71 @@ CUSTOM_FIELDS = {
     ],
     "Leave Application": [
         {"fieldname": "tlc_reject_reason", "label": "Lý do từ chối", "fieldtype": "Small Text", "insert_after": "status",
-         "depends_on": "eval:doc.workflow_state", "description": "Bắt buộc khi từ chối đơn."},
+         "depends_on": "eval:doc.workflow_state", "description": "Bắt buộc khi từ chối đơn.", "permlevel": 1},
         {"fieldname": "tlc_rejected_stage", "label": "Bị từ chối ở bước", "fieldtype": "Data", "insert_after": "tlc_reject_reason",
-         "read_only": 1, "depends_on": "eval:doc.tlc_rejected_stage"},
+         "read_only": 1, "hidden": 1},
     ],
 }
 
 
+# Who reads and who writes the reason to reject (permlevel 1 of Leave Application): the employee reads it on their request.
+REASON_PERMS = {"Employee": (1, 0), "Leave Approver": (1, 1), "TLC HR Lead": (1, 1), "TLC HR Officer": (1, 1), "TLC Director": (1, 1),
+                "HR Manager": (1, 1), "HR User": (1, 1)}
+
+
+def ensure_reason_permissions():
+    from frappe.permissions import add_permission, update_permission_property
+
+    for role, (read, write) in REASON_PERMS.items():
+        if not frappe.db.exists("Custom DocPerm", {"parent": "Leave Application", "role": role, "permlevel": 1}):
+            add_permission("Leave Application", role, 1)
+        update_permission_property("Leave Application", role, 1, "read", read)
+        update_permission_property("Leave Application", role, 1, "write", write)
+
+
+# HRMS e-mails the approver when a request arrives and the employee when it is decided; without templates it stops the user
+# with a message on every save. The templates render with the fields of the Leave Application.
+EMAIL_TEMPLATES = {
+    "leave_approval_notification_template": (
+        "TLC Đơn nghỉ cần duyệt",
+        "Đơn nghỉ phép {{ name }} của {{ employee_name }} cần bạn duyệt",
+        "<p>{{ employee_name }} xin {{ leave_type }} từ {{ frappe.format(from_date, 'Date') }} đến {{ frappe.format(to_date, 'Date') }}"
+        " ({{ total_leave_days }} ngày).</p><p>Lý do: {{ description or '' }}</p>"
+        "<p>Trạng thái: <b>{{ workflow_state }}</b>. Mở đơn trên TLC HRM để duyệt hoặc từ chối.</p>",
+    ),
+    "leave_status_notification_template": (
+        "TLC Kết quả đơn nghỉ",
+        "Đơn nghỉ phép {{ name }}: {{ workflow_state }}",
+        "<p>Đơn {{ leave_type }} từ {{ frappe.format(from_date, 'Date') }} đến {{ frappe.format(to_date, 'Date') }}"
+        " ({{ total_leave_days }} ngày) của bạn: <b>{{ workflow_state }}</b>.</p>"
+        "{% if tlc_reject_reason %}<p>Lý do từ chối: {{ tlc_reject_reason }}</p>{% endif %}",
+    ),
+}
+
+
+def ensure_email_templates():
+    for field, (name, subject, body) in EMAIL_TEMPLATES.items():
+        doc = frappe.get_doc("Email Template", name) if frappe.db.exists("Email Template", name) else frappe.new_doc("Email Template")
+        doc.update({"name": name, "subject": subject, "use_html": 1, "response_html": body, "response": body})
+        if doc.is_new():
+            doc.insert(ignore_permissions=True)
+        else:
+            doc.save(ignore_permissions=True)
+        if frappe.db.get_single_value("HR Settings", field) != name:
+            frappe.db.set_single_value("HR Settings", field, name)
+
+
 def after_migrate():
     ensure_roles()
+    ensure_email_templates()
     create_custom_fields(CUSTOM_FIELDS, update=True)
+    ensure_reason_permissions()
     ensure_workflow_states()
     ensure_leave_workflow()
     apply_settings()
+    from tlc_hr.setup.workspaces import ensure_all
+
+    ensure_all()
     frappe.db.commit()
 
 
