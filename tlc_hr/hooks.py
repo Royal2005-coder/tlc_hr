@@ -1,4 +1,4 @@
-"""Frappe hooks of tlc_hr. TLC behaviour is added here; the core apps are not modified."""
+"""Frappe hooks of tlc_hr. TLC behaviour is added here; frappe, erpnext, hrms and erpnextvn are not modified."""
 
 app_name = "tlc_hr"
 app_title = "TLC HR"
@@ -9,6 +9,13 @@ app_license = "GPL-3.0"
 
 required_apps = ["frappe", "erpnext", "hrms", "erpnextvn"]
 
-# The 2026 Vietnamese payroll parameters replace the older defaults of erpnextvn on install and after every migration.
-after_install = "tlc_hr.vn.statutory.apply_settings"
-after_migrate = ["tlc_hr.vn.statutory.apply_settings"]
+# Roles, custom fields, approval workflows and the 2026 payroll values, on install and after every migration.
+after_install = "tlc_hr.setup.install.after_migrate"
+after_migrate = ["tlc_hr.setup.install.after_migrate"]
+
+doc_events = {
+    "Leave Application": {"validate": "tlc_hr.events.leave_application_validate"},
+}
+
+# Users land on the TLC home after login.
+role_home_page = {"Employee": "tlc"}

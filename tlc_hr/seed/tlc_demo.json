@@ -1,0 +1,5304 @@
+{
+ "company": {
+  "name": "TLC Demo",
+  "legal_name": "Công ty TLC (dữ liệu mẫu hư cấu)",
+  "sites": [
+   "Hội sở",
+   "Nhà máy 1",
+   "Nhà máy 2",
+   "Nhà máy 3"
+  ]
+ },
+ "calendars": [
+  {
+   "code": "office",
+   "name": "Giờ hành chính",
+   "days": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "sessions": [
+    [
+     "08:00",
+     "12:00"
+    ],
+    [
+     "13:00",
+     "17:00"
+    ]
+   ]
+  },
+  {
+   "code": "warehouse_night",
+   "name": "Nhà máy ca đêm 22:00-06:00",
+   "days": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "sessions": [
+    [
+     "22:00",
+     "06:00"
+    ]
+   ]
+  },
+  {
+   "code": "warehouse_peak",
+   "name": "Nhà máy mùa cao điểm",
+   "days": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "sessions": [
+    [
+     "07:00",
+     "11:30"
+    ],
+    [
+     "13:00",
+     "19:00"
+    ]
+   ]
+  }
+ ],
+ "holidays": [
+  {
+   "date": "2026-09-02",
+   "name": "Quốc khánh (dữ liệu mẫu)"
+  }
+ ],
+ "departments": [
+  {
+   "code": "exec",
+   "name": "Ban điều hành",
+   "manager": "thanh"
+  },
+  {
+   "code": "hr",
+   "name": "Nhân sự và Hành chính",
+   "manager": "hoa"
+  },
+  {
+   "code": "fin",
+   "name": "Tài chính Kế toán",
+   "manager": "dat"
+  },
+  {
+   "code": "sales",
+   "name": "Kinh doanh",
+   "manager": "quang"
+  },
+  {
+   "code": "ops",
+   "name": "Nhà máy 1",
+   "manager": "hung"
+  },
+  {
+   "code": "fac2",
+   "name": "Nhà máy 2",
+   "manager": "nm2"
+  },
+  {
+   "code": "fac3",
+   "name": "Nhà máy 3",
+   "manager": "nm3"
+  },
+  {
+   "code": "it",
+   "name": "Công nghệ",
+   "manager": "nam"
+  },
+  {
+   "code": "cs",
+   "name": "Chăm sóc khách hàng",
+   "manager": "mai"
+  }
+ ],
+ "jobs": [
+  {
+   "code": "ceo",
+   "name": "Tổng giám đốc"
+  },
+  {
+   "code": "cfo",
+   "name": "Giám đốc tài chính"
+  },
+  {
+   "code": "hr_director",
+   "name": "Giám đốc nhân sự"
+  },
+  {
+   "code": "hr_officer",
+   "name": "Chuyên viên nhân sự"
+  },
+  {
+   "code": "payroll_officer",
+   "name": "Chuyên viên lương"
+  },
+  {
+   "code": "facilities",
+   "name": "Hành chính tổng hợp"
+  },
+  {
+   "code": "legal_counsel",
+   "name": "Chuyên viên pháp chế"
+  },
+  {
+   "code": "hr_intern",
+   "name": "Thực tập sinh nhân sự"
+  },
+  {
+   "code": "fin_manager",
+   "name": "Trưởng phòng tài chính"
+  },
+  {
+   "code": "accountant",
+   "name": "Kế toán"
+  },
+  {
+   "code": "sales_head",
+   "name": "Trưởng phòng kinh doanh"
+  },
+  {
+   "code": "sales_exec",
+   "name": "Nhân viên kinh doanh"
+  },
+  {
+   "code": "ops_manager",
+   "name": "Trưởng bộ phận vận hành"
+  },
+  {
+   "code": "warehouse_lead",
+   "name": "Tổ trưởng kho"
+  },
+  {
+   "code": "warehouse_staff",
+   "name": "Nhân viên kho"
+  },
+  {
+   "code": "it_lead",
+   "name": "Trưởng bộ phận công nghệ"
+  },
+  {
+   "code": "business_analyst",
+   "name": "Chuyên viên phân tích nghiệp vụ"
+  },
+  {
+   "code": "security_officer",
+   "name": "Cán bộ an toàn thông tin"
+  },
+  {
+   "code": "developer",
+   "name": "Lập trình viên"
+  },
+  {
+   "code": "cs_lead",
+   "name": "Trưởng chăm sóc khách hàng"
+  },
+  {
+   "code": "cs_agent",
+   "name": "Nhân viên chăm sóc khách hàng"
+  }
+ ],
+ "people": [
+  {
+   "key": "thanh",
+   "name": "Nguyễn Văn Thành",
+   "department": "exec",
+   "job": "ceo",
+   "grade": "g4",
+   "roles": [
+    "director"
+   ],
+   "wage": 120000000
+  },
+  {
+   "key": "tuan",
+   "name": "Võ Minh Tuấn",
+   "department": "exec",
+   "job": "cfo",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "cfo"
+   ],
+   "wage": 90000000
+  },
+  {
+   "key": "hoa",
+   "name": "Lê Thị Hòa",
+   "department": "hr",
+   "job": "hr_director",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "hr_director",
+    "business_owner",
+    "role_admin"
+   ],
+   "wage": 60000000
+  },
+  {
+   "key": "lan",
+   "name": "Hoàng Thị Lan",
+   "department": "hr",
+   "job": "hr_officer",
+   "grade": "g3",
+   "manager": "hoa",
+   "roles": [
+    "hr_officer",
+    "period_controller",
+    "business_acceptor"
+   ],
+   "wage": 28000000
+  },
+  {
+   "key": "phuong",
+   "name": "Đỗ Thu Phương",
+   "department": "hr",
+   "job": "payroll_officer",
+   "grade": "g3",
+   "manager": "hoa",
+   "roles": [
+    "payroll_officer"
+   ],
+   "wage": 26000000
+  },
+  {
+   "key": "luat",
+   "name": "Trần Thị Pháp",
+   "department": "hr",
+   "job": "legal_counsel",
+   "grade": "g3",
+   "manager": "hoa",
+   "roles": [
+    "legal_reviewer"
+   ],
+   "wage": 30000000
+  },
+  {
+   "key": "ninh",
+   "name": "Trần Bảo Ninh",
+   "department": "hr",
+   "job": "hr_intern",
+   "grade": "g1",
+   "manager": "hoa",
+   "wage": 7000000
+  },
+  {
+   "key": "oanh",
+   "name": "Lê Thị Oanh",
+   "department": "hr",
+   "job": "facilities",
+   "grade": "g2",
+   "manager": "hoa",
+   "roles": [
+    "custodian"
+   ],
+   "wage": 16000000
+  },
+  {
+   "key": "dat",
+   "name": "Phạm Quốc Đạt",
+   "department": "fin",
+   "job": "fin_manager",
+   "grade": "g4",
+   "manager": "tuan",
+   "roles": [
+    "manager"
+   ],
+   "wage": 55000000
+  },
+  {
+   "key": "chi",
+   "name": "Lê Kim Chi",
+   "department": "fin",
+   "job": "accountant",
+   "grade": "g3",
+   "manager": "dat",
+   "roles": [
+    "accountant"
+   ],
+   "wage": 24000000,
+   "dependents": 1
+  },
+  {
+   "key": "quang",
+   "name": "Trần Minh Quang",
+   "department": "sales",
+   "job": "sales_head",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "manager"
+   ],
+   "wage": 52000000,
+   "dependents": 2
+  },
+  {
+   "key": "an",
+   "name": "Nguyễn Hoài An",
+   "department": "sales",
+   "job": "sales_exec",
+   "grade": "g2",
+   "manager": "quang",
+   "wage": 22000000
+  },
+  {
+   "key": "dung",
+   "name": "Phạm Tiến Dũng",
+   "department": "sales",
+   "job": "sales_exec",
+   "grade": "g2",
+   "manager": "quang",
+   "wage": 20000000,
+   "dependents": 2
+  },
+  {
+   "key": "mai",
+   "name": "Bùi Thanh Mai",
+   "department": "cs",
+   "job": "cs_lead",
+   "grade": "g3",
+   "manager": "thanh",
+   "roles": [
+    "manager"
+   ],
+   "wage": 30000000
+  },
+  {
+   "key": "hung",
+   "name": "Đặng Văn Hùng",
+   "department": "ops",
+   "job": "ops_manager",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "manager"
+   ],
+   "wage": 48000000,
+   "dependents": 1,
+   "workforce": "factory"
+  },
+  {
+   "key": "nm2",
+   "name": "Lương Quốc Hải",
+   "department": "fac2",
+   "job": "ops_manager",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "manager"
+   ],
+   "wage": 48000000,
+   "dependents": 1,
+   "workforce": "factory"
+  },
+  {
+   "key": "nm3",
+   "name": "Đinh Công Sơn",
+   "department": "fac3",
+   "job": "ops_manager",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "manager"
+   ],
+   "wage": 48000000,
+   "dependents": 1,
+   "workforce": "factory"
+  },
+  {
+   "key": "tai",
+   "name": "Võ Đức Tài",
+   "department": "ops",
+   "job": "warehouse_lead",
+   "grade": "g3",
+   "manager": "hung",
+   "roles": [
+    "manager"
+   ],
+   "calendar": "warehouse_night",
+   "wage": 25000000,
+   "workforce": "factory"
+  },
+  {
+   "key": "binh",
+   "name": "Trần Văn Bình",
+   "department": "ops",
+   "job": "warehouse_staff",
+   "grade": "g2",
+   "manager": "hung",
+   "calendar": "warehouse_night",
+   "wage": 15000000,
+   "workforce": "factory"
+  },
+  {
+   "key": "nam",
+   "name": "Ngô Hoài Nam",
+   "department": "it",
+   "job": "it_lead",
+   "grade": "g4",
+   "manager": "thanh",
+   "roles": [
+    "manager",
+    "business_developer"
+   ],
+   "wage": 58000000
+  },
+  {
+   "key": "khanh",
+   "name": "Ngô Gia Khánh",
+   "department": "it",
+   "job": "security_officer",
+   "grade": "g3",
+   "manager": "nam",
+   "roles": [
+    "security_officer"
+   ],
+   "wage": 32000000
+  },
+  {
+   "key": "vy",
+   "name": "Phan Thảo Vy",
+   "department": "it",
+   "job": "business_analyst",
+   "grade": "g3",
+   "manager": "nam",
+   "roles": [
+    "business_analyst"
+   ],
+   "wage": 30000000
+  },
+  {
+   "key": "ha",
+   "name": "Lý Thu Hà",
+   "department": "it",
+   "job": "developer",
+   "grade": "g2",
+   "manager": "nam",
+   "wage": 27000000
+  }
+ ],
+ "bulk": [
+  {
+   "department": "fac2",
+   "job": "warehouse_staff",
+   "count": 6,
+   "manager": "nm2",
+   "calendar": "warehouse_night",
+   "prefix": "f2w",
+   "workforce": "factory",
+   "wage": [
+    11000000,
+    15000000
+   ]
+  },
+  {
+   "department": "fac3",
+   "job": "warehouse_staff",
+   "count": 6,
+   "manager": "nm3",
+   "calendar": "warehouse_peak",
+   "prefix": "f3w",
+   "workforce": "factory",
+   "wage": [
+    11000000,
+    14000000
+   ]
+  },
+  {
+   "department": "sales",
+   "job": "sales_exec",
+   "count": 5,
+   "manager": "quang",
+   "prefix": "sales",
+   "wage": [
+    14000000,
+    24000000
+   ]
+  },
+  {
+   "department": "ops",
+   "job": "warehouse_staff",
+   "count": 8,
+   "manager": "hung",
+   "calendar": "warehouse_night",
+   "prefix": "nightw",
+   "workforce": "factory",
+   "wage": [
+    11000000,
+    15000000
+   ]
+  },
+  {
+   "department": "ops",
+   "job": "warehouse_staff",
+   "count": 4,
+   "manager": "tai",
+   "calendar": "warehouse_peak",
+   "prefix": "dayw",
+   "workforce": "factory",
+   "wage": [
+    11000000,
+    14000000
+   ]
+  },
+  {
+   "department": "fin",
+   "job": "accountant",
+   "count": 2,
+   "manager": "dat",
+   "prefix": "acct",
+   "wage": [
+    16000000,
+    22000000
+   ]
+  },
+  {
+   "department": "it",
+   "job": "developer",
+   "count": 2,
+   "manager": "nam",
+   "prefix": "dev",
+   "wage": [
+    22000000,
+    34000000
+   ]
+  },
+  {
+   "department": "cs",
+   "job": "cs_agent",
+   "count": 4,
+   "manager": "mai",
+   "prefix": "support",
+   "wage": [
+    11000000,
+    16000000
+   ]
+  }
+ ],
+ "assignments": [
+  {
+   "employee": "binh",
+   "manager": "tai",
+   "from": "today-30d",
+   "to": "today+365d"
+  }
+ ],
+ "delegations": [
+  {
+   "principal": "dat",
+   "delegate": "tuan",
+   "from": "today-1d",
+   "to": "today+60d",
+   "reason": "Dat nghỉ phép dài ngày, CFO duyệt thay"
+  }
+ ],
+ "leave_types": [
+  {
+   "code": "annual",
+   "name": "Phép năm",
+   "validation": "hr",
+   "allocation": true
+  },
+  {
+   "code": "sick",
+   "name": "Nghỉ ốm",
+   "validation": "hr",
+   "allocation": false
+  }
+ ],
+ "allocations": [
+  {
+   "leave_type": "annual",
+   "days": 12,
+   "who": "all"
+  }
+ ],
+ "resources": [
+  {
+   "code": "room_a",
+   "name": "Phòng họp Sao Hôm",
+   "kind": "room"
+  },
+  {
+   "code": "room_b",
+   "name": "Phòng họp Sao Mai",
+   "kind": "room"
+  },
+  {
+   "code": "laptop_01",
+   "name": "Laptop Dell Latitude 5440 #A01",
+   "kind": "asset"
+  },
+  {
+   "code": "laptop_02",
+   "name": "Laptop Dell Latitude 5440 #A02",
+   "kind": "asset"
+  },
+  {
+   "code": "book_ddia",
+   "name": "Designing Data-Intensive Applications (1 bản)",
+   "kind": "book"
+  },
+  {
+   "code": "meal_lunch",
+   "name": "Suất ăn trưa văn phòng",
+   "kind": "meal",
+   "capacity": 40,
+   "cutoff_hours": 16
+  },
+  {
+   "code": "meal_partner",
+   "name": "Suất ăn tiệc đối tác",
+   "kind": "meal",
+   "capacity": 1,
+   "cutoff_hours": 24
+  }
+ ],
+ "periods": [
+  {
+   "code": "p1",
+   "name": "Kỳ công tuần T-4",
+   "from": "monday-4w",
+   "to": "monday-3w-1d"
+  },
+  {
+   "code": "p2",
+   "name": "Kỳ công tuần T-3",
+   "from": "monday-3w",
+   "to": "monday-2w-1d"
+  },
+  {
+   "code": "p3",
+   "name": "Kỳ công tuần T-2",
+   "from": "monday-2w",
+   "to": "monday-1w-1d"
+  }
+ ],
+ "baselines": [
+  {
+   "policy": "hr.travel_approval"
+  },
+  {
+   "policy": "agent.guard"
+  },
+  {
+   "policy": "hrm.approval_route"
+  },
+  {
+   "policy": "hrm.overtime_limit"
+  }
+ ],
+ "statutory": [
+  {
+   "name": "Bộ tham số 2026 Q3 (demo)",
+   "from": "2026-07-01",
+   "to": "2026-09-30",
+   "note": "Demo only. Same sourced 2026 catalog; not a legal approval or filing."
+  },
+  {
+   "name": "Bộ tham số 2026 Q4 (demo)",
+   "from": "2026-10-01",
+   "to": "2026-12-31",
+   "note": "Demo only. Same sourced 2026 catalog; not a legal approval or filing."
+  }
+ ],
+ "attendance": [
+  {
+   "who": [
+    "an",
+    "dung",
+    "ha",
+    "lan"
+   ],
+   "days": 10,
+   "sessions": [
+    [
+     "08:02",
+     "12:01"
+    ],
+    [
+     "13:00",
+     "17:35"
+    ]
+   ]
+  },
+  {
+   "who": [
+    "binh",
+    "nightw01",
+    "nightw02",
+    "nightw03"
+   ],
+   "days": 10,
+   "sessions": [
+    [
+     "21:58",
+     "06:03"
+    ]
+   ]
+  }
+ ],
+ "lifecycle": [
+  {
+   "kind": "onboarding",
+   "name": "Onboarding: Hoàng Gia Huy (nhân viên kho)",
+   "department": "ops",
+   "job_title": "Nhân viên kho",
+   "responsible": "lan",
+   "start": "today",
+   "items": [
+    "Laptop, tài khoản và thẻ ra vào",
+    "Hợp đồng lao động và đăng ký bảo hiểm xã hội",
+    "Huấn luyện an toàn kho"
+   ],
+   "done": 2
+  },
+  {
+   "kind": "offboarding",
+   "name": "Nghỉ việc: nhân viên kho ca ngày (đề xuất)",
+   "person": "dayw04",
+   "responsible": "lan",
+   "start": "today",
+   "reason": "resign"
+  }
+ ],
+ "scenarios": [
+  {
+   "id": "leave_happy_path",
+   "title": "Phép năm, người duyệt đúng phạm vi, post một lần, dữ liệu riêng tư",
+   "covers": [
+    "§10.1",
+    "CP"
+   ],
+   "steps": [
+    {
+     "id": "request",
+     "actor": "an",
+     "op": "leave.request",
+     "args": {
+      "type": "annual",
+      "from": "workday+10",
+      "to": "workday+11",
+      "name": "Nghỉ phép năm"
+     },
+     "ref": "lv"
+    },
+    {
+     "id": "create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "leave",
+      "subject": "an",
+      "values": {
+       "name": "Nghỉ phép năm",
+       "leave": "$lv"
+      }
+     },
+     "ref": "c"
+    },
+    {
+     "id": "submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$c",
+      "key": "post-leave"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "native_leave": 1,
+       "leave": 2
+      }
+     }
+    },
+    {
+     "id": "replay",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$c",
+      "key": "post-leave"
+     },
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "native_leave": 1,
+       "leave": 2
+      }
+     }
+    },
+    {
+     "id": "post_twice",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$c",
+      "key": "post-leave-again"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "approved"
+     }
+    },
+    {
+     "id": "others_cannot_read",
+     "actor": "binh",
+     "op": "core.get",
+     "args": {
+      "case": "$c"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "overspend",
+     "actor": "an",
+     "op": "leave.request",
+     "args": {
+      "type": "annual",
+      "from": "workday+30",
+      "to": "workday+49",
+      "name": "Vượt số dư"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "return_reject_and_stale_task",
+   "title": "Trả về và từ chối cần lý do, revision mới, task cũ không duyệt revision mới",
+   "covers": [
+    "§10.2",
+    "CHG"
+   ],
+   "steps": [
+    {
+     "id": "create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "dung",
+      "values": {
+       "name": "Đề nghị tạm ứng 5 triệu",
+       "advance_amount": 5000000
+      }
+     },
+     "ref": "c"
+    },
+    {
+     "id": "submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "before",
+     "actor": "dung",
+     "op": "core.get",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "old"
+    },
+    {
+     "id": "return_without_reason",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "return",
+      "reason": ""
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "reason"
+     }
+    },
+    {
+     "id": "return",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "return",
+      "reason": "Thiếu báo giá"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "returned"
+     }
+    },
+    {
+     "id": "revise",
+     "actor": "dung",
+     "op": "core.revise",
+     "args": {
+      "case": "$c",
+      "values": {
+       "note": "Đã bổ sung báo giá"
+      }
+     },
+     "ref": "c",
+     "expect": {
+      "state": "draft"
+     }
+    },
+    {
+     "id": "resubmit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "stale_task",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve",
+      "task": "$old.tasks.0.id"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "approve_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "second",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "dung",
+      "values": {
+       "name": "Đề nghị tạm ứng bị từ chối",
+       "advance_amount": 1000000
+      }
+     },
+     "ref": "c2"
+    },
+    {
+     "id": "second_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$c2"
+     },
+     "ref": "c2"
+    },
+    {
+     "id": "reject",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c2",
+      "decision": "reject",
+      "reason": "Chưa có kế hoạch công tác"
+     },
+     "ref": "c2",
+     "expect": {
+      "state": "rejected"
+     }
+    }
+   ]
+  },
+  {
+   "id": "coleader_any_all_and_delegation",
+   "title": "Co-leader all và any, ủy quyền có thời hạn",
+   "covers": [
+    "§10.2",
+    "ORG",
+    "CHG"
+   ],
+   "steps": [
+    {
+     "id": "all_create",
+     "actor": "binh",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "binh",
+      "values": {
+       "name": "Tạm ứng ca đêm",
+       "advance_amount": 3000000
+      }
+     },
+     "ref": "call"
+    },
+    {
+     "id": "all_submit",
+     "actor": "binh",
+     "op": "core.submit",
+     "args": {
+      "case": "$call"
+     },
+     "ref": "call",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "all_first",
+     "actor": "hung",
+     "op": "core.decide",
+     "args": {
+      "case": "$call",
+      "decision": "approve"
+     },
+     "ref": "call",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "all_second",
+     "actor": "tai",
+     "op": "core.decide",
+     "args": {
+      "case": "$call",
+      "decision": "approve"
+     },
+     "ref": "call",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "all_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$call",
+      "decision": "approve"
+     },
+     "ref": "call",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "any_create",
+     "actor": "lan",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "binh",
+      "values": {
+       "name": "Tạm ứng ca đêm (any)",
+       "advance_amount": 2000000
+      }
+     },
+     "ref": "cany"
+    },
+    {
+     "id": "any_configure",
+     "actor": "lan",
+     "op": "core.configure",
+     "args": {
+      "case": "$cany",
+      "values": {
+       "approval_mode": "any"
+      }
+     }
+    },
+    {
+     "id": "any_submit",
+     "actor": "lan",
+     "op": "core.submit",
+     "args": {
+      "case": "$cany"
+     },
+     "ref": "cany",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "any_one",
+     "actor": "hung",
+     "op": "core.decide",
+     "args": {
+      "case": "$cany",
+      "decision": "approve"
+     },
+     "ref": "cany",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "any_other_superseded",
+     "actor": "tai",
+     "op": "core.decide",
+     "args": {
+      "case": "$cany",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "any_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$cany",
+      "decision": "approve"
+     },
+     "ref": "cany",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "del_create",
+     "actor": "chi",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "chi",
+      "values": {
+       "name": "Tạm ứng của kế toán",
+       "advance_amount": 2000000
+      }
+     },
+     "ref": "cdel"
+    },
+    {
+     "id": "del_submit",
+     "actor": "chi",
+     "op": "core.submit",
+     "args": {
+      "case": "$cdel"
+     },
+     "ref": "cdel",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "del_principal_cannot",
+     "actor": "dat",
+     "op": "core.decide",
+     "args": {
+      "case": "$cdel",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "del_delegate",
+     "actor": "tuan",
+     "op": "core.decide",
+     "args": {
+      "case": "$cdel",
+      "decision": "approve"
+     },
+     "ref": "cdel",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "del_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$cdel",
+      "decision": "approve"
+     },
+     "ref": "cdel",
+     "expect": {
+      "state": "approved"
+     }
+    }
+   ]
+  },
+  {
+   "id": "travel_advance_report_settlement",
+   "title": "Công tác ghi công và hủy suất ăn; tạm ứng 10 triệu quyết toán bằng, thiếu, vượt",
+   "covers": [
+    "§10.3",
+    "§10.4",
+    "CT",
+    "TU"
+   ],
+   "matrix": [
+    {
+     "who": "an",
+     "boss": "quang",
+     "actual": 10000000,
+     "delta": 0,
+     "payment": "settled"
+    },
+    {
+     "who": "dung",
+     "boss": "quang",
+     "actual": 8000000,
+     "delta": 2000000,
+     "payment": "settled"
+    },
+    {
+     "who": "ha",
+     "boss": "nam",
+     "actual": 12000000,
+     "delta": 2000000,
+     "payment": "settled"
+    }
+   ],
+   "steps": [
+    {
+     "id": "meal_create",
+     "actor": "$m.who",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "$m.who",
+      "values": {
+       "name": "Đặt suất ăn ngày công tác",
+       "resource": "meal_lunch",
+       "meal_date": "workday+15"
+      }
+     },
+     "ref": "meal"
+    },
+    {
+     "id": "meal_submit",
+     "actor": "$m.who",
+     "op": "core.submit",
+     "args": {
+      "case": "$meal"
+     },
+     "ref": "meal"
+    },
+    {
+     "id": "meal_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$meal"
+     },
+     "ref": "meal",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "resource_reserve": 1
+      }
+     }
+    },
+    {
+     "id": "trip_create",
+     "actor": "$m.who",
+     "op": "core.create",
+     "args": {
+      "kind": "travel",
+      "subject": "$m.who",
+      "values": {
+       "name": "Công tác Đà Nẵng",
+       "destination": "Đà Nẵng",
+       "date_from": "workday+14",
+       "date_to": "workday+16"
+      }
+     },
+     "ref": "trip"
+    },
+    {
+     "id": "trip_submit",
+     "actor": "$m.who",
+     "op": "core.submit",
+     "args": {
+      "case": "$trip"
+     },
+     "ref": "trip"
+    },
+    {
+     "id": "trip_approve",
+     "actor": "$m.boss",
+     "op": "core.decide",
+     "args": {
+      "case": "$trip",
+      "decision": "approve"
+     },
+     "ref": "trip"
+    },
+    {
+     "id": "trip_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$trip",
+      "decision": "approve"
+     },
+     "ref": "trip",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "trip_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$trip"
+     },
+     "ref": "trip",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "meal_cancel": 1
+      }
+     }
+    },
+    {
+     "id": "adv_create",
+     "actor": "$m.who",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "$m.who",
+      "values": {
+       "name": "Tạm ứng công tác",
+       "advance_amount": 10000000,
+       "parent": "$trip"
+      }
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "adv_submit",
+     "actor": "$m.who",
+     "op": "core.submit",
+     "args": {
+      "case": "$adv"
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "adv_approve",
+     "actor": "$m.boss",
+     "op": "core.decide",
+     "args": {
+      "case": "$adv",
+      "decision": "approve"
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "adv_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$adv",
+      "decision": "approve"
+     },
+     "ref": "adv",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "adv_post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$adv",
+      "execution_user": "chi"
+     },
+     "ref": "adv",
+     "expect": {
+      "state": "executing"
+     }
+    },
+    {
+     "id": "adv_pay_early",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$adv",
+      "amount": 9000000
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "equal"
+     }
+    },
+    {
+     "id": "adv_paid",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$adv",
+      "amount": 10000000,
+      "reference": "DEMO-ADV-${m.who}",
+      "evidence": "Ủy nhiệm chi mẫu (dữ liệu giả)"
+     },
+     "ref": "adv",
+     "expect": {
+      "state": "completed",
+      "payment_state": "advanced"
+     }
+    },
+    {
+     "id": "report_revise",
+     "actor": "$m.who",
+     "op": "core.revise",
+     "args": {
+      "case": "$adv",
+      "report": true,
+      "values": {
+       "actual_amount": "$m.actual",
+       "note": "Quyết toán thực chi"
+      }
+     },
+     "ref": "adv",
+     "expect": {
+      "state": "draft"
+     }
+    },
+    {
+     "id": "report_evidence",
+     "actor": "$m.who",
+     "op": "core.attach",
+     "args": {
+      "case": "$adv",
+      "text": "Hóa đơn và chứng từ thực chi (dữ liệu giả)"
+     }
+    },
+    {
+     "id": "report_submit",
+     "actor": "$m.who",
+     "op": "core.submit",
+     "args": {
+      "case": "$adv"
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "report_approve",
+     "actor": "$m.boss",
+     "op": "core.decide",
+     "args": {
+      "case": "$adv",
+      "decision": "approve"
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "report_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$adv",
+      "decision": "approve"
+     },
+     "ref": "adv",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "report_post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$adv",
+      "execution_user": "chi"
+     },
+     "ref": "adv"
+    },
+    {
+     "id": "settle",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$adv",
+      "amount": "$m.delta",
+      "reference": "DEMO-SETTLE-${m.who}",
+      "evidence": "Chứng từ chi bù hoặc hoàn ứng (dữ liệu giả)"
+     },
+     "ref": "adv",
+     "when": "$m.delta"
+    },
+    {
+     "id": "settled",
+     "actor": "chi",
+     "op": "core.get",
+     "args": {
+      "case": "$adv"
+     },
+     "expect": {
+      "state": "completed",
+      "payment_state": "${m.payment}"
+     }
+    }
+   ]
+  },
+  {
+   "id": "money_zero_cancel_paid",
+   "title": "Ứng 0, hủy trước khi chi, đã chi thì không xóa",
+   "covers": [
+    "§10.4",
+    "TU"
+   ],
+   "steps": [
+    {
+     "id": "zero_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "an",
+      "values": {
+       "name": "Công tác tự túc",
+       "advance_amount": 0
+      }
+     },
+     "ref": "z"
+    },
+    {
+     "id": "zero_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$z"
+     },
+     "ref": "z"
+    },
+    {
+     "id": "zero_approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$z",
+      "decision": "approve"
+     },
+     "ref": "z"
+    },
+    {
+     "id": "zero_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$z",
+      "decision": "approve"
+     },
+     "ref": "z",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "zero_post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$z",
+      "execution_user": "chi"
+     },
+     "ref": "z",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "cancel_create",
+     "actor": "ha",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "ha",
+      "values": {
+       "name": "Tạm ứng sẽ hủy",
+       "advance_amount": 1000000
+      }
+     },
+     "ref": "x"
+    },
+    {
+     "id": "cancel_submit",
+     "actor": "ha",
+     "op": "core.submit",
+     "args": {
+      "case": "$x"
+     },
+     "ref": "x"
+    },
+    {
+     "id": "cancel_approve",
+     "actor": "nam",
+     "op": "core.decide",
+     "args": {
+      "case": "$x",
+      "decision": "approve"
+     },
+     "ref": "x"
+    },
+    {
+     "id": "cancel_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$x",
+      "decision": "approve"
+     },
+     "ref": "x",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "cancel_reverse",
+     "actor": "chi",
+     "op": "core.reverse",
+     "args": {
+      "case": "$x",
+      "reason": "Chuyến công tác hủy"
+     },
+     "ref": "x",
+     "expect": {
+      "state": "cancelled",
+      "effects": {
+       "money_cancel": 1
+      }
+     }
+    },
+    {
+     "id": "paid_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "money",
+      "subject": "dung",
+      "values": {
+       "name": "Tạm ứng đã chi",
+       "advance_amount": 4000000
+      }
+     },
+     "ref": "p"
+    },
+    {
+     "id": "paid_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$p"
+     },
+     "ref": "p"
+    },
+    {
+     "id": "paid_approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p"
+    },
+    {
+     "id": "paid_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "paid_post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$p",
+      "execution_user": "chi"
+     },
+     "ref": "p"
+    },
+    {
+     "id": "paid_execute",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$p",
+      "amount": 4000000,
+      "reference": "DEMO-PAID-DUNG"
+     },
+     "ref": "p",
+     "expect": {
+      "payment_state": "advanced"
+     }
+    },
+    {
+     "id": "paid_reverse",
+     "actor": "chi",
+     "op": "core.reverse",
+     "args": {
+      "case": "$p",
+      "reason": "Hủy sau khi đã chi"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "already paid"
+     }
+    }
+   ]
+  },
+  {
+   "id": "approval_chain_levels",
+   "title": "Chuỗi duyệt hai cấp theo chính sách; cấp sau chỉ mở khi cấp trước duyệt; bỏ cấp khi trùng người; Giám đốc tự duyệt chỉ khi chính sách cho phép",
+   "covers": [
+    "CHG",
+    "BRD §3.1",
+    "TU",
+    "CT"
+   ],
+   "steps": [
+    {
+     "id": "trip_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "travel",
+      "subject": "an",
+      "values": {
+       "name": "Công tác Cần Thơ",
+       "destination": "Cần Thơ",
+       "date_from": "workday+20",
+       "date_to": "workday+21"
+      }
+     },
+     "ref": "c"
+    },
+    {
+     "id": "trip_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "manager,director"
+      }
+     }
+    },
+    {
+     "id": "director_too_early",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "manager_approves",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "director_returns",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "return",
+      "reason": "Cần thêm lịch trình chi tiết"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "returned"
+     }
+    },
+    {
+     "id": "revise",
+     "actor": "an",
+     "op": "core.revise",
+     "args": {
+      "case": "$c",
+      "values": {
+       "note": "Đã bổ sung lịch trình"
+      }
+     },
+     "ref": "c",
+     "expect": {
+      "state": "draft"
+     }
+    },
+    {
+     "id": "resubmit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "manager_again",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "director_approves",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "hr_trip_create",
+     "actor": "hoa",
+     "op": "core.create",
+     "args": {
+      "kind": "travel",
+      "subject": "hoa",
+      "values": {
+       "name": "Hội thảo nhân sự Hà Nội",
+       "destination": "Hà Nội",
+       "date_from": "workday+25",
+       "date_to": "workday+26"
+      }
+     },
+     "ref": "h"
+    },
+    {
+     "id": "hr_trip_submit",
+     "actor": "hoa",
+     "op": "core.submit",
+     "args": {
+      "case": "$h"
+     },
+     "ref": "h",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "manager"
+      }
+     }
+    },
+    {
+     "id": "hr_trip_approved",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$h",
+      "decision": "approve"
+     },
+     "ref": "h",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "ceo_trip_create",
+     "actor": "thanh",
+     "op": "core.create",
+     "args": {
+      "kind": "travel",
+      "subject": "thanh",
+      "values": {
+       "name": "Gặp đối tác Singapore",
+       "destination": "Singapore",
+       "date_from": "workday+30",
+       "date_to": "workday+32"
+      }
+     },
+     "ref": "d"
+    },
+    {
+     "id": "ceo_trip_refused",
+     "actor": "thanh",
+     "op": "core.submit",
+     "args": {
+      "case": "$d"
+     },
+     "expect": {
+      "result": "AccessError",
+      "contains": "self-approval"
+     }
+    },
+    {
+     "id": "allow_push",
+     "actor": "lan",
+     "op": "policy.push",
+     "args": {
+      "policy": "hrm.approval_route",
+      "effective": "now-5m",
+      "note": "BRD HR-CHG-16 đã được ký: Giám đốc tự duyệt đề xuất của mình, bắt buộc nêu lý do; các hàng còn lại giữ nguyên",
+      "rules": [
+       {
+        "when": [
+         "\"timesheet_signoff\"",
+         "",
+         "",
+         "",
+         "",
+         "\"factory\""
+        ],
+        "then": [
+         "\"manager,hr,director\"",
+         "false",
+         "\"\""
+        ]
+       },
+       {
+        "when": [
+         "\"timesheet_signoff\"",
+         "",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"hr,director\"",
+         "false",
+         "\"\""
+        ]
+       },
+       {
+        "when": [
+         "\"leave\"",
+         "",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"manager\"",
+         "false",
+         "\"\""
+        ]
+       },
+       {
+        "when": [
+         "\"overtime\"",
+         "",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"consent,director\"",
+         "false",
+         "\"hr\""
+        ]
+       },
+       {
+        "when": [
+         "\"resource\"",
+         "",
+         "",
+         "",
+         "\"room\", \"meal\"",
+         ""
+        ],
+        "then": [
+         "\"none\"",
+         "false",
+         "\"\""
+        ]
+       },
+       {
+        "when": [
+         "\"resource\"",
+         "",
+         "",
+         "",
+         "\"book\"",
+         ""
+        ],
+        "then": [
+         "\"hr\"",
+         "false",
+         "\"\""
+        ]
+       },
+       {
+        "when": [
+         "\"travel\", \"money\", \"purchase\"",
+         "\"director\"",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"director\"",
+         "true",
+         "\"hr\""
+        ]
+       },
+       {
+        "when": [
+         "\"purchase\"",
+         "",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"manager,director\"",
+         "false",
+         "\"accountant\""
+        ]
+       },
+       {
+        "when": [
+         "\"travel\", \"money\"",
+         "",
+         "",
+         "",
+         "",
+         ""
+        ],
+        "then": [
+         "\"manager,director\"",
+         "false",
+         "\"hr\""
+        ]
+       },
+       {
+        "when": [],
+        "then": [
+         "\"default\"",
+         "false",
+         "\"\""
+        ]
+       }
+      ],
+      "cases": [
+       {
+        "name": "director trip may self-approve",
+        "input": {
+         "kind": "travel",
+         "author_level": "director"
+        },
+        "expected": {
+         "levels": "director",
+         "director_self": true
+        }
+       },
+       {
+        "name": "employee trip keeps two levels",
+        "input": {
+         "kind": "travel",
+         "author_level": "employee"
+        },
+        "expected": {
+         "levels": "manager,director",
+         "director_self": false
+        }
+       },
+       {
+        "name": "a meal still needs no approval",
+        "input": {
+         "kind": "resource",
+         "author_level": "employee",
+         "resource_kind": "meal"
+        },
+        "expected": {
+         "levels": "none",
+         "director_self": false
+        }
+       },
+       {
+        "name": "another type keeps its own chain",
+        "input": {
+         "kind": "document",
+         "author_level": "employee"
+        },
+        "expected": {
+         "levels": "default",
+         "director_self": false
+        }
+       }
+      ]
+     },
+     "ref": "v2"
+    },
+    {
+     "id": "allow_self_approve",
+     "actor": "lan",
+     "op": "policy.approve",
+     "args": {
+      "version": "$v2"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    },
+    {
+     "id": "allow_approve",
+     "actor": "hoa",
+     "op": "policy.approve",
+     "args": {
+      "version": "$v2"
+     },
+     "ref": "v2"
+    },
+    {
+     "id": "allow_activate",
+     "actor": "hoa",
+     "op": "policy.activate",
+     "args": {
+      "version": "$v2"
+     },
+     "ref": "v2",
+     "expect": {
+      "equals": {
+       "state": "active"
+      }
+     }
+    },
+    {
+     "id": "ceo_trip_submit",
+     "actor": "thanh",
+     "op": "core.submit",
+     "args": {
+      "case": "$d"
+     },
+     "ref": "d",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "ceo_no_reason",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$d",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "reason"
+     }
+    },
+    {
+     "id": "ceo_with_reason",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$d",
+      "decision": "approve",
+      "reason": "Người ký duy nhất; đã báo cáo Hội đồng quản trị"
+     },
+     "ref": "d",
+     "expect": {
+      "state": "approved"
+     }
+    }
+   ]
+  },
+  {
+   "id": "overtime_consent_and_limit",
+   "title": "Trưởng bộ phận đề xuất tăng ca cho nhiều người; từng người đồng ý; Giám đốc duyệt; giới hạn 40 giờ mỗi tháng theo chính sách",
+   "covers": [
+    "CP",
+    "BLLĐ 2019 Đ.107"
+   ],
+   "steps": [
+    {
+     "id": "propose",
+     "actor": "hung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw01",
+       "nightw02"
+      ],
+      "values": {
+       "name": "Tăng ca kiểm kê cuối quý",
+       "start_at": "monday+1w 18:00",
+       "end_at": "monday+1w 21:00",
+       "day_type": "weekday",
+       "note": "Kiểm kê kho cuối quý"
+      }
+     },
+     "ref": "ot"
+    },
+    {
+     "id": "colleague_cannot_propose",
+     "actor": "dung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw03"
+      ],
+      "values": {
+       "name": "Tăng ca trái quyền",
+       "start_at": "monday+1w 18:00",
+       "end_at": "monday+1w 20:00"
+      }
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "submit",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$ot.cases.0.id"
+     },
+     "ref": "a",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "consent,director"
+      }
+     }
+    },
+    {
+     "id": "head_cannot_consent",
+     "actor": "hung",
+     "op": "core.decide",
+     "args": {
+      "case": "$ot.cases.0.id",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "employee_consents",
+     "actor": "nightw01",
+     "op": "core.decide",
+     "args": {
+      "case": "$ot.cases.0.id",
+      "decision": "approve"
+     },
+     "ref": "a",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "director_approves",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$ot.cases.0.id",
+      "decision": "approve"
+     },
+     "ref": "a",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "hr_posts",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$ot.cases.0.id"
+     },
+     "ref": "a",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "overtime": 1
+      }
+     }
+    },
+    {
+     "id": "second_submit",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$ot.cases.1.id"
+     },
+     "ref": "b",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "decline_needs_reason",
+     "actor": "nightw02",
+     "op": "core.decide",
+     "args": {
+      "case": "$ot.cases.1.id",
+      "decision": "reject"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "reason"
+     }
+    },
+    {
+     "id": "employee_declines",
+     "actor": "nightw02",
+     "op": "core.decide",
+     "args": {
+      "case": "$ot.cases.1.id",
+      "decision": "reject",
+      "reason": "Việc gia đình"
+     },
+     "ref": "b",
+     "expect": {
+      "state": "rejected"
+     }
+    },
+    {
+     "id": "limit_1",
+     "actor": "hung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw03"
+      ],
+      "values": {
+       "name": "Tăng ca đợt 1",
+       "start_at": "nextmonth+0d 08:00",
+       "end_at": "nextmonth+0d 20:00"
+      }
+     },
+     "ref": "l1"
+    },
+    {
+     "id": "limit_1_submit",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$l1.cases.0.id"
+     },
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "limit_2",
+     "actor": "hung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw03"
+      ],
+      "values": {
+       "name": "Tăng ca đợt 2",
+       "start_at": "nextmonth+1d 08:00",
+       "end_at": "nextmonth+1d 20:00"
+      }
+     },
+     "ref": "l2"
+    },
+    {
+     "id": "limit_2_submit",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$l2.cases.0.id"
+     },
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "limit_3",
+     "actor": "hung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw03"
+      ],
+      "values": {
+       "name": "Tăng ca đợt 3",
+       "start_at": "nextmonth+2d 08:00",
+       "end_at": "nextmonth+2d 20:00"
+      }
+     },
+     "ref": "l3"
+    },
+    {
+     "id": "limit_3_submit",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$l3.cases.0.id"
+     },
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "limit_4",
+     "actor": "hung",
+     "op": "core.create_batch",
+     "args": {
+      "subjects": [
+       "nightw03"
+      ],
+      "values": {
+       "name": "Tăng ca đợt 4",
+       "start_at": "nextmonth+3d 08:00",
+       "end_at": "nextmonth+3d 14:00"
+      }
+     },
+     "ref": "l4"
+    },
+    {
+     "id": "limit_4_refused",
+     "actor": "hung",
+     "op": "core.submit",
+     "args": {
+      "case": "$l4.cases.0.id"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "40"
+     }
+    }
+   ]
+  },
+  {
+   "id": "purchase_proposal_to_invoice",
+   "title": "Đề xuất mua hàng dịch vụ có báo giá; hai cấp duyệt; kế toán chi; hóa đơn thấp hơn số đã chi thì nhà cung cấp hoàn",
+   "covers": [
+    "TU",
+    "BRD §3.1"
+   ],
+   "steps": [
+    {
+     "id": "create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "purchase",
+      "subject": "an",
+      "values": {
+       "name": "Mua máy in nhãn cho kho",
+       "advance_amount": 6500000,
+       "supplier": "Công ty TNHH Thiết bị Văn phòng Việt",
+       "supplier_account": "0071000123456",
+       "payment_due": "workday+15",
+       "cost_center": "SALES"
+      }
+     },
+     "ref": "p"
+    },
+    {
+     "id": "no_quotation",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$p"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "quotation"
+     }
+    },
+    {
+     "id": "quotation",
+     "actor": "an",
+     "op": "core.attach",
+     "args": {
+      "case": "$p",
+      "text": "Báo giá số BG-2026-118 (dữ liệu giả)"
+     }
+    },
+    {
+     "id": "submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$p"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "manager,director"
+      }
+     }
+    },
+    {
+     "id": "manager",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$p",
+      "execution_user": "chi"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "executing",
+      "effects": {
+       "payment_authorized": 1
+      }
+     }
+    },
+    {
+     "id": "pay",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$p",
+      "amount": 6500000,
+      "reference": "DEMO-PURCHASE",
+      "evidence": "Ủy nhiệm chi mẫu (dữ liệu giả)"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "completed",
+      "payment_state": "advanced"
+     }
+    },
+    {
+     "id": "invoice_revise",
+     "actor": "an",
+     "op": "core.revise",
+     "args": {
+      "case": "$p",
+      "report": true,
+      "values": {
+       "actual_amount": 6300000,
+       "note": "Hóa đơn thực tế"
+      }
+     },
+     "ref": "p",
+     "expect": {
+      "state": "draft"
+     }
+    },
+    {
+     "id": "invoice_attach",
+     "actor": "an",
+     "op": "core.attach",
+     "args": {
+      "case": "$p",
+      "text": "Hóa đơn GTGT 0001234 (dữ liệu giả)"
+     }
+    },
+    {
+     "id": "invoice_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$p"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "invoice_manager",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "invoice_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$p",
+      "decision": "approve"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "invoice_post",
+     "actor": "chi",
+     "op": "core.post",
+     "args": {
+      "case": "$p",
+      "execution_user": "chi"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "executing",
+      "effects": {
+       "invoice_accepted": 1
+      }
+     }
+    },
+    {
+     "id": "refund",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$p",
+      "amount": 200000,
+      "reference": "DEMO-PURCHASE-REFUND",
+      "evidence": "Nhà cung cấp hoàn 200.000 đồng (dữ liệu giả)"
+     },
+     "ref": "p",
+     "expect": {
+      "state": "completed",
+      "payment_state": "settled"
+     }
+    }
+   ]
+  },
+  {
+   "id": "time_lock_and_adjustment",
+   "title": "Nhiều phiên chấm công, ca qua nửa đêm, khóa kỳ bị chặn rồi khóa, điều chỉnh sang kỳ sau",
+   "covers": [
+    "§10.6",
+    "CP"
+   ],
+   "steps": [
+    {
+     "id": "morning",
+     "actor": "lan",
+     "op": "attendance.punch",
+     "args": {
+      "employee": "binh",
+      "in": "monday-4w 08:00",
+      "out": "monday-4w 12:00"
+     }
+    },
+    {
+     "id": "afternoon",
+     "actor": "lan",
+     "op": "attendance.punch",
+     "args": {
+      "employee": "binh",
+      "in": "monday-4w 13:00",
+      "out": "monday-4w 17:30"
+     }
+    },
+    {
+     "id": "night",
+     "actor": "lan",
+     "op": "attendance.punch",
+     "args": {
+      "employee": "binh",
+      "in": "monday-4w+1d 22:00",
+      "out": "monday-4w+2d 06:00"
+     }
+    },
+    {
+     "id": "open_session",
+     "actor": "lan",
+     "op": "attendance.punch",
+     "args": {
+      "employee": "binh",
+      "in": "monday-4w+3d 22:00"
+     }
+    },
+    {
+     "id": "leave_request",
+     "actor": "dung",
+     "op": "leave.request",
+     "args": {
+      "type": "annual",
+      "from": "monday-4w+1d",
+      "to": "monday-4w+1d",
+      "name": "Nghỉ phép đã diễn ra"
+     },
+     "ref": "lv"
+    },
+    {
+     "id": "leave_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "leave",
+      "subject": "dung",
+      "values": {
+       "name": "Nghỉ phép đã diễn ra",
+       "leave": "$lv"
+      }
+     },
+     "ref": "c"
+    },
+    {
+     "id": "leave_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c"
+    },
+    {
+     "id": "leave_approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$c",
+      "decision": "approve"
+     },
+     "ref": "c"
+    },
+    {
+     "id": "leave_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "c",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "leave": 1
+      }
+     }
+    },
+    {
+     "id": "leave_effects",
+     "actor": "lan",
+     "op": "core.get",
+     "args": {
+      "case": "$c"
+     },
+     "ref": "full"
+    },
+    {
+     "id": "lock_blocked",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p1"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "unfinished"
+     }
+    },
+    {
+     "id": "close_session",
+     "actor": "lan",
+     "op": "attendance.close",
+     "args": {
+      "employee": "binh",
+      "out": "monday-4w+4d 06:00"
+     }
+    },
+    {
+     "id": "lock",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p1"
+     },
+     "expect": {
+      "equals": {
+       "state": "locked"
+      }
+     }
+    },
+    {
+     "id": "late_leave",
+     "actor": "dung",
+     "op": "leave.request",
+     "args": {
+      "type": "annual",
+      "from": "monday-4w+2d",
+      "to": "monday-4w+2d",
+      "name": "Nghỉ bổ sung sau khóa kỳ"
+     },
+     "expect": {
+      "result": "AccessError",
+      "contains": "locked"
+     }
+    },
+    {
+     "id": "adj_create",
+     "actor": "lan",
+     "op": "core.create",
+     "args": {
+      "kind": "adjustment",
+      "subject": "dung",
+      "values": {
+       "name": "Điều chỉnh sau khóa kỳ",
+       "source_effect": "$full.effects.type=leave.0.id",
+       "target_period": "p2",
+       "adjustment_units": -8,
+       "note": "Hoàn nửa ngày phép đã ghi nhầm"
+      }
+     },
+     "ref": "adj"
+    },
+    {
+     "id": "adj_submit",
+     "actor": "lan",
+     "op": "core.submit",
+     "args": {
+      "case": "$adj"
+     },
+     "ref": "adj"
+    },
+    {
+     "id": "adj_approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$adj",
+      "decision": "approve"
+     },
+     "ref": "adj"
+    },
+    {
+     "id": "adj_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$adj"
+     },
+     "ref": "adj",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "adjustment": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "typed_resources",
+   "title": "Phòng chồng giờ, tài sản định danh, sách có hàng đợi, suất ăn hết chỗ và quá hạn",
+   "covers": [
+    "§10.7",
+    "DV",
+    "TS"
+   ],
+   "steps": [
+    {
+     "id": "room_a_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "an",
+      "values": {
+       "name": "Họp khách hàng",
+       "resource": "room_a",
+       "start_at": "monday+1w 09:00",
+       "end_at": "monday+1w 10:00"
+      }
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "room_a_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$r1"
+     },
+     "ref": "r1",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "room_a_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$r1"
+     },
+     "ref": "r1",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "room_b_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "dung",
+      "values": {
+       "name": "Họp nội bộ chồng giờ",
+       "resource": "room_a",
+       "start_at": "monday+1w 09:30",
+       "end_at": "monday+1w 10:30"
+      }
+     },
+     "ref": "r2"
+    },
+    {
+     "id": "room_b_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$r2"
+     },
+     "ref": "r2"
+    },
+    {
+     "id": "room_b_overlap",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$r2"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "overlaps"
+     }
+    },
+    {
+     "id": "laptop_create",
+     "actor": "ha",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "ha",
+      "values": {
+       "name": "Cấp laptop",
+       "resource": "laptop_01"
+      }
+     },
+     "ref": "l1"
+    },
+    {
+     "id": "laptop_submit",
+     "actor": "ha",
+     "op": "core.submit",
+     "args": {
+      "case": "$l1"
+     },
+     "ref": "l1"
+    },
+    {
+     "id": "laptop_approve",
+     "actor": "nam",
+     "op": "core.decide",
+     "args": {
+      "case": "$l1",
+      "decision": "approve"
+     },
+     "ref": "l1"
+    },
+    {
+     "id": "laptop_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$l1",
+      "execution_user": "oanh"
+     },
+     "ref": "l1",
+     "expect": {
+      "state": "executing"
+     }
+    },
+    {
+     "id": "laptop_issue",
+     "actor": "oanh",
+     "op": "core.execute",
+     "args": {
+      "case": "$l1",
+      "reference": "DEMO-HANDOVER-A01",
+      "evidence": "Biên bản bàn giao mẫu (dữ liệu giả)"
+     },
+     "ref": "l1",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "custody_issue": 1
+      }
+     }
+    },
+    {
+     "id": "laptop_other_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "an",
+      "values": {
+       "name": "Xin cùng laptop",
+       "resource": "laptop_01"
+      }
+     },
+     "ref": "l2"
+    },
+    {
+     "id": "laptop_other_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$l2"
+     },
+     "ref": "l2"
+    },
+    {
+     "id": "laptop_other_approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$l2",
+      "decision": "approve"
+     },
+     "ref": "l2"
+    },
+    {
+     "id": "laptop_double_issue",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$l2",
+      "execution_user": "oanh"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "already reserved"
+     }
+    },
+    {
+     "id": "laptop_return",
+     "actor": "oanh",
+     "op": "core.reverse",
+     "args": {
+      "case": "$l1",
+      "reason": "Trả máy",
+      "reference": "DEMO-RETURN-A01",
+      "evidence": "Biên bản nhận lại mẫu (dữ liệu giả)"
+     },
+     "expect": {
+      "state": "cancelled",
+      "effects": {
+       "resource_return": 1
+      }
+     }
+    },
+    {
+     "id": "book_first_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "an",
+      "values": {
+       "name": "Mượn sách DDIA",
+       "resource": "book_ddia"
+      }
+     },
+     "ref": "b1"
+    },
+    {
+     "id": "book_first_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$b1"
+     },
+     "ref": "b1"
+    },
+    {
+     "id": "book_first_approve",
+     "actor": "lan",
+     "op": "core.decide",
+     "args": {
+      "case": "$b1",
+      "decision": "approve"
+     },
+     "ref": "b1"
+    },
+    {
+     "id": "book_first_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$b1",
+      "execution_user": "oanh"
+     },
+     "ref": "b1",
+     "expect": {
+      "state": "executing"
+     }
+    },
+    {
+     "id": "book_second_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "dung",
+      "values": {
+       "name": "Mượn sách DDIA (hàng đợi)",
+       "resource": "book_ddia"
+      }
+     },
+     "ref": "b2"
+    },
+    {
+     "id": "book_second_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$b2"
+     },
+     "ref": "b2"
+    },
+    {
+     "id": "book_second_approve",
+     "actor": "lan",
+     "op": "core.decide",
+     "args": {
+      "case": "$b2",
+      "decision": "approve"
+     },
+     "ref": "b2"
+    },
+    {
+     "id": "book_second_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$b2",
+      "execution_user": "oanh"
+     },
+     "ref": "b2",
+     "expect": {
+      "state": "executing"
+     }
+    },
+    {
+     "id": "book_out_of_order",
+     "actor": "oanh",
+     "op": "core.execute",
+     "args": {
+      "case": "$b2",
+      "reference": "DEMO-BOOK-2",
+      "evidence": "Biên bản mượn sách (dữ liệu giả)"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "queue"
+     }
+    },
+    {
+     "id": "book_first_issue",
+     "actor": "oanh",
+     "op": "core.execute",
+     "args": {
+      "case": "$b1",
+      "reference": "DEMO-BOOK-1",
+      "evidence": "Biên bản mượn sách (dữ liệu giả)"
+     },
+     "ref": "b1",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "book_first_return",
+     "actor": "oanh",
+     "op": "core.reverse",
+     "args": {
+      "case": "$b1",
+      "reason": "Trả sách",
+      "reference": "DEMO-BOOK-1-RET",
+      "evidence": "Biên bản trả sách (dữ liệu giả)"
+     },
+     "expect": {
+      "state": "cancelled"
+     }
+    },
+    {
+     "id": "book_second_issue",
+     "actor": "oanh",
+     "op": "core.execute",
+     "args": {
+      "case": "$b2",
+      "reference": "DEMO-BOOK-2",
+      "evidence": "Biên bản mượn sách (dữ liệu giả)"
+     },
+     "ref": "b2",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "meal_first_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "an",
+      "values": {
+       "name": "Suất ăn tiệc đối tác",
+       "resource": "meal_partner",
+       "meal_date": "workday+9"
+      }
+     },
+     "ref": "m1"
+    },
+    {
+     "id": "meal_first_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$m1"
+     },
+     "ref": "m1",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "meal_first_post",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$m1"
+     },
+     "ref": "m1",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "meal_second_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "dung",
+      "values": {
+       "name": "Suất ăn tiệc đối tác (hết chỗ)",
+       "resource": "meal_partner",
+       "meal_date": "workday+9"
+      }
+     },
+     "ref": "m2"
+    },
+    {
+     "id": "meal_second_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$m2"
+     },
+     "ref": "m2"
+    },
+    {
+     "id": "meal_capacity",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$m2"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "capacity"
+     }
+    },
+    {
+     "id": "meal_late_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "resource",
+      "subject": "dung",
+      "values": {
+       "name": "Suất ăn hôm nay",
+       "resource": "meal_lunch",
+       "meal_date": "today"
+      }
+     },
+     "ref": "m3"
+    },
+    {
+     "id": "meal_late_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$m3"
+     },
+     "ref": "m3"
+    },
+    {
+     "id": "meal_cutoff",
+     "actor": "oanh",
+     "op": "core.post",
+     "args": {
+      "case": "$m3"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "cutoff"
+     }
+    }
+   ]
+  },
+  {
+   "id": "document_snapshot",
+   "title": "Giấy xác nhận từ case đã duyệt, bản PDF bất biến, người khác không đọc được",
+   "covers": [
+    "GK",
+    "§10.9"
+   ],
+   "steps": [
+    {
+     "id": "create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "document",
+      "subject": "an",
+      "values": {
+       "name": "Xác nhận công tác",
+       "note": "Giấy xác nhận đang công tác"
+      }
+     },
+     "ref": "d"
+    },
+    {
+     "id": "submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$d"
+     },
+     "ref": "d"
+    },
+    {
+     "id": "approve",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$d",
+      "decision": "approve"
+     },
+     "ref": "d"
+    },
+    {
+     "id": "post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$d"
+     },
+     "ref": "d",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "render",
+     "actor": "an",
+     "op": "core.render",
+     "args": {
+      "case": "$d"
+     },
+     "ref": "d"
+    },
+    {
+     "id": "owner_reads",
+     "actor": "an",
+     "op": "core.get",
+     "args": {
+      "case": "$d"
+     },
+     "expect": {
+      "equals": {
+       "document_ids": "$nonempty"
+      }
+     }
+    },
+    {
+     "id": "stranger",
+     "actor": "binh",
+     "op": "core.get",
+     "args": {
+      "case": "$d"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "policy_change_four_eyes",
+   "title": "HR đổi ngưỡng duyệt công tác; tự duyệt bị từ chối; người khác duyệt; hồ sơ đang chờ được dồn theo; hồ sơ đã duyệt giữ nguyên",
+   "covers": [
+    "§10.8",
+    "CHG"
+   ],
+   "steps": [
+    {
+     "id": "small",
+     "actor": "an",
+     "op": "travel.request",
+     "args": {
+      "name": "Gặp khách Biên Hòa",
+      "amount": 2000000,
+      "destination_type": "domestic",
+      "submit": true
+     },
+     "ref": "t_small",
+     "expect": {
+      "equals": {
+       "approval_tier": "dept_head"
+      }
+     }
+    },
+    {
+     "id": "middle",
+     "actor": "dung",
+     "op": "travel.request",
+     "args": {
+      "name": "Hội thảo Hà Nội",
+      "amount": 7000000,
+      "destination_type": "domestic",
+      "submit": true
+     },
+     "ref": "t_mid",
+     "expect": {
+      "equals": {
+       "approval_tier": "director"
+      }
+     }
+    },
+    {
+     "id": "frozen_create",
+     "actor": "an",
+     "op": "travel.request",
+     "args": {
+      "name": "Khảo sát kho Hải Phòng",
+      "amount": 4000000,
+      "destination_type": "domestic",
+      "submit": true
+     },
+     "ref": "t_frozen"
+    },
+    {
+     "id": "frozen_approve",
+     "actor": "quang",
+     "op": "travel.approve",
+     "args": {
+      "request": "$t_frozen"
+     },
+     "ref": "t_frozen",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "push",
+     "actor": "lan",
+     "op": "policy.push",
+     "args": {
+      "policy": "hr.travel_approval",
+      "effective": "now-5m",
+      "note": "Hạ ngưỡng CFO: nội địa trên 6 triệu do CFO duyệt",
+      "rules": [
+       {
+        "when": [
+         "> 6000000"
+        ],
+        "then": [
+         "\"cfo\"",
+         "\"hr_travel_request.group_travel_cfo\""
+        ]
+       },
+       {
+        "when": [
+         "",
+         "\"international\""
+        ],
+        "then": [
+         "\"director\"",
+         "\"hr_travel_request.group_travel_director\""
+        ]
+       },
+       {
+        "when": [],
+        "then": [
+         "\"dept_head\"",
+         "\"hr_travel_request.group_hr_travel_request_approver\""
+        ]
+       }
+      ],
+      "cases": [
+       {
+        "name": "small domestic trip",
+        "input": {
+         "amount": 2000000,
+         "destination_type": "domestic"
+        },
+        "expected": {
+         "tier": "dept_head"
+        }
+       },
+       {
+        "name": "any trip abroad",
+        "input": {
+         "amount": 3000000,
+         "destination_type": "international"
+        },
+        "expected": {
+         "tier": "director"
+        }
+       },
+       {
+        "name": "medium trip now CFO",
+        "input": {
+         "amount": 8000000,
+         "destination_type": "domestic"
+        },
+        "expected": {
+         "tier": "cfo"
+        }
+       }
+      ]
+     },
+     "ref": "v2"
+    },
+    {
+     "id": "self_approve",
+     "actor": "lan",
+     "op": "policy.approve",
+     "args": {
+      "version": "$v2"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    },
+    {
+     "id": "approve",
+     "actor": "hoa",
+     "op": "policy.approve",
+     "args": {
+      "version": "$v2"
+     },
+     "ref": "v2"
+    },
+    {
+     "id": "activate",
+     "actor": "hoa",
+     "op": "policy.activate",
+     "args": {
+      "version": "$v2"
+     },
+     "ref": "v2",
+     "expect": {
+      "equals": {
+       "state": "active"
+      }
+     }
+    },
+    {
+     "id": "reconciled",
+     "actor": "dung",
+     "op": "travel.get",
+     "args": {
+      "request": "$t_mid"
+     },
+     "expect": {
+      "equals": {
+       "approval_tier": "cfo"
+      }
+     }
+    },
+    {
+     "id": "history_kept",
+     "actor": "an",
+     "op": "travel.get",
+     "args": {
+      "request": "$t_frozen"
+     },
+     "expect": {
+      "state": "approved",
+      "equals": {
+       "approval_tier": "dept_head"
+      }
+     }
+    },
+    {
+     "id": "decision",
+     "actor": "lan",
+     "op": "policy.evaluate",
+     "args": {
+      "policy": "hr.travel_approval",
+      "context": {
+       "amount": 8000000,
+       "destination_type": "domestic"
+      }
+     },
+     "expect": {
+      "equals": {
+       "tier": "cfo"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "business_intake_to_uat",
+   "title": "Doanh nghiệp đề xuất, analyst phân loại, bằng chứng bàn giao bất biến, UAT độc lập",
+   "covers": [
+    "CHG",
+    "§8"
+   ],
+   "steps": [
+    {
+     "id": "create",
+     "actor": "hoa",
+     "op": "business.create",
+     "args": {
+      "name": "Phụ cấp công tác theo vùng",
+      "problem": "Phụ cấp công tác đang tính thủ công trên Excel và sai lệch giữa các vùng",
+      "desired_outcome": "Phụ cấp tự tính đúng theo vùng và loại chuyến đi",
+      "acceptance_criteria": "Ba kịch bản mẫu của kế toán cho kết quả khớp số tay",
+      "actors": "Nhân viên đi công tác; Trưởng bộ phận duyệt; Giám đốc duyệt; Kế toán kiểm tra",
+      "current_process": "Kế toán tính phụ cấp thủ công trên Excel theo bảng vùng",
+      "target_process": "Nhân viên - submit; Trưởng bộ phận - decide; Giám đốc - decide; HR - post phụ cấp theo vùng; Kế toán - execute chi",
+      "data_fields": "vùng | chọn | bắt buộc | địa điểm công tác | không; số ngày | số | bắt buộc | ngày công tác | không; loại chuyến | chọn | bắt buộc | đề xuất | không",
+      "rules": "Vùng I 600.000 đồng một ngày, vùng II 500.000 đồng; áp dụng từ ngày duyệt bảng",
+      "effects": "Dòng phụ cấp được cộng vào bảng quyết toán; báo Kế toán và HR",
+      "privacy_legal": "Không có dữ liệu nhạy cảm; mức phụ cấp do Kế toán trưởng xác nhận"
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "submit",
+     "actor": "hoa",
+     "op": "business.submit",
+     "args": {
+      "request": "$r1"
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "triage",
+     "actor": "vy",
+     "op": "business.triage",
+     "args": {
+      "request": "$r1",
+      "route": "logic",
+      "capability": "travel.allowance",
+      "reason": "Cần quy tắc tính mới trong code đã review, không chỉ đổi ngưỡng"
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "owner_cannot_triage",
+     "actor": "hoa",
+     "op": "business.triage",
+     "args": {
+      "request": "$r1",
+      "route": "data",
+      "capability": "travel.allowance",
+      "reason": "Thử tự phân loại"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    },
+    {
+     "id": "link",
+     "actor": "nam",
+     "op": "business.link_artifact",
+     "args": {
+      "request": "$r1",
+      "artifact": {
+       "type": "module_release",
+       "module": "travel_allowance",
+       "version": "19.0.2.0.0",
+       "digest": "3b9a707f5ea271f40842de4b51c76c3ebfdb659585b15603a0ecebe943227434",
+       "reference": "release://travel_allowance/19.0.2.0.0",
+       "scenario_evidence": [
+        {
+         "scenario": "Công tác trong nước vùng I",
+         "expected": "600000",
+         "actual": "600000",
+         "passed": true
+        },
+        {
+         "scenario": "Công tác nước ngoài",
+         "expected": "1500000",
+         "actual": "1500000",
+         "passed": true
+        }
+       ]
+      }
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "developer_cannot_accept",
+     "actor": "nam",
+     "op": "business.accept",
+     "args": {
+      "request": "$r1",
+      "summary": "Tự nghiệm thu"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "accept",
+     "actor": "lan",
+     "op": "business.accept",
+     "args": {
+      "request": "$r1",
+      "summary": "Kế toán và HR đã chạy lại ba kịch bản độc lập"
+     },
+     "ref": "r1"
+    },
+    {
+     "id": "close",
+     "actor": "hoa",
+     "op": "business.close",
+     "args": {
+      "request": "$r1"
+     },
+     "ref": "r1",
+     "expect": {
+      "state": "closed"
+     }
+    },
+    {
+     "id": "waiting_create",
+     "actor": "hoa",
+     "op": "business.create",
+     "args": {
+      "name": "Cho phép đặt suất ăn cho khách",
+      "problem": "Lễ tân phải gọi bếp để thêm suất ăn cho khách",
+      "desired_outcome": "Đặt suất ăn khách trong cùng đơn đặt suất",
+      "acceptance_criteria": "Suất ăn khách có trong báo cáo cuối ngày"
+     },
+     "ref": "r2"
+    },
+    {
+     "id": "waiting_submit",
+     "actor": "hoa",
+     "op": "business.submit",
+     "args": {
+      "request": "$r2"
+     },
+     "ref": "r2"
+    },
+    {
+     "id": "config_create",
+     "actor": "hoa",
+     "op": "business.create",
+     "args": {
+      "name": "Thêm loại nghỉ chế độ",
+      "problem": "Chưa có loại nghỉ hiếu hỷ",
+      "desired_outcome": "HR tự tạo loại nghỉ trong cấu hình",
+      "acceptance_criteria": "Loại nghỉ xuất hiện trong đơn nghỉ phép"
+     },
+     "ref": "r3"
+    },
+    {
+     "id": "config_submit",
+     "actor": "hoa",
+     "op": "business.submit",
+     "args": {
+      "request": "$r3"
+     },
+     "ref": "r3"
+    },
+    {
+     "id": "config_triage",
+     "actor": "vy",
+     "op": "business.triage",
+     "args": {
+      "request": "$r3",
+      "route": "configuration",
+      "capability": "leave.types",
+      "reason": "Thay đổi dữ liệu cấu hình, không cần code"
+     },
+     "ref": "r3"
+    }
+   ]
+  },
+  {
+   "id": "ai_employee_boundary",
+   "title": "Agent chạy bằng quyền người hỏi; human-only bị từ chối; second-person; guard",
+   "covers": [
+    "§10.9",
+    "BC"
+   ],
+   "steps": [
+    {
+     "id": "balance",
+     "actor": "an",
+     "op": "agent.ask",
+     "args": {
+      "agent": "leo_leave",
+      "tool": "leave.balance",
+      "text": "Tôi còn bao nhiêu ngày phép?"
+     },
+     "expect": {
+      "equals": {
+       "decision": "executed"
+      }
+     }
+    },
+    {
+     "id": "human_only",
+     "actor": "an",
+     "op": "agent.ask",
+     "args": {
+      "agent": "leo_payroll",
+      "tool": "payroll.validate_batch",
+      "text": "Chốt bảng lương giúp tôi"
+     },
+     "expect": {
+      "equals": {
+       "code": "E_HUMAN_ONLY"
+      }
+     }
+    },
+    {
+     "id": "big_trip_guard",
+     "actor": "an",
+     "op": "agent.ask",
+     "args": {
+      "agent": "leo_travel",
+      "tool": "travel.request",
+      "args": {
+       "subject": "Chuyến công tác quá hạn mức",
+       "amount": 60000000,
+       "destination_type": "domestic"
+      },
+      "text": "Đặt chuyến 60 triệu"
+     },
+     "expect": {
+      "equals": {
+       "decision": "denied"
+      }
+     }
+    },
+    {
+     "id": "floor",
+     "actor": "an",
+     "op": "agent.ask",
+     "args": {
+      "agent": "leo_onboarding",
+      "tool": "onboarding.open",
+      "text": "Xem checklist onboarding"
+     },
+     "expect": {
+      "equals": {
+       "code": "E_ACCESS"
+      }
+     }
+    },
+    {
+     "id": "onboarding_request",
+     "actor": "lan",
+     "op": "agent.ask",
+     "args": {
+      "agent": "leo_onboarding",
+      "tool": "onboarding.start",
+      "args": {
+       "name": "Hoàng Gia Huy",
+       "job_title": "Nhân viên kho",
+       "grade": "g1"
+      },
+      "text": "Onboard Huy"
+     },
+     "ref": "ob",
+     "expect": {
+      "equals": {
+       "decision": "approval"
+      }
+     }
+    },
+    {
+     "id": "requester_cannot_approve",
+     "actor": "lan",
+     "op": "agent.decide",
+     "args": {
+      "approval": "$ob.approval.id"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "director_approves",
+     "actor": "hoa",
+     "op": "agent.decide",
+     "args": {
+      "approval": "$ob.approval.id"
+     },
+     "ref": "obd",
+     "expect": {
+      "equals": {
+       "state": "done"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "payroll_dated_statutory_sets",
+   "title": "Phiếu lương dùng bộ tham số có hiệu lực theo kỳ; kỳ ngoài lịch sử bị từ chối",
+   "covers": [
+    "LG",
+    "PL"
+   ],
+   "steps": [
+    {
+     "id": "slip_q3",
+     "actor": "phuong",
+     "op": "payroll.slip",
+     "args": {
+      "employee": "an",
+      "month": "2026-09"
+     },
+     "expect": {
+      "equals": {
+       "state": "verify"
+      }
+     }
+    },
+    {
+     "id": "slip_q4",
+     "actor": "phuong",
+     "op": "payroll.slip",
+     "args": {
+      "employee": "dung",
+      "month": "2026-10"
+     },
+     "expect": {
+      "equals": {
+       "state": "verify"
+      }
+     }
+    },
+    {
+     "id": "slip_no_history",
+     "actor": "phuong",
+     "op": "payroll.slip",
+     "args": {
+      "employee": "an",
+      "month": "2026-03"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "declared_request_types",
+   "title": "Loại đơn khai báo bằng YAML (không viết Python) chạy đủ vòng đời; loại không cần duyệt; dữ liệu nhạy cảm; loại lạ bị từ chối",
+   "covers": [
+    "GK",
+    "DV",
+    "HS"
+   ],
+   "steps": [
+    {
+     "id": "unknown_type",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "no_such_type",
+      "subject": "an",
+      "values": {}
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "Unknown request type"
+     }
+    },
+    {
+     "id": "bad_option",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "parking_registration",
+      "subject": "an",
+      "values": {
+       "plate": "51F-123.45",
+       "vehicle": "tank",
+       "start_date": "workday+14"
+      }
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "Loại xe"
+     }
+    },
+    {
+     "id": "parking_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "parking_registration",
+      "subject": "an",
+      "values": {
+       "name": "Đăng ký gửi xe máy",
+       "plate": "51F-123.45",
+       "vehicle": "motorbike",
+       "start_date": "workday+14"
+      }
+     },
+     "ref": "pk"
+    },
+    {
+     "id": "parking_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$pk"
+     },
+     "ref": "pk",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "manager"
+      }
+     }
+    },
+    {
+     "id": "colleague_cannot_decide",
+     "actor": "dung",
+     "op": "core.decide",
+     "args": {
+      "case": "$pk",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "parking_manager",
+     "actor": "quang",
+     "op": "core.decide",
+     "args": {
+      "case": "$pk",
+      "decision": "approve"
+     },
+     "ref": "pk",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "parking_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$pk"
+     },
+     "ref": "pk",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "parking_slot_granted": 1
+      }
+     }
+    },
+    {
+     "id": "parking_reverse",
+     "actor": "lan",
+     "op": "core.reverse",
+     "args": {
+      "case": "$pk",
+      "reason": "Nhân viên chuyển sang đi xe buýt"
+     },
+     "ref": "pk",
+     "expect": {
+      "state": "cancelled",
+      "effects": {
+       "parking_slot_granted_reverse": 1
+      }
+     }
+    },
+    {
+     "id": "supplies_create",
+     "actor": "dung",
+     "op": "core.create",
+     "args": {
+      "kind": "office_supplies",
+      "subject": "dung",
+      "values": {
+       "name": "Văn phòng phẩm quý 4",
+       "item": "Bút bi xanh",
+       "quantity": 12,
+       "needed_by": "workday+10"
+      }
+     },
+     "ref": "sp"
+    },
+    {
+     "id": "supplies_submit",
+     "actor": "dung",
+     "op": "core.submit",
+     "args": {
+      "case": "$sp"
+     },
+     "ref": "sp",
+     "expect": {
+      "state": "approved",
+      "equals": {
+       "route_levels": "none"
+      }
+     }
+    },
+    {
+     "id": "supplies_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$sp"
+     },
+     "ref": "sp",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "supplies_requested": 1
+      }
+     }
+    },
+    {
+     "id": "bank_create",
+     "actor": "an",
+     "op": "core.create",
+     "args": {
+      "kind": "bank_account_change",
+      "subject": "an",
+      "values": {
+       "name": "Đổi tài khoản nhận lương",
+       "bank_name": "Vietcombank",
+       "account_number": "0071000999999",
+       "effective_from": "workday+20"
+      }
+     },
+     "ref": "bk"
+    },
+    {
+     "id": "bank_no_evidence",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$bk"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    },
+    {
+     "id": "bank_attach",
+     "actor": "an",
+     "op": "core.attach",
+     "args": {
+      "case": "$bk",
+      "text": "Giấy xác nhận tài khoản của ngân hàng (dữ liệu giả)"
+     }
+    },
+    {
+     "id": "bank_submit",
+     "actor": "an",
+     "op": "core.submit",
+     "args": {
+      "case": "$bk"
+     },
+     "ref": "bk",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "hr"
+      }
+     }
+    },
+    {
+     "id": "bank_requester_cannot_decide",
+     "actor": "an",
+     "op": "core.decide",
+     "args": {
+      "case": "$bk",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "bank_hr_sees_account",
+     "actor": "lan",
+     "op": "core.get",
+     "args": {
+      "case": "$bk"
+     },
+     "expect": {
+      "equals": {
+       "data.account_number": "0071000999999"
+      }
+     }
+    },
+    {
+     "id": "bank_hr_decides",
+     "actor": "lan",
+     "op": "core.decide",
+     "args": {
+      "case": "$bk",
+      "decision": "approve"
+     },
+     "ref": "bk",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "bank_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$bk"
+     },
+     "ref": "bk",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "bank_account_changed": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "period_and_payroll_signoff",
+   "title": "Kỳ công chỉ khóa được sau khi bảng chấm công đã được quản lý kiểm tra và Giám đốc ký; bảng lương do Giám đốc ký, kế toán xác nhận chi",
+   "covers": [
+    "CP",
+    "LG",
+    "HR-CP-24",
+    "HR-LG-07"
+   ],
+   "steps": [
+    {
+     "id": "gate_on",
+     "actor": "lan",
+     "op": "config.set",
+     "args": {
+      "key": "signoff_kind",
+      "value": "timesheet_signoff"
+     }
+    },
+    {
+     "id": "lock_without_signoff",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p3"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "timesheet_signoff"
+     }
+    },
+    {
+     "id": "sheet_create",
+     "actor": "lan",
+     "op": "core.create",
+     "args": {
+      "kind": "timesheet_signoff",
+      "subject": "lan",
+      "values": {
+       "name": "Bảng chấm công kỳ T-2",
+       "period": "p3",
+       "variance_note": "Không có sai lệch ngoài các ngày đã giải trình"
+      }
+     },
+     "ref": "ts"
+    },
+    {
+     "id": "sheet_submit",
+     "actor": "lan",
+     "op": "core.submit",
+     "args": {
+      "case": "$ts"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "hr,director"
+      }
+     }
+    },
+    {
+     "id": "still_blocked",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p3"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "timesheet_signoff"
+     }
+    },
+    {
+     "id": "sheet_hr_reconcile",
+     "actor": "hoa",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "sheet_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "sheet_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$ts"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "timesheet_signed": 1
+      }
+     }
+    },
+    {
+     "id": "lock_after_signoff",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p3"
+     },
+     "expect": {
+      "equals": {
+       "state": "locked"
+      }
+     }
+    },
+    {
+     "id": "payroll_create",
+     "actor": "lan",
+     "op": "core.create",
+     "args": {
+      "kind": "payroll_signoff",
+      "subject": "lan",
+      "values": {
+       "name": "Bảng lương kỳ T-2",
+       "period": "p3",
+       "headcount": 45,
+       "total_net": 912000000
+      }
+     },
+     "ref": "pr"
+    },
+    {
+     "id": "payroll_submit",
+     "actor": "lan",
+     "op": "core.submit",
+     "args": {
+      "case": "$pr"
+     },
+     "ref": "pr",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "director"
+      }
+     }
+    },
+    {
+     "id": "payroll_hr_cannot_sign",
+     "actor": "hoa",
+     "op": "core.decide",
+     "args": {
+      "case": "$pr",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "payroll_director",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$pr",
+      "decision": "approve"
+     },
+     "ref": "pr",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "payroll_post",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$pr",
+      "execution_user": "chi"
+     },
+     "ref": "pr",
+     "expect": {
+      "state": "executing",
+      "effects": {
+       "payroll_approved": 1
+      }
+     }
+    },
+    {
+     "id": "payroll_paid",
+     "actor": "chi",
+     "op": "core.execute",
+     "args": {
+      "case": "$pr",
+      "reference": "DEMO-PAYROLL",
+      "evidence": "Bảng kê chuyển lương mẫu (dữ liệu giả)"
+     },
+     "ref": "pr",
+     "expect": {
+      "state": "completed"
+     }
+    },
+    {
+     "id": "payslip_gate_on",
+     "actor": "lan",
+     "op": "config.set",
+     "args": {
+      "key": "payroll_gate",
+      "value": "locked"
+     }
+    },
+    {
+     "id": "payslip_blocked_by_open_period",
+     "actor": "phuong",
+     "op": "payroll.slip",
+     "args": {
+      "employee": "an",
+      "month": "2026-10"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "not all locked"
+     }
+    },
+    {
+     "id": "payslip_gate_off",
+     "actor": "lan",
+     "op": "config.set",
+     "args": {
+      "key": "payroll_gate",
+      "value": ""
+     }
+    },
+    {
+     "id": "payslip_shows_the_ledger",
+     "actor": "phuong",
+     "op": "payroll.slip",
+     "args": {
+      "employee": "an",
+      "month": "2026-10"
+     },
+     "expect": {
+      "equals": {
+       "state": "verify",
+       "hrm_complete": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "factory_attendance_period_chain",
+   "title": "Kỳ công của nhân viên nhà máy do Trưởng bộ phận xem trước, HR đối soát, Giám đốc hoặc CEO ký; ký xong mới khóa kỳ và thực thi",
+   "covers": [
+    "CP",
+    "HR-CP-24"
+   ],
+   "steps": [
+    {
+     "id": "gate_on",
+     "actor": "lan",
+     "op": "config.set",
+     "args": {
+      "key": "signoff_kind",
+      "value": "timesheet_signoff"
+     }
+    },
+    {
+     "id": "sheet_create",
+     "actor": "lan",
+     "op": "core.create",
+     "args": {
+      "kind": "timesheet_signoff",
+      "subject": "tai",
+      "values": {
+       "name": "Bảng chấm công kho kỳ T-3",
+       "period": "p2",
+       "variance_note": "Ca đêm qua nửa đêm đã tách đúng ngày"
+      }
+     },
+     "ref": "ts"
+    },
+    {
+     "id": "sheet_submit",
+     "actor": "lan",
+     "op": "core.submit",
+     "args": {
+      "case": "$ts"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "pending",
+      "equals": {
+       "route_levels": "manager,hr,director"
+      }
+     }
+    },
+    {
+     "id": "hr_not_before_manager",
+     "actor": "hoa",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "director_not_before_hr",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "department_head",
+     "actor": "hung",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "hr_reconcile",
+     "actor": "hoa",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "pending"
+     }
+    },
+    {
+     "id": "lock_before_signature",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p2"
+     },
+     "expect": {
+      "result": "UserError",
+      "contains": "timesheet_signoff"
+     }
+    },
+    {
+     "id": "director_signs",
+     "actor": "thanh",
+     "op": "core.decide",
+     "args": {
+      "case": "$ts",
+      "decision": "approve"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "approved"
+     }
+    },
+    {
+     "id": "execute",
+     "actor": "lan",
+     "op": "core.post",
+     "args": {
+      "case": "$ts"
+     },
+     "ref": "ts",
+     "expect": {
+      "state": "completed",
+      "effects": {
+       "timesheet_signed": 1
+      }
+     }
+    },
+    {
+     "id": "lock_after_signoff",
+     "actor": "lan",
+     "op": "core.lock_period",
+     "args": {
+      "period": "p2"
+     },
+     "expect": {
+      "equals": {
+       "state": "locked"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "role_administration_four_eyes",
+   "title": "Đổi Giám đốc/HR là việc có hai người: quản trị vai trò đề nghị, Giám đốc quyết định; không tự cấp quyền; lịch sử giữ lại",
+   "covers": [
+    "CHG",
+    "§8"
+   ],
+   "steps": [
+    {
+     "id": "request",
+     "actor": "hoa",
+     "op": "role.request",
+     "args": {
+      "user": "dayw01",
+      "role": "resource",
+      "action": "grant",
+      "reason": "Phụ trách phòng họp tầng 2"
+     },
+     "ref": "chg",
+     "expect": {
+      "equals": {
+       "state": "pending"
+      }
+     }
+    },
+    {
+     "id": "hr_officer_cannot_request",
+     "actor": "lan",
+     "op": "role.request",
+     "args": {
+      "user": "dayw02",
+      "role": "resource",
+      "action": "grant",
+      "reason": "Thử đề nghị khi không phải quản trị vai trò"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "nobody_requests_for_self",
+     "actor": "hoa",
+     "op": "role.request",
+     "args": {
+      "user": "hoa",
+      "role": "director",
+      "action": "grant",
+      "reason": "Tự đề nghị"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "requester_cannot_decide",
+     "actor": "hoa",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "hr_cannot_decide",
+     "actor": "lan",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "director_approves",
+     "actor": "thanh",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "ref": "chg",
+     "expect": {
+      "equals": {
+       "state": "approved",
+       "decided_by": "thanh@demo.example"
+      }
+     }
+    },
+    {
+     "id": "revoke",
+     "actor": "hoa",
+     "op": "role.request",
+     "args": {
+      "user": "dayw01",
+      "role": "resource",
+      "action": "revoke",
+      "reason": "Chuyển bộ phận"
+     },
+     "ref": "rev",
+     "expect": {
+      "equals": {
+       "state": "pending"
+      }
+     }
+    },
+    {
+     "id": "reject_needs_reason",
+     "actor": "thanh",
+     "op": "role.decide",
+     "args": {
+      "change": "$rev",
+      "decision": "reject"
+     },
+     "expect": {
+      "result": "UserError"
+     }
+    },
+    {
+     "id": "director_revokes",
+     "actor": "thanh",
+     "op": "role.decide",
+     "args": {
+      "change": "$rev",
+      "decision": "approve"
+     },
+     "expect": {
+      "equals": {
+       "state": "approved"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "legal_signs_the_overtime_limit",
+   "title": "Giới hạn tăng ca là tham số theo luật; HR soạn thay đổi, chỉ Pháp chế ký; người duyệt chính sách thông thường không ký được",
+   "covers": [
+    "LG",
+    "BLLĐ 2019 Đ.107"
+   ],
+   "steps": [
+    {
+     "id": "hr_drafts",
+     "actor": "lan",
+     "op": "policy.push",
+     "args": {
+      "policy": "hrm.overtime_limit",
+      "effective": "now-5m",
+      "note": "Rà soát định kỳ: giữ nguyên 40 giờ/tháng và 200 giờ/năm theo BLLĐ 2019 Đ.107",
+      "rules": [
+       {
+        "when": [
+         "",
+         "> 40",
+         ""
+        ],
+        "then": [
+         "false",
+         "\"Quá 40 giờ tăng ca trong tháng (BLLĐ 2019 Đ.107)\""
+        ]
+       },
+       {
+        "when": [
+         "",
+         "",
+         "> 200"
+        ],
+        "then": [
+         "false",
+         "\"Quá 200 giờ tăng ca trong năm (BLLĐ 2019 Đ.107)\""
+        ]
+       },
+       {
+        "when": [],
+        "then": [
+         "true",
+         "\"\""
+        ]
+       }
+      ],
+      "cases": [
+       {
+        "name": "tối bình thường",
+        "input": {
+         "hours": 3,
+         "month_hours": 12,
+         "year_hours": 80
+        },
+        "expected": {
+         "allowed": true
+        }
+       },
+       {
+        "name": "giờ thứ 41 của tháng",
+        "input": {
+         "hours": 3,
+         "month_hours": 41,
+         "year_hours": 80
+        },
+        "expected": {
+         "allowed": false
+        }
+       },
+       {
+        "name": "giờ thứ 201 của năm",
+        "input": {
+         "hours": 3,
+         "month_hours": 20,
+         "year_hours": 201
+        },
+        "expected": {
+         "allowed": false
+        }
+       }
+      ]
+     },
+     "ref": "otv"
+    },
+    {
+     "id": "author_cannot_approve",
+     "actor": "lan",
+     "op": "policy.approve",
+     "args": {
+      "version": "$otv"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "general_approver_cannot_sign",
+     "actor": "hoa",
+     "op": "policy.approve",
+     "args": {
+      "version": "$otv"
+     },
+     "expect": {
+      "result": "AccessError",
+      "contains": "approver group"
+     }
+    },
+    {
+     "id": "legal_signs",
+     "actor": "luat",
+     "op": "policy.approve",
+     "args": {
+      "version": "$otv"
+     },
+     "ref": "otv"
+    },
+    {
+     "id": "legal_activates",
+     "actor": "luat",
+     "op": "policy.activate",
+     "args": {
+      "version": "$otv"
+     },
+     "ref": "otv",
+     "expect": {
+      "equals": {
+       "state": "active"
+      }
+     }
+    },
+    {
+     "id": "limit_still_enforced",
+     "actor": "lan",
+     "op": "policy.evaluate",
+     "args": {
+      "policy": "hrm.overtime_limit",
+      "context": {
+       "hours": 3,
+       "month_hours": 41,
+       "year_hours": 80
+      }
+     },
+     "expect": {
+      "equals": {
+       "allowed": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "hr_intern_access",
+   "title": "Người mới vào HR được cấp đúng quyền của vị trí: HR đề nghị, Giám đốc quyết định, thực tập sinh không chạm được chính sách hay vai trò quản trị",
+   "covers": [
+    "CHG",
+    "§8",
+    "HR-CHG-05"
+   ],
+   "steps": [
+    {
+     "id": "intern_cannot_grant_roles",
+     "actor": "ninh",
+     "op": "role.request",
+     "args": {
+      "user": "dayw01",
+      "role": "employees_officer",
+      "action": "grant",
+      "reason": "Thử cấp quyền khi chưa có vai trò"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "request_officer",
+     "actor": "hoa",
+     "op": "role.request",
+     "args": {
+      "user": "ninh",
+      "role": "employees_officer",
+      "action": "grant",
+      "reason": "Thực tập sinh nhân sự cần quản lý hồ sơ nhân viên"
+     },
+     "ref": "chg",
+     "expect": {
+      "equals": {
+       "state": "pending"
+      }
+     }
+    },
+    {
+     "id": "hr_officer_cannot_decide",
+     "actor": "lan",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "requester_cannot_decide",
+     "actor": "hoa",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "director_decides",
+     "actor": "thanh",
+     "op": "role.decide",
+     "args": {
+      "change": "$chg",
+      "decision": "approve"
+     },
+     "expect": {
+      "equals": {
+       "state": "approved"
+      }
+     }
+    },
+    {
+     "id": "payroll_is_sensitive",
+     "actor": "hoa",
+     "op": "role.request",
+     "args": {
+      "user": "ninh",
+      "role": "payroll_manager",
+      "action": "grant",
+      "reason": "Thử xin quyền lương"
+     },
+     "ref": "sens",
+     "expect": {
+      "equals": {
+       "state": "pending"
+      }
+     }
+    },
+    {
+     "id": "intern_cannot_decide_own_role",
+     "actor": "ninh",
+     "op": "role.decide",
+     "args": {
+      "change": "$sens",
+      "decision": "approve"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    },
+    {
+     "id": "director_rejects_payroll",
+     "actor": "thanh",
+     "op": "role.decide",
+     "args": {
+      "change": "$sens",
+      "decision": "reject",
+      "reason": "Thực tập sinh không xem lương"
+     },
+     "expect": {
+      "equals": {
+       "state": "rejected"
+      }
+     }
+    },
+    {
+     "id": "intern_still_cannot_grant_roles",
+     "actor": "ninh",
+     "op": "role.request",
+     "args": {
+      "user": "dayw01",
+      "role": "employees_officer",
+      "action": "grant",
+      "reason": "Vẫn không có quyền quản trị vai trò"
+     },
+     "expect": {
+      "result": "AccessError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "external_payment_exchange",
+   "title": "Worker crash sau khi ngân hàng nhận lệnh, retry theo external reference",
+   "covers": [
+    "§10.5",
+    "TU"
+   ],
+   "deferred": "No exchange ledger or worker exists yet (Plane HRM-267). The core records a transfer a person observed; it never sends money, so there is nothing to retry."
+  },
+  {
+   "id": "concurrent_reservations",
+   "title": "Hai người cùng đặt một phòng hoặc một bản sách trong hai transaction song song",
+   "covers": [
+    "§10.7",
+    "DV"
+   ],
+   "deferred": "A seed runs in one database transaction. The row lock and the advisory lock are exercised by sequential overlap above; true parallel sessions need a load test on the stage database."
+  },
+  {
+   "id": "period_reopen",
+   "title": "Mở lại kỳ đã khóa bằng thao tác đặc quyền có audit",
+   "covers": [
+    "§10.6",
+    "CP"
+   ],
+   "deferred": "The core has lock and next-period adjustment, not a privileged reopen transition."
+  },
+  {
+   "id": "office_supplies_stock",
+   "title": "Văn phòng phẩm theo số lượng tồn và chốt hộp thư",
+   "covers": [
+    "DV"
+   ],
+   "deferred": "Resource kinds are room, asset, book and meal. A quantity stock ledger is not modelled."
+  }
+ ]
+}

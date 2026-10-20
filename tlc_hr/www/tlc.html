@@ -1,0 +1,64 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<style>
+  .tlc { max-width: 960px; margin: 0 auto; font-size: 15px; }
+  .tlc h1 { font-size: 26px; margin-bottom: 4px; }
+  .tlc .who { color: var(--text-muted); margin-bottom: 24px; }
+  .tlc .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .tlc .tile { display: block; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; color: inherit; font-weight: 600; }
+  .tlc .tile:hover { border-color: var(--primary); text-decoration: none; }
+  .tlc h2 { font-size: 18px; margin: 24px 0 8px; }
+  .tlc table { width: 100%; border-collapse: collapse; }
+  .tlc th, .tlc td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border-color); }
+  .tlc .empty { color: var(--text-muted); }
+  .tlc .count { background: var(--red-500, #e53e3e); color: #fff; border-radius: 10px; padding: 0 8px; font-size: 13px; }
+</style>
+<div class="tlc">
+  <h1>TLC HRM</h1>
+  {% if person %}
+  <div class="who">{{ person.employee_name }}{% if person.department %} · {{ person.department }}{% endif %}</div>
+  {% else %}
+  <div class="who">{{ _("Tài khoản này chưa gắn với hồ sơ nhân viên.") }}</div>
+  {% endif %}
+
+  <div class="tiles">
+    {% for tile in tiles %}<a class="tile" href="{{ tile.link }}">{{ tile.title }}</a>{% endfor %}
+  </div>
+
+  <h2>Việc chờ tôi duyệt {% if inbox %}<span class="count">{{ inbox|length }}</span>{% endif %}</h2>
+  {% if inbox %}
+  <table>
+    <tr><th>Người xin</th><th>Loại</th><th>Từ</th><th>Đến</th><th>Số ngày</th><th>Bước</th></tr>
+    {% for row in inbox %}
+    <tr>
+      <td><a href="/app/leave-application/{{ row.name }}">{{ row.employee_name }}</a></td>
+      <td>{{ row.leave_type }}</td><td>{{ frappe.format(row.from_date, "Date") }}</td>
+      <td>{{ frappe.format(row.to_date, "Date") }}</td><td>{{ row.total_leave_days }}</td><td>{{ row.workflow_state }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="empty">Không có việc nào chờ bạn duyệt.</p>{% endif %}
+
+  {% if person %}
+  <h2>Số ngày phép còn lại</h2>
+  {% if balances %}
+  <table>{% for b in balances %}<tr><td>{{ b.leave_type }}</td><td>{{ b.balance }} ngày</td></tr>{% endfor %}</table>
+  {% else %}<p class="empty">Chưa được cấp phép.</p>{% endif %}
+
+  <h2>Đơn gần đây của tôi</h2>
+  {% if my_requests %}
+  <table>
+    <tr><th>Loại</th><th>Từ</th><th>Đến</th><th>Số ngày</th><th>Trạng thái</th></tr>
+    {% for row in my_requests %}
+    <tr>
+      <td><a href="/app/leave-application/{{ row.name }}">{{ row.leave_type }}</a></td>
+      <td>{{ frappe.format(row.from_date, "Date") }}</td><td>{{ frappe.format(row.to_date, "Date") }}</td>
+      <td>{{ row.total_leave_days }}</td><td>{{ row.workflow_state or "" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="empty">Bạn chưa có đơn nào.</p>{% endif %}
+  {% endif %}
+</div>
+{% endblock %}
