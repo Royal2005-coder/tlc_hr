@@ -62,5 +62,7 @@ def leave_balances(employee):
 
     result = []
     for leave_type in frappe.get_all("Leave Allocation", filters={"employee": employee, "docstatus": 1}, pluck="leave_type", distinct=True):
-        result.append({"leave_type": leave_type, "balance": get_leave_balance_on(employee, leave_type, nowdate())})
+        # Count every leave of the allocation period, so approved leave in the coming weeks is already deducted.
+        balance = get_leave_balance_on(employee, leave_type, nowdate(), consider_all_leaves_in_the_allocation_period=True)
+        result.append({"leave_type": leave_type, "balance": balance})
     return result

@@ -152,6 +152,7 @@ def people(data):
             created[row["key"]] = employee_for(row, jobs, data, created.get(boss), by_key.get(boss))
             pending.remove(row)
     unrestrict_company_wide(rows)
+    fix_user_names(rows)
     for dept in data["departments"]:
         head = created.get(dept.get("manager"))
         if head:
@@ -170,12 +171,25 @@ def unrestrict_company_wide(rows):
                 frappe.delete_doc("User Permission", name, ignore_permissions=True)
 
 
+def fix_user_names(rows):
+    """Users created before the name-order fix: rewrite first and last name (idempotent)."""
+    for row in rows:
+        family_and_middle, _, given = row["name"].rpartition(" ")
+        user = frappe.get_doc("User", email_of(row["key"]))
+        if (user.first_name, user.last_name, user.middle_name or "") != (family_and_middle, given, ""):
+            user.update({"first_name": family_and_middle, "middle_name": "", "last_name": given})
+            user.save(ignore_permissions=True)
+
+
 def user_for(row, password):
     email = email_of(row["key"])
     if frappe.db.exists("User", email):
         return
-    # Vietnamese names keep their order (family, middle, given): the whole name goes in first_name.
-    user = frappe.get_doc({"doctype": "User", "email": email, "first_name": row["name"],
+    # Frappe shows first_name + last_name: family and middle names go first, the given name last, so the name reads in Vietnamese order
+    # (and with both set, ERPNext does not split the employee name again into first, middle and last).
+    family_and_middle, _, given = row["name"].rpartition(" ")
+    user = frappe.get_doc({"doctype": "User", "email": email, "first_name": family_and_middle or given,
+                           "last_name": given if family_and_middle else "",
                            "language": "vi", "time_zone": "Asia/Ho_Chi_Minh", "send_welcome_email": 0,
                            "user_type": "System User"})
     user.flags.no_welcome_mail = True
