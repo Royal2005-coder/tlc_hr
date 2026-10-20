@@ -17,7 +17,11 @@ doc_events = {
     "Leave Application": {"validate": "tlc_hr.events.leave_application_validate"},
     "Employee": {"validate": "tlc_hr.events.employee_validate"},
     "Employee Checkin": {"validate": "tlc_hr.attendance.checkin.validate"},
+    "Attendance Request": {"validate": "tlc_hr.events.attendance_request_validate"},
 }
+
+# The reason dialog of "Từ chối" for every TLC approval workflow on the desk.
+app_include_js = ["/assets/tlc_hr/js/tlc_workflow.js"]
 
 # TLC additions to the standard Leave Application form (decision support for the approver, reason to reject).
 doctype_js = {"Leave Application": "public/js/leave_application.js"}

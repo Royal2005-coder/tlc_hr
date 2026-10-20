@@ -2,8 +2,12 @@
 
 import frappe
 from frappe import _
+from frappe.utils import getdate, nowdate
 
-from tlc_hr.setup.install import REJECTED
+from tlc_hr.workflow_rules import apply_common
+
+# Corrections about a day already worked; only a business trip may be declared ahead.
+PAST_ONLY = ("Quên chấm vào", "Quên chấm ra", "Máy chấm công lỗi")
 
 
 def employee_validate(doc, method=None):
@@ -14,17 +18,17 @@ def employee_validate(doc, method=None):
 
 
 def leave_application_validate(doc, method=None):
-    """Fill the approver from the employee, require a reason to reject, and refuse a decision on a request of one's own."""
+    """Approver from the employee when the request comes from the API; shared rules of TLC workflows."""
     if not doc.get("leave_approver"):
         # HRMS fills it in its forms; requests created through the API need it too.
         doc.leave_approver = frappe.db.get_value("Employee", doc.employee, "leave_approver")
-    before = doc.get_doc_before_save()
-    if doc.get("workflow_state") == REJECTED and before and before.get("workflow_state") != REJECTED:
-        doc.tlc_rejected_stage = before.get("workflow_state")  # which level said no: line manager or HR
-    if doc.get("workflow_state") == REJECTED and not (doc.get("tlc_reject_reason") or "").strip():
-        frappe.throw(_("Nhập lý do từ chối trước khi từ chối đơn."), title=_("Thiếu lý do từ chối"))
-    if doc.has_value_changed("workflow_state") and doc.get("workflow_state") != "Nháp":
-        own_user = frappe.db.get_value("Employee", doc.employee, "user_id")
-        is_decision = doc.get_doc_before_save() and doc.get_doc_before_save().get("workflow_state") != "Nháp"
-        if is_decision and own_user and own_user == frappe.session.user:
-            frappe.throw(_("Bạn không thể tự duyệt hay từ chối đơn của chính mình."), title=_("Không được tự duyệt"))
+    apply_common(doc)
+
+
+def attendance_request_validate(doc, method=None):
+    """Corrections: the line manager decides first; forgetting to check in is declared after the day, never ahead."""
+    if doc.get("tlc_correction_type") and doc.reason != "Work From Home":
+        doc.reason = "On Duty"
+    if doc.get("tlc_correction_type") in PAST_ONLY and getdate(doc.to_date) > getdate(nowdate()):
+        frappe.throw(_("Chỉ giải trình {0} cho ngày đã qua.").format(doc.tlc_correction_type.lower()))
+    apply_common(doc, approver_field="tlc_approver")
