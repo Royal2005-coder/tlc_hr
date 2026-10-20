@@ -1,0 +1,294 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Overtime Request",
+ "module": "TLC HR",
+ "custom": 0,
+ "is_submittable": 1,
+ "autoname": "format:TLC-OT-{YYYY}-{#####}",
+ "naming_rule": "Expression",
+ "title_field": "employee_name",
+ "track_changes": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "engine": "InnoDB",
+ "show_title_field_in_link": 1,
+ "search_fields": "employee_name,ot_date",
+ "description": "Đề nghị tăng ca: quản lý đề xuất, người lao động đồng ý, giám đốc duyệt.",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "employee_user",
+  "column_break_emp",
+  "department",
+  "company",
+  "section_time",
+  "ot_date",
+  "from_time",
+  "to_time",
+  "column_break_time",
+  "hours",
+  "day_type",
+  "reason",
+  "section_limit",
+  "month_hours",
+  "column_break_limit",
+  "year_hours",
+  "section_decision",
+  "consent_at",
+  "tlc_reject_reason",
+  "tlc_rejected_stage",
+  "workflow_state",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Người lao động",
+   "options": "Employee",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Họ tên",
+   "fetch_from": "employee.employee_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "employee_user",
+   "fieldtype": "Link",
+   "label": "Tài khoản",
+   "options": "User",
+   "fetch_from": "employee.user_id",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "column_break_emp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Bộ phận",
+   "options": "Department",
+   "fetch_from": "employee.department",
+   "read_only": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Công ty",
+   "options": "Company",
+   "fetch_from": "employee.company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_time",
+   "fieldtype": "Section Break",
+   "label": "Thời gian tăng ca"
+  },
+  {
+   "fieldname": "ot_date",
+   "fieldtype": "Date",
+   "label": "Ngày",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "from_time",
+   "fieldtype": "Time",
+   "label": "Từ giờ",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_time",
+   "fieldtype": "Time",
+   "label": "Đến giờ",
+   "reqd": 1,
+   "description": "Qua nửa đêm thì tính sang ngày hôm sau."
+  },
+  {
+   "fieldname": "column_break_time",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hours",
+   "fieldtype": "Float",
+   "label": "Số giờ",
+   "read_only": 1,
+   "in_list_view": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "day_type",
+   "fieldtype": "Select",
+   "label": "Loại ngày",
+   "options": "Ngày thường\nNgày nghỉ tuần\nNgày lễ",
+   "read_only": 1,
+   "description": "Theo lịch nghỉ của người lao động: ngày thường 150%, nghỉ tuần 200%, ngày lễ 300%."
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do / công việc",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_limit",
+   "fieldtype": "Section Break",
+   "label": "Giới hạn theo Bộ luật Lao động (điều 107)"
+  },
+  {
+   "fieldname": "month_hours",
+   "fieldtype": "Float",
+   "label": "Tổng giờ trong tháng (kể cả đơn này)",
+   "read_only": 1,
+   "precision": "2",
+   "description": "Tối đa 40 giờ."
+  },
+  {
+   "fieldname": "column_break_limit",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "year_hours",
+   "fieldtype": "Float",
+   "label": "Tổng giờ trong năm (kể cả đơn này)",
+   "read_only": 1,
+   "precision": "2",
+   "description": "Tối đa 200 giờ."
+  },
+  {
+   "fieldname": "section_decision",
+   "fieldtype": "Section Break",
+   "label": "Đồng ý và duyệt"
+  },
+  {
+   "fieldname": "consent_at",
+   "fieldtype": "Datetime",
+   "label": "Người lao động đồng ý lúc",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "tlc_reject_reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do từ chối",
+   "no_copy": 1,
+   "depends_on": "eval:doc.workflow_state",
+   "description": "Bắt buộc khi người lao động hoặc giám đốc từ chối."
+  },
+  {
+   "fieldname": "tlc_rejected_stage",
+   "fieldtype": "Data",
+   "label": "Bị từ chối ở bước",
+   "read_only": 1,
+   "hidden": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "label": "Trạng thái",
+   "options": "Workflow State",
+   "read_only": 1,
+   "hidden": 1,
+   "no_copy": 1,
+   "allow_on_submit": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Sửa từ",
+   "options": "TLC Overtime Request",
+   "read_only": 1,
+   "no_copy": 1,
+   "print_hide": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "delete": 1,
+   "amend": 1
+  },
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1
+  },
+  {
+   "role": "Employee",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "write": 1
+  }
+ ],
+ "states": [],
+ "links": [],
+ "actions": [],
+ "modified": "2026-10-21 02:00:00.000000",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-10-21 02:00:00.000000"
+}

@@ -10,13 +10,15 @@ import json
 import frappe
 
 from tlc_hr.setup.install import TO_HR, TO_MANAGER
+from tlc_hr.setup.overtime import TO_DIRECTOR, TO_WORKER
 
 MODULE = "TLC HR"
 LEAVE = "Leave Application"
+OT = "TLC Overtime Request"
 TODAY = "frappe.datetime.get_today()"
 
 NUMBER_CARDS = {
-    # name: (doctype, static filters, dynamic filters, color)
+    # name: (doctype, static filters, dynamic filters, color[, (function, field)]); the default function counts documents
     "TLC Nhân sự đang làm việc": ("Employee", [["Employee", "status", "=", "Active"]], [], "#2f8a3c"),
     "TLC Nhân sự khối Nhà máy": ("Employee", [["Employee", "status", "=", "Active"], ["Employee", "tlc_workforce", "=", "factory"]], [], "#b5541b"),
     "TLC Nhân sự khối Hội sở": ("Employee", [["Employee", "status", "=", "Active"], ["Employee", "tlc_workforce", "=", "head_office"]], [], "#1d5fa8"),
@@ -29,6 +31,10 @@ NUMBER_CARDS = {
                                      [], "#e2a400"),
     "TLC Đi muộn tháng này": ("Attendance", [["Attendance", "late_entry", "=", 1], ["Attendance", "docstatus", "=", 1],
                                             ["Attendance", "attendance_date", "Timespan", "this month"]], [], "#e8590c"),
+    "TLC Tăng ca chờ người lao động": (OT, [[OT, "workflow_state", "=", TO_WORKER]], [], "#e2a400"),
+    "TLC Tăng ca chờ giám đốc duyệt": (OT, [[OT, "workflow_state", "=", TO_DIRECTOR]], [], "#d9480f"),
+    "TLC Giờ tăng ca tháng này": (OT, [[OT, "docstatus", "=", 1], [OT, "ot_date", "Timespan", "this month"]], [], "#1d5fa8",
+                                  ("Sum", "hours")),
     "TLC Nghỉ phép hôm nay": (LEAVE, [[LEAVE, "status", "=", "Approved"]],
                               [[LEAVE, "from_date", "<=", TODAY], [LEAVE, "to_date", ">=", TODAY]], "#7048e8"),
 }
@@ -41,6 +47,9 @@ CHARTS = {
                                 "group_by_based_on": "status", "type": "Donut",
                                 "filters_json": json.dumps([["Attendance", "docstatus", "=", 1],
                                                             ["Attendance", "attendance_date", "Timespan", "this month"]])},
+    "TLC Giờ tăng ca theo bộ phận": {"chart_type": "Group By", "document_type": OT, "group_by_type": "Sum",
+                                     "aggregate_function_based_on": "hours", "group_by_based_on": "department", "type": "Bar",
+                                     "filters_json": json.dumps([[OT, "docstatus", "=", 1], [OT, "ot_date", "Timespan", "this year"]])},
     "TLC Đơn nghỉ theo trạng thái": {"chart_type": "Group By", "document_type": LEAVE, "group_by_type": "Count",
                                      "group_by_based_on": "workflow_state", "type": "Donut", "filters_json": "[]"},
     "TLC Ngày nghỉ đã duyệt theo tháng": {"chart_type": "Sum", "document_type": LEAVE, "based_on": "from_date",
@@ -59,6 +68,7 @@ SHORTCUTS = {
     "Bảng công": ("DocType", "Attendance", "List", "Blue", None),
     "Điều chỉnh công": ("DocType", "Attendance Request", "List", "Orange",
                         [["Attendance Request", "workflow_state", "in", [TO_MANAGER, TO_HR]]]),
+    "Tăng ca": ("DocType", OT, "List", "Orange", [[OT, "workflow_state", "in", [TO_WORKER, TO_DIRECTOR]]]),
     "Phân ca": ("DocType", "Shift Assignment", "List", "Grey", None),
     # The report needs a period: the shortcut opens it on the current year (refreshed at every migration).
     "Số dư phép": ("URL", "/desk/query-report/Employee Leave Balance?from_date={year}-01-01&to_date={year}-12-31", "", "Grey", None),
@@ -74,20 +84,22 @@ WORKSPACES = {
         "roles": ["TLC Line Manager"], "icon": "users", "sequence": 1,
         "cards": ["TLC Đơn chờ tôi duyệt", "TLC Điều chỉnh công chờ duyệt", "TLC Nhân sự đang làm việc", "TLC Chấm công hôm nay",
                   "TLC Đi muộn tháng này",
-                  "TLC Nghỉ phép hôm nay"],
+                  "TLC Tăng ca chờ người lao động", "TLC Giờ tăng ca tháng này", "TLC Nghỉ phép hôm nay"],
         "charts": ["TLC Chấm công tháng này", "TLC Đơn nghỉ theo trạng thái"],
         "quick_list": (LEAVE, "Đơn chờ quản lý duyệt", [[LEAVE, "workflow_state", "=", TO_MANAGER]]),
-        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Nhân viên", "Sơ đồ tổ chức",
+        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Nhân viên", "Sơ đồ tổ chức",
                       "Số dư phép",
                       "Ứng dụng Frappe HR"],
     },
     "TLC Nhân sự": {
         "roles": ["TLC HR Lead", "TLC HR Officer"], "icon": "hr", "sequence": 2,
         "cards": ["TLC Nhân sự đang làm việc", "TLC Nhân sự khối Hội sở", "TLC Nhân sự khối Nhà máy", "TLC Đơn chờ nhân sự duyệt",
-                  "TLC Điều chỉnh công chờ duyệt", "TLC Chấm công hôm nay", "TLC Đi muộn tháng này", "TLC Nghỉ phép hôm nay"],
-        "charts": ["TLC Chấm công tháng này", "TLC Nhân sự theo phòng ban", "TLC Ngày nghỉ đã duyệt theo tháng"],
+                  "TLC Điều chỉnh công chờ duyệt", "TLC Chấm công hôm nay", "TLC Đi muộn tháng này", "TLC Giờ tăng ca tháng này",
+                  "TLC Nghỉ phép hôm nay"],
+        "charts": ["TLC Chấm công tháng này", "TLC Giờ tăng ca theo bộ phận", "TLC Nhân sự theo phòng ban",
+                   "TLC Ngày nghỉ đã duyệt theo tháng"],
         "quick_list": (LEAVE, "Đơn chờ nhân sự duyệt", [[LEAVE, "workflow_state", "=", TO_HR]]),
-        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Phân ca", "Nhân viên",
+        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Phân ca", "Nhân viên",
                       "Cấp phép năm", "Lịch nghỉ lễ",
                       "Tham số lương Việt Nam",
                       "Số dư phép", "Sơ đồ tổ chức", "Yêu cầu cần xử lý"],
@@ -95,10 +107,12 @@ WORKSPACES = {
     "TLC Điều hành": {
         "roles": ["TLC Director"], "icon": "dashboard", "sequence": 3,
         "cards": ["TLC Nhân sự đang làm việc", "TLC Nhân sự khối Hội sở", "TLC Nhân sự khối Nhà máy", "TLC Đơn chờ tôi duyệt",
-                  "TLC Đơn chờ quản lý duyệt", "TLC Đơn chờ nhân sự duyệt", "TLC Chấm công hôm nay", "TLC Nghỉ phép hôm nay"],
-        "charts": ["TLC Chấm công tháng này", "TLC Nhân sự theo phòng ban", "TLC Ngày nghỉ đã duyệt theo tháng"],
+                  "TLC Tăng ca chờ giám đốc duyệt", "TLC Đơn chờ quản lý duyệt", "TLC Đơn chờ nhân sự duyệt", "TLC Chấm công hôm nay",
+                  "TLC Giờ tăng ca tháng này", "TLC Nghỉ phép hôm nay"],
+        "charts": ["TLC Chấm công tháng này", "TLC Giờ tăng ca theo bộ phận", "TLC Nhân sự theo phòng ban",
+                   "TLC Ngày nghỉ đã duyệt theo tháng"],
         "quick_list": (LEAVE, "Đơn chờ tôi duyệt", [[LEAVE, "workflow_state", "=", TO_MANAGER]]),
-        "shortcuts": ["Đơn chờ duyệt", "Lịch nghỉ phép", "Nhân viên", "Sơ đồ tổ chức", "Số dư phép"],
+        "shortcuts": ["Đơn chờ duyệt", "Tăng ca", "Lịch nghỉ phép", "Nhân viên", "Sơ đồ tổ chức", "Số dư phép"],
     },
 }
 
@@ -113,9 +127,11 @@ def upsert(doctype, name, values):
 
 
 def ensure_number_cards():
-    for label, (doctype, filters, dynamic, color) in NUMBER_CARDS.items():
+    for label, (doctype, filters, dynamic, color, *aggregate) in NUMBER_CARDS.items():
+        function, field = aggregate[0] if aggregate else ("Count", None)
         upsert("Number Card", label, {
-            "label": label, "type": "Document Type", "document_type": doctype, "function": "Count", "is_public": 1,
+            "label": label, "type": "Document Type", "document_type": doctype, "function": function,
+            "aggregate_function_based_on": field, "is_public": 1,
             "module": MODULE, "color": color, "filters_json": json.dumps(filters), "dynamic_filters_json": json.dumps(dynamic),
             "show_percentage_stats": 0,
         })
@@ -159,7 +175,7 @@ def ensure_workspaces():
                 row["link_to"] = target
             if stats:
                 row["stats_filter"] = json.dumps(stats)
-                row["format"] = "{} đơn" if target == LEAVE else "{}"
+                row["format"] = "{} đơn" if target in (LEAVE, OT) else "{}"
             doc.append("shortcuts", row)
         doc.save(ignore_permissions=True)
 

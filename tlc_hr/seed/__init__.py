@@ -34,7 +34,7 @@ def run():
     """Create the whole demo step by step; each finished step is committed, so a rerun continues where a failure stopped."""
     data = load()
     for step in (setup_company, accounts, holidays, departments, designations, people, payroll_fields, leave, shifts, checkins,
-                 demo_mail):
+                 demo_mail, overtime):
         step(data)
         frappe.db.commit()
         print("seed:", step.__name__, "done")
@@ -372,6 +372,61 @@ def checkins(data, days=DEMO_DAYS):
         doc.save(ignore_permissions=True)
         frappe.db.commit()
         doc.process_auto_attendance()
+
+
+# (from, to) of the overtime the factory heads propose: after office hours, before the night shift. Peak shifts are already 12 h.
+OVERTIME_TIMES = {"TLC Hành chính": ("17:30:00", "20:30:00"), "TLC Ca đêm": ("18:30:00", "21:00:00")}
+
+
+def overtime(data):
+    """Overtime of factory people through the real workflow (head proposes, worker consents, director approves): two approved
+    evenings earlier this month, and next week a request waiting for the worker or the director (no e-mail during the seed)."""
+    import datetime as dt
+
+    from frappe.model.workflow import apply_workflow
+
+    today = getdate(nowdate())
+    past = [d for d in (today - dt.timedelta(days=n) for n in range(1, 20)) if d.weekday() < 5 and d.month == today.month][:6]
+    upcoming = next(d for d in (today + dt.timedelta(days=n) for n in range(7, 14)) if d.weekday() < 5)
+    rng = random.Random(20261022)
+    workers = frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active", "tlc_workforce": "factory",
+                                                  "leave_approver": ["is", "set"], "user_id": ["is", "set"]},
+                             fields=["name", "user_id", "leave_approver", "default_shift"], order_by="name")
+    frappe.flags.mute_emails = True
+    try:
+        for i, worker in enumerate(workers):
+            times = OVERTIME_TIMES.get(worker.default_shift)
+            if not times or "TLC Line Manager" not in frappe.get_roles(worker.leave_approver):
+                continue
+            plan = [(day, ("Đồng ý", "Duyệt")) for day in rng.sample(past, k=min(2, len(past)))]
+            plan.append((upcoming, ((), ("Đồng ý",), None)[i % 3]))
+            for day, actions in plan:
+                if actions is None or frappe.db.exists("TLC Overtime Request", {"employee": worker.name, "ot_date": day}):
+                    continue
+                frappe.set_user(worker.leave_approver)
+                doc = frappe.get_doc({"doctype": "TLC Overtime Request", "employee": worker.name, "ot_date": day, "from_time": times[0],
+                                      "to_time": times[1], "reason": "Đơn hàng cuối tháng"}).insert()
+                apply_workflow(doc, "Đề nghị")
+                for action, user in zip(actions, (worker.user_id, email_of("thanh"))):
+                    frappe.set_user(user)
+                    apply_workflow(frappe.get_doc(doc.doctype, doc.name), action)
+    finally:
+        frappe.set_user("Administrator")
+        frappe.flags.mute_emails = False
+
+
+def reset_overtime_requests():
+    """Demo and UAT only: delete every overtime request, then the seed step overtime puts the demo ones back."""
+    if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
+        frappe.throw("reset_overtime_requests runs only on a test site (site config allow_tests)")
+    names = frappe.get_all("TLC Overtime Request", pluck="name")
+    if names:
+        frappe.db.delete("Workflow Action", {"reference_doctype": "TLC Overtime Request"})
+        frappe.db.delete("Notification Log", {"document_type": "TLC Overtime Request"})
+        frappe.db.delete("TLC Overtime Request", {"name": ["in", names]})
+    overtime(load())
+    frappe.db.commit()
+    print(f"reset: {len(names)} overtime requests deleted, demo overtime seeded")
 
 
 def reset_attendance_demo():

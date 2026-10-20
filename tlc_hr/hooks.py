@@ -18,7 +18,12 @@ doc_events = {
     "Employee": {"validate": "tlc_hr.events.employee_validate"},
     "Employee Checkin": {"validate": "tlc_hr.attendance.checkin.validate"},
     "Attendance Request": {"validate": "tlc_hr.events.attendance_request_validate"},
+    "Overtime Slip": {"validate": "tlc_hr.attendance.overtime.cap_to_approved"},
 }
+
+OVERTIME = "tlc_hr.tlc_hr.doctype.tlc_overtime_request.tlc_overtime_request"
+permission_query_conditions = {"TLC Overtime Request": f"{OVERTIME}.query_conditions"}
+has_permission = {"TLC Overtime Request": f"{OVERTIME}.has_permission"}
 
 # The reason dialog of "Từ chối" for every TLC approval workflow on the desk.
 app_include_js = ["/assets/tlc_hr/js/tlc_workflow.js"]

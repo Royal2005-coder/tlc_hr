@@ -53,7 +53,7 @@ REASON_PERMS = {"Employee": (1, 0), "Leave Approver": (1, 1), "TLC HR Lead": (1,
 
 
 # Doctypes whose reason to reject sits at permlevel 1.
-REASON_DOCTYPES = ["Leave Application", "Attendance Request"]
+REASON_DOCTYPES = ["Leave Application", "Attendance Request"]  # TLC Overtime Request keeps it at level 0: the worker refuses too
 
 
 def ensure_reason_permissions():
@@ -117,6 +117,9 @@ def after_migrate():
     from tlc_hr.setup.attendance import ensure_all as ensure_attendance
 
     ensure_attendance()
+    from tlc_hr.setup.overtime import ensure_all as ensure_overtime
+
+    ensure_overtime()
     from tlc_hr.setup.workspaces import ensure_all
 
     ensure_all()
