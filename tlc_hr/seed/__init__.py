@@ -33,7 +33,8 @@ def load():
 def run():
     """Create the whole demo step by step; each finished step is committed, so a rerun continues where a failure stopped."""
     data = load()
-    for step in (setup_company, holidays, departments, designations, people, leave, demo_mail):
+    for step in (setup_company, accounts, holidays, departments, designations, people, payroll_fields, leave, shifts, checkins,
+                 demo_mail):
         step(data)
         frappe.db.commit()
         print("seed:", step.__name__, "done")
@@ -72,6 +73,25 @@ def setup_company(data):
         detail = chr(10).join([last[0].method, last[0].error]) if last else "no error log"
         frappe.throw(chr(10).join([f"setup wizard did not create {COMPANY}: {result}", detail]))
     frappe.db.set_single_value("System Settings", "language", "vi")
+
+
+def accounts(data):
+    from tlc_hr.setup.accounts import ensure_accounts
+
+    ensure_accounts(COMPANY)
+
+
+def payroll_fields(data):
+    """Employees created before the sync hook: copy wage and dependents into the fields payroll reads (idempotent)."""
+    for row in frappe.get_all("Employee", filters={"company": COMPANY},
+                              fields=["name", "tlc_monthly_wage", "tlc_dependents", "vn_insurance_salary", "vn_number_of_dependents"]):
+        values = {}
+        if row.tlc_monthly_wage and not row.vn_insurance_salary:
+            values["vn_insurance_salary"] = row.tlc_monthly_wage
+        if (row.vn_number_of_dependents or 0) != (row.tlc_dependents or 0):
+            values["vn_number_of_dependents"] = row.tlc_dependents or 0
+        if values:
+            frappe.db.set_value("Employee", row.name, values)
 
 
 def holidays(data):
@@ -135,7 +155,8 @@ def expand_people(data):
             rows.append({"key": f"{bulk['prefix']}{i:02d}",
                          "name": f"{rng.choice(family_names)} Văn {rng.choice(first_names)}",
                          "department": bulk["department"], "job": bulk["job"], "manager": bulk["manager"],
-                         "wage": round(rng.randint(low, high), -5), "workforce": bulk.get("workforce", "head_office")})
+                         "wage": round(rng.randint(low, high), -5), "workforce": bulk.get("workforce", "head_office"),
+                         "calendar": bulk.get("calendar")})
     return rows
 
 
@@ -289,6 +310,79 @@ def demo_mail(data):
     account.update(values)
     account.flags.ignore_validate = True
     account.save(ignore_permissions=True) if not account.is_new() else account.insert(ignore_permissions=True)
+
+
+def shifts(data):
+    """Each person works the shift of their calendar at the site of their department (office hours when no calendar)."""
+    from tlc_hr.setup.attendance import SHIFT_OF_CALENDAR, assign, ensure_all, site_of
+
+    ensure_all()
+    calendar_of = {row["key"]: row.get("calendar") for row in expand_people(data)}
+    for employee in frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, fields=["name", "tlc_key", "department"]):
+        shift = SHIFT_OF_CALENDAR.get(calendar_of.get(employee.tlc_key) or "office", "TLC Hành chính")
+        assign(employee.name, shift, site_of(employee.department), COMPANY)
+
+
+# (IN, OUT) of each shift: hour, minute; OUT before IN means the next day
+SHIFT_TIMES = {"TLC Hành chính": ((7, 52), (17, 8)), "TLC Ca đêm": ((21, 52), (6, 8)), "TLC Cao điểm": ((6, 52), (19, 8))}
+DEMO_DAYS = 10
+
+
+def checkins(data, days=DEMO_DAYS):
+    """Check-ins of everyone for the last working days, at their work site; a few late arrivals and absences (stable random)."""
+    import datetime as dt
+
+    from tlc_hr.setup.attendance import SITES, site_of
+
+    today = getdate(nowdate())
+    work_days = []
+    day = today - dt.timedelta(days=1)
+    while len(work_days) < days:
+        if day.weekday() < 5:
+            work_days.append(day)
+        day -= dt.timedelta(days=1)
+    work_days.reverse()
+    rng = random.Random(20261021)
+    employees = frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, fields=["name", "department", "default_shift"])
+    for employee in employees:
+        shift = employee.default_shift or "TLC Hành chính"
+        (in_h, in_m), (out_h, out_m) = SHIFT_TIMES[shift]
+        lat, lon, _radius = SITES[site_of(employee.department)]
+        for work_day in work_days:
+            roll = rng.random()
+            if roll < 0.02:
+                continue  # absent
+            late = 25 if roll > 0.95 else 0
+            start = dt.datetime.combine(work_day, dt.time(in_h, in_m)) + dt.timedelta(minutes=late + rng.randint(0, 12))
+            # idempotent: this shift already has its IN (the OUT of last night's shift falls on this date, so look at IN only)
+            window = [start - dt.timedelta(hours=2), start + dt.timedelta(hours=2)]
+            if frappe.db.exists("Employee Checkin", {"employee": employee.name, "log_type": "IN", "time": ["between", window]}):
+                continue
+            end_day = work_day + dt.timedelta(days=1) if out_h < in_h else work_day
+            end = dt.datetime.combine(end_day, dt.time(out_h, out_m)) + dt.timedelta(minutes=rng.randint(0, 20))
+            for log_type, when in (("IN", start), ("OUT", end)):
+                frappe.get_doc({"doctype": "Employee Checkin", "employee": employee.name, "log_type": log_type, "time": when,
+                                "latitude": lat + rng.uniform(-0.0004, 0.0004), "longitude": lon + rng.uniform(-0.0004, 0.0004)}).insert()
+    first = work_days[0]
+    for shift in SHIFT_TIMES:
+        doc = frappe.get_doc("Shift Type", shift)
+        if not doc.process_attendance_after or getdate(doc.process_attendance_after) < first:
+            doc.process_attendance_after = first
+        doc.last_sync_of_checkin = frappe.utils.now_datetime()
+        doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        doc.process_auto_attendance()
+
+
+def reset_attendance_demo():
+    """Demo and test sites only: delete check-ins, attendance (not leave) and shift assignments, so the seed rebuilds them."""
+    if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
+        frappe.throw("reset_attendance_demo runs only on a test site (site config allow_tests)")
+    frappe.db.delete("Employee Checkin")
+    frappe.db.delete("Attendance", {"status": ["!=", "On Leave"]})
+    frappe.db.delete("Shift Assignment")
+    frappe.db.commit()
+    print("reset: attendance demo deleted")
 
 
 def reset_leave_requests():

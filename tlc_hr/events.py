@@ -6,6 +6,13 @@ from frappe import _
 from tlc_hr.setup.install import REJECTED
 
 
+def employee_validate(doc, method=None):
+    """Payroll reads the Vietnamese fields of erpnextvn: keep them in step with the TLC fields (one value, two names)."""
+    if doc.get("tlc_monthly_wage") and not doc.get("vn_insurance_salary"):
+        doc.vn_insurance_salary = doc.tlc_monthly_wage
+    doc.vn_number_of_dependents = doc.get("tlc_dependents") or 0
+
+
 def leave_application_validate(doc, method=None):
     """Fill the approver from the employee, require a reason to reject, and refuse a decision on a request of one's own."""
     if not doc.get("leave_approver"):

@@ -15,6 +15,8 @@ after_migrate = ["tlc_hr.setup.install.after_migrate"]
 
 doc_events = {
     "Leave Application": {"validate": "tlc_hr.events.leave_application_validate"},
+    "Employee": {"validate": "tlc_hr.events.employee_validate"},
+    "Employee Checkin": {"validate": "tlc_hr.attendance.checkin.validate"},
 }
 
 # TLC additions to the standard Leave Application form (decision support for the approver, reason to reject).

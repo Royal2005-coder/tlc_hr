@@ -25,6 +25,8 @@ CUSTOM_FIELDS = {
     ],
     "Department": [
         {"fieldname": "tlc_head", "label": "Trưởng bộ phận", "fieldtype": "Link", "options": "Employee", "insert_after": "department_name"},
+        {"fieldname": "tlc_wage_region", "label": "Vùng lương tối thiểu", "fieldtype": "Select", "options": "I\nII\nIII\nIV",
+         "default": "I", "insert_after": "tlc_head", "description": "Vùng theo Nghị định 293/2025/NĐ-CP của nơi làm việc; quyết định trần đóng BHTN."},
     ],
     "Leave Application": [
         {"fieldname": "tlc_reject_reason", "label": "Lý do từ chối", "fieldtype": "Small Text", "insert_after": "status",
@@ -90,6 +92,13 @@ def after_migrate():
     ensure_workflow_states()
     ensure_leave_workflow()
     apply_settings()
+    from tlc_hr.setup.accounts import ensure_accounts
+
+    for company in frappe.get_all("Company", pluck="name"):
+        ensure_accounts(company)
+    from tlc_hr.setup.attendance import ensure_all as ensure_attendance
+
+    ensure_attendance()
     from tlc_hr.setup.workspaces import ensure_all
 
     ensure_all()

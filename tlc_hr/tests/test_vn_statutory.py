@@ -42,5 +42,16 @@ class TestPit2026(unittest.TestCase):
         self.assertEqual(result.bracket, 2)
 
 
+class TestCeilings2026(unittest.TestCase):
+    def test_2026_ceilings(self):
+        from tlc_hr.vn.statutory import MIN_WAGE_2026, base_salary_on
+
+        self.assertEqual(20 * MIN_WAGE_2026["I"], 106_200_000)  # BHTN ceiling, region I
+        self.assertEqual(20 * base_salary_on("2026-10-01"), 50_600_000)  # BHXH/BHYT ceiling from July 2026
+        self.assertEqual(base_salary_on("2026-03-01"), 2_340_000)
+        with self.assertRaises(ValueError):
+            base_salary_on("2020-01-01")
+
+
 if __name__ == "__main__":
     unittest.main()
