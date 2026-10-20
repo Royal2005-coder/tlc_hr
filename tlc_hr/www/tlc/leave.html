@@ -1,0 +1,55 @@
+{% extends "templates/tlc/layout.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar, state_badge, steps, dates, days with context %}
+
+{% block tlc_content %}
+<div class="tp-pagehead">
+  <div><h1>Nghỉ phép</h1><p>Số dư, đơn đã gửi và tiến trình duyệt của bạn.</p></div>
+  {% if person and person.approver_name %}<button class="tp-btn primary" onclick="tpOpenLeave()" data-testid="leave-request">{{ icon("plus", 18) }} Xin nghỉ phép</button>{% endif %}
+</div>
+
+<div class="tp-grid">
+  {% for b in balances %}
+  <section class="tp-card c-6" data-testid="balance-card">
+    <div class="tp-card-h">{{ b.leave_type }}<span class="tp-sub">năm {{ today.year }}</span></div>
+    <div class="tp-balance">
+      <div class="tp-ring" style="--p: {{ (100 * b.remaining / b.allocated)|round if b.allocated else 0 }}"><div><span><b data-testid="balance-remaining">{{ days(b.remaining) }}</b><small>ngày<br>còn lại</small></span></div></div>
+      <div style="flex:1">
+        <div class="tp-bar" title="Đã dùng và chờ duyệt"><span class="used" style="width: {{ b.used_pct }}%"></span><span class="pend" style="width: {{ b.pending_pct }}%"></span></div>
+        <div class="tp-legend"><span><i style="background:var(--tp-brand)"></i>Đã dùng/đã duyệt {{ days(b.used) }}</span>
+          <span><i style="background:#9fcfbd"></i>Chờ duyệt {{ days(b.pending) }}</span><span>Được cấp {{ days(b.allocated) }}</span></div>
+        {% if b.pending %}<div class="tp-hint">Nếu các đơn đang chờ được duyệt, bạn còn <b>{{ days(b.after_pending) }}</b> ngày.</div>{% endif %}
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <section class="tp-card c-12"><div class="tp-empty">Bạn chưa được cấp ngày phép nào. Liên hệ phòng Nhân sự.</div></section>
+  {% endfor %}
+
+  <section class="tp-card c-8" data-testid="my-requests">
+    <div class="tp-card-h">Đơn của tôi</div>
+    {% for r in requests %}
+    <div class="tp-req" data-testid="my-request" data-name="{{ r.name }}">
+      <div class="tp-req-h">
+        <div class="t"><b>{{ r.leave_type }} · {{ dates(r) }}</b>
+          <div class="tp-sub">{{ r.name }} · {{ days(r.total_leave_days) }} ngày{% if r.half_day %} (nửa ngày){% endif %} · {{ r.description or "" }}</div></div>
+        <span data-testid="my-request-state">{{ state_badge(r.workflow_state) }}</span>
+      </div>
+      {{ steps(r.steps) }}
+      {% if r.tlc_reject_reason %}<div class="tp-hint bad" data-testid="my-request-reason">Lý do từ chối: {{ r.tlc_reject_reason }}</div>{% endif %}
+      {% if r.can_withdraw %}<div class="tp-actions"><button class="tp-btn danger sm" data-testid="withdraw" onclick="tpWithdraw(this, '{{ r.name }}')">Rút đơn</button></div>{% endif %}
+    </div>
+    {% else %}
+    <div class="tp-empty">Bạn chưa có đơn nào. {% if person and person.approver_name %}<a class="tp-link" href="#" onclick="tpOpenLeave();return false">Gửi đơn đầu tiên</a>{% endif %}</div>
+    {% endfor %}
+  </section>
+
+  <section class="tp-card c-4" data-testid="w-holidays">
+    <div class="tp-card-h"><span class="ttl">{{ icon("flag", 18) }} Ngày lễ trong lịch</span></div>
+    <ul class="tp-list">
+      {% for h in holidays %}<li><div class="t"><b>{{ h.description }}</b><span>{{ frappe.format(h.holiday_date, "Date") }}</span></div></li>
+      {% else %}<li class="tp-empty">Không còn ngày lễ nào trong năm.</li>{% endfor %}
+    </ul>
+    <div class="tp-sub" style="margin-top:10px">Thứ Bảy, Chủ nhật và ngày lễ không tính vào số ngày nghỉ.</div>
+  </section>
+</div>
+{% endblock %}

@@ -21,7 +21,7 @@ class TestTlcApi(IntegrationTestCase):
     def setUp(self):
         if not frappe.db.exists("User", WORKER):
             self.skipTest("TLC demo seed not loaded (bench execute tlc_hr.seed.run)")
-        self.day = working_day(60 + frappe.db.count("Leave Application"))
+        self.day = working_day(36 + frappe.db.count("Leave Application") % 4)  # inside the 2026 allocation
 
     def tearDown(self):
         frappe.set_user("Administrator")

@@ -1,0 +1,36 @@
+{% extends "templates/tlc/layout.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar, state_badge, steps, dates, days with context %}
+
+{% block tlc_content %}
+<div class="tp-pagehead"><div><h1>Duyệt đơn</h1><p>Mỗi đơn kèm thông tin giúp bạn quyết định: số dư sau khi duyệt, ai cùng bộ phận cũng nghỉ những ngày đó.</p></div>
+  <span class="badge {% if inbox %}warn{% else %}ok{% endif %}" style="font-size:14px" data-testid="inbox-count">{{ inbox|length }} đơn chờ</span></div>
+
+{% for row in inbox %}
+<article class="tp-req" id="{{ row.name }}" data-testid="inbox-item" data-name="{{ row.name }}" data-employee="{{ row.employee_name }}">
+  <div class="tp-req-h">{{ avatar(row.employee_name, "lg") }}
+    <div class="t"><b>{{ row.employee_name }}</b><div class="tp-sub">{{ row.site }} · gửi {{ row.waiting_days }} ngày trước · {{ row.name }}</div></div>
+    {{ state_badge(row.workflow_state) }}</div>
+  <div class="facts">
+    <span>Loại: <b>{{ row.leave_type }}</b></span>
+    <span>Thời gian: <b>{{ dates(row) }}</b></span>
+    <span>Số ngày: <b>{{ days(row.total_leave_days) }}</b>{% if row.half_day %} (nửa ngày){% endif %}</span>
+    <span>Số dư sau khi duyệt: <b data-testid="balance-after" style="color: {{ 'var(--tp-bad)' if row.balance_after < 0 else 'var(--tp-ok)' }}">{{ days(row.balance_after) }}</b> / {{ days(row.balance_now) }} ngày</span>
+  </div>
+  {% if row.description %}<div class="tp-hint">Lý do: {{ row.description }}</div>{% endif %}
+  {% if row.overlap %}<div class="tp-hint warn" data-testid="overlap">Cùng thời gian, {{ row.overlap|length }}/{{ row.team_size }} người trong {{ row.site }} cũng nghỉ:
+    {% for o in row.overlap %}{{ o.name }}{% if o.pending %} (chờ duyệt){% endif %}{{ ", " if not loop.last }}{% endfor %}</div>
+  {% else %}<div class="tp-hint" data-testid="no-overlap">Không ai khác trong {{ row.site }} nghỉ vào thời gian này.</div>{% endif %}
+  {{ steps(row.steps) }}
+  <div class="tp-actions">
+    <button class="tp-btn primary" data-testid="approve" onclick="tpDecide(this, '{{ row.name }}', 'approve')">{{ icon("approvals", 18) }} Duyệt</button>
+    <button class="tp-btn danger" data-testid="reject-open" onclick="tpToggleReject('{{ row.name }}')">Từ chối…</button>
+  </div>
+  <div class="tp-reject" id="reject-{{ row.name }}">
+    <textarea class="tp-input" rows="2" data-testid="reject-reason" placeholder="Lý do từ chối (bắt buộc, người xin sẽ thấy), ví dụ: trùng lịch kiểm kê"></textarea>
+    <div class="tp-actions"><button class="tp-btn danger" data-testid="reject-confirm" onclick="tpDecide(this, '{{ row.name }}', 'reject')">Xác nhận từ chối</button></div>
+  </div>
+</article>
+{% else %}
+<section class="tp-card" data-testid="inbox-empty"><div class="tp-empty" style="text-align:center;padding:30px">Không còn đơn nào chờ bạn duyệt. 🎉</div></section>
+{% endfor %}
+{% endblock %}

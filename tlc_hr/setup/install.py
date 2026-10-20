@@ -29,6 +29,8 @@ CUSTOM_FIELDS = {
     "Leave Application": [
         {"fieldname": "tlc_reject_reason", "label": "Lý do từ chối", "fieldtype": "Small Text", "insert_after": "status",
          "depends_on": "eval:doc.workflow_state", "description": "Bắt buộc khi từ chối đơn."},
+        {"fieldname": "tlc_rejected_stage", "label": "Bị từ chối ở bước", "fieldtype": "Data", "insert_after": "tlc_reject_reason",
+         "read_only": 1, "depends_on": "eval:doc.tlc_rejected_stage"},
     ],
 }
 

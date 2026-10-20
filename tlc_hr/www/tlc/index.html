@@ -1,0 +1,114 @@
+{% extends "templates/tlc/layout.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar, state_badge, steps, dates, days with context %}
+
+{% block tlc_content %}
+{% if person %}
+<section class="tp-hero" data-testid="hero">
+  {{ avatar(person.employee_name, "lg av") }}
+  <div class="grow">
+    <h1 data-testid="hero-name">{{ greeting }}, {{ person.first_name }}!</h1>
+    <div class="meta">{{ person.employee_name }} · {{ person.designation or "" }} · {{ person.site }}
+      <span class="tag" data-testid="workforce">{{ person.workforce_label }}</span></div>
+  </div>
+  <div class="acts" style="display:flex;gap:8px;flex-wrap:wrap">
+    {% if person.approver_name %}<button class="tp-btn light" onclick="tpOpenLeave()" data-testid="hero-leave">{{ icon("plus", 18) }} Xin nghỉ phép</button>{% endif %}
+    {% if inbox_total %}<a class="tp-btn ghost" href="/tlc/approvals" data-testid="hero-approvals">Duyệt {{ inbox_total }} đơn</a>
+    {% elif f.sees_company %}<a class="tp-btn ghost" href="/tlc/reports">Xem báo cáo</a>
+    {% else %}<a class="tp-btn ghost" href="/tlc/me">Hồ sơ của tôi</a>{% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if company %}
+<div class="tp-kpis" data-testid="company-kpis">
+  <div class="tp-kpi good"><div class="n">{{ company.headcount }}</div><div class="l">nhân sự đang làm việc</div></div>
+  <div class="tp-kpi"><div class="n">{{ company.away_today|length }}</div><div class="l">nghỉ phép hôm nay</div></div>
+  <div class="tp-kpi {% if company.waiting['Chờ quản lý duyệt'] %}alert{% endif %}"><div class="n">{{ company.waiting['Chờ quản lý duyệt'] }}</div><div class="l">đơn chờ quản lý duyệt</div></div>
+  <div class="tp-kpi {% if company.waiting['Chờ nhân sự duyệt'] %}alert{% endif %}"><div class="n" data-testid="kpi-waiting-hr">{{ company.waiting['Chờ nhân sự duyệt'] }}</div><div class="l">đơn chờ nhân sự duyệt</div></div>
+</div>
+{% endif %}
+
+<div class="tp-grid">
+  <div class="c-8" style="display:grid;gap:16px;align-content:start">
+    {% if f.is_approver %}
+    <section class="tp-card" data-testid="w-inbox">
+      <div class="tp-card-h">Việc cần tôi duyệt {% if inbox_total %}<a href="/tlc/approvals">Xem tất cả ({{ inbox_total }})</a>{% endif %}</div>
+      {% for row in inbox %}
+      <div class="tp-req" data-testid="inbox-item" data-name="{{ row.name }}">
+        <div class="tp-req-h">{{ avatar(row.employee_name) }}
+          <div class="t"><b>{{ row.employee_name }}</b><div class="tp-sub">{{ row.leave_type }} · {{ dates(row) }} · {{ days(row.total_leave_days) }} ngày · {{ row.site }}</div></div>
+          {{ state_badge(row.workflow_state) }}</div>
+        <div class="tp-actions">
+          <button class="tp-btn primary sm" data-testid="approve" onclick="tpDecide(this, '{{ row.name }}', 'approve')">Duyệt</button>
+          <a class="tp-btn ghost sm" href="/tlc/approvals#{{ row.name }}">Xem để quyết định</a>
+        </div>
+      </div>
+      {% else %}<div class="tp-empty" data-testid="inbox-empty">Không có đơn nào chờ bạn. Tuyệt vời!</div>{% endfor %}
+    </section>
+    {% endif %}
+
+    {% if mine %}
+    <section class="tp-card" data-testid="w-mine">
+      <div class="tp-card-h">Đơn của tôi đang theo dõi <a href="/tlc/leave">Tất cả đơn</a></div>
+      {% for r in mine %}
+      <div class="tp-req" data-testid="mine-item" data-name="{{ r.name }}">
+        <div class="tp-req-h"><div class="t"><b>{{ r.leave_type }} · {{ dates(r) }}</b><div class="tp-sub">{{ days(r.total_leave_days) }} ngày · {{ r.description or "" }}</div></div>{{ state_badge(r.workflow_state) }}</div>
+        {{ steps(r.steps) }}
+        {% if r.tlc_reject_reason %}<div class="tp-hint bad">Lý do từ chối: {{ r.tlc_reject_reason }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="tp-card" data-testid="w-whos-out">
+      <div class="tp-card-h">Ai vắng mặt
+        <span class="tp-sub">{% if f.sees_company %}toàn công ty{% elif f.is_manager %}đội của tôi{% else %}{{ person.site if person else "" }}{% endif %} · 7 ngày tới</span></div>
+      {% for day, people in whos_out.items() %}
+      <div class="tp-day">{{ day }}</div>
+      <div class="tp-faces">
+        {% for p in people %}<span class="tp-face {{ 'pending' if p.pending }}" data-testid="out-face" title="{{ p.type }}{{ ' (chờ duyệt)' if p.pending }}">
+          {{ avatar(p.name, "sm" ~ (" ring" if p.report else "")) }} {{ p.name }}{% if p.half %} · ½{% endif %}{% if p.pending %} · chờ duyệt{% endif %}</span>{% endfor %}
+      </div>
+      {% else %}<div class="tp-empty">Mọi người đều đi làm trong 7 ngày tới.</div>{% endfor %}
+      {% if whos_out %}<div class="tp-legend"><span><i style="background:var(--tp-brand-tint)"></i>Đã duyệt</span><span><i style="background:var(--tp-line)"></i>Chờ duyệt</span>{% if f.is_manager %}<span><i style="background:var(--tp-brand)"></i>Viền: người thuộc quyền</span>{% endif %}</div>{% endif %}
+    </section>
+  </div>
+
+  <div class="c-4" style="display:grid;gap:16px;align-content:start">
+    {% for b in balances[:1] %}
+    <section class="tp-card" data-testid="w-balance">
+      <div class="tp-card-h">Nghỉ phép của tôi <a href="/tlc/leave">Chi tiết</a></div>
+      <div class="tp-balance">
+        <div class="tp-ring" style="--p: {{ (100 * b.remaining / b.allocated)|round if b.allocated else 0 }}"><div><span><b data-testid="balance-remaining">{{ days(b.remaining) }}</b><small>ngày<br>còn lại</small></span></div></div>
+        <div style="font-size:14px;line-height:1.7">
+          <div>{{ b.leave_type }}: được cấp <b>{{ days(b.allocated) }}</b></div>
+          <div>Đã dùng/đã duyệt: <b>{{ days(b.used) }}</b></div>
+          <div>Đang chờ duyệt: <b data-testid="balance-pending">{{ days(b.pending) }}</b></div>
+        </div>
+      </div>
+      {% if person.approver_name %}<button class="tp-btn primary" style="width:100%;margin-top:14px" onclick="tpOpenLeave()" data-testid="w-balance-request">{{ icon("plus", 18) }} Xin nghỉ phép</button>{% endif %}
+    </section>
+    {% endfor %}
+    {% if person and not person.approver_name %}
+    <section class="tp-card" data-testid="no-approver"><div class="tp-card-h">Nghỉ phép của tôi</div>
+      <div class="tp-sub">Bạn là cấp duyệt cao nhất: báo phòng Nhân sự để ghi nhận ngày nghỉ của bạn.</div></section>
+    {% endif %}
+
+    <section class="tp-card" data-testid="w-celebrations">
+      <div class="tp-card-h"><span class="ttl">{{ icon("gift", 18) }} Chúc mừng</span><span class="tp-sub">30 ngày tới</span></div>
+      <ul class="tp-list">
+        {% for c in celebrations %}<li>{{ avatar(c.name, "sm") }}<div class="t"><b>{{ c.name }}</b><span>{{ c.label }} · {{ c.date.strftime("%d/%m") }} · {{ c.site }}</span></div></li>
+        {% else %}<li class="tp-empty">Chưa có sự kiện nào.</li>{% endfor %}
+      </ul>
+    </section>
+
+    <section class="tp-card" data-testid="w-holidays">
+      <div class="tp-card-h"><span class="ttl">{{ icon("flag", 18) }} Ngày lễ sắp tới</span></div>
+      <ul class="tp-list">
+        {% for h in holidays %}<li><div class="t"><b>{{ h.description }}</b><span>{{ frappe.format(h.holiday_date, "Date") }}</span></div></li>
+        {% else %}<li class="tp-empty">Chưa có ngày lễ nào trong lịch.</li>{% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

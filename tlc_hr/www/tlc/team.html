@@ -1,0 +1,57 @@
+{% extends "templates/tlc/layout.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar, days with context %}
+
+{% block tlc_content %}
+<div class="tp-pagehead">
+  <div><h1>{% if f.sees_company %}Lịch vắng mặt{% else %}Đội của tôi{% endif %}</h1>
+    <p>{% if f.sees_company %}Toàn công ty hoặc theo phòng ban.{% else %}Những người thuộc quyền của bạn.{% endif %} Ô xanh: đã duyệt · ô sọc xám: chờ duyệt (bấm để duyệt).</p></div>
+  {% if departments %}
+  <form method="get"><select class="tp-input" name="dept" onchange="this.form.submit()" data-testid="team-dept" style="min-width:240px">
+    <option value="">Toàn công ty</option>{% for d in departments %}<option value="{{ d }}" {% if d == dept %}selected{% endif %}>{{ site_of(d) }}</option>{% endfor %}</select></form>
+  {% endif %}
+</div>
+
+<div class="tp-kpis">
+  <div class="tp-kpi good"><div class="n" data-testid="team-size">{{ members|length }}</div><div class="l">người</div></div>
+  <div class="tp-kpi"><div class="n" data-testid="team-away">{{ away_today }}</div><div class="l">nghỉ hôm nay</div></div>
+  <div class="tp-kpi {% if pending_total %}alert{% endif %}"><div class="n" data-testid="team-pending">{{ pending_total }}</div><div class="l">đơn đang chờ duyệt</div></div>
+</div>
+
+<section class="tp-card" style="margin-bottom:16px" data-testid="team-calendar">
+  <div class="tp-card-h">Lịch {{ calendar.start.strftime("%d/%m") }} – {{ calendar.end.strftime("%d/%m/%Y") }}
+    <span><a class="tp-btn ghost sm" href="?start={{ calendar.prev }}&dept={{ dept }}" data-testid="cal-prev">‹ Trước</a>
+      <a class="tp-btn ghost sm" href="?dept={{ dept }}">Tuần này</a>
+      <a class="tp-btn ghost sm" href="?start={{ calendar.next }}&dept={{ dept }}" data-testid="cal-next">Sau ›</a></span></div>
+  <div class="tp-scroll">
+    <table class="tp-cal">
+      <tr><th class="name">Nhân viên</th>{% for d in calendar.days %}<th class="{{ 'today' if d.today }}">{{ d.label }}<br><b>{{ d.num }}</b></th>{% endfor %}</tr>
+      {% for m in members %}
+      <tr data-testid="cal-row" data-employee="{{ m.employee_name }}">
+        <td class="name">{{ avatar(m.employee_name, "sm") }} {{ m.employee_name }}</td>
+        {% for d in calendar.days %}
+        {% set cell = calendar.cells.get(m.name, {}).get(d.date) %}
+        <td class="{{ 'we' if d.weekend }} {{ 'hol' if d.holiday }}" {% if d.holiday %}title="{{ d.holiday }}"{% endif %}>
+          {% if cell %}<a class="tp-cell {{ cell.state }} {{ 'half' if cell.half }}" data-testid="cal-{{ cell.state }}"
+             title="{{ m.employee_name }} · {{ cell.type }}{{ ' · chờ duyệt' if cell.state == 'pending' }}"
+             {% if cell.state == 'pending' %}href="/tlc/approvals#{{ cell.name }}"{% endif %}></a>{% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      {% else %}<tr><td class="tp-empty" colspan="15">Không có ai trong phạm vi này.</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="tp-legend"><span><i style="background:var(--tp-brand)"></i>Đã duyệt</span><span><i style="background:#c9d2d9"></i>Chờ duyệt</span><span><i style="background:#f7f8f9;border:1px solid var(--tp-line)"></i>Cuối tuần</span><span><i style="background:#fff7e6;border:1px solid var(--tp-line)"></i>Ngày lễ</span></div>
+</section>
+
+<section class="tp-card" data-testid="team-table">
+  <div class="tp-card-h">Thành viên</div>
+  <div class="tp-scroll"><table class="tp-table">
+    <tr><th>Nhân viên</th><th>Chức danh</th><th>Hôm nay</th><th>Phép năm còn</th><th>Đơn chờ</th></tr>
+    {% for m in members %}
+    <tr data-testid="team-member"><td>{{ avatar(m.employee_name, "sm") }} {{ m.employee_name }}</td><td>{{ m.designation or "" }}</td>
+      <td>{% if m.away_today %}<span class="badge bad">Nghỉ phép</span>{% else %}<span class="badge ok">Đi làm</span>{% endif %}</td>
+      <td>{{ days(m.annual_left) }}</td><td>{% if m.pending %}<span class="badge warn">{{ m.pending }}</span>{% else %}—{% endif %}</td></tr>
+    {% endfor %}
+  </table></div>
+</section>
+{% endblock %}

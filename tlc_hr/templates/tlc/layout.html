@@ -1,0 +1,83 @@
+{% extends "templates/web.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar with context %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block page_content %}
+<style>{% include "templates/tlc/tlc.css" %}</style>
+<div class="tp" data-testid="tp-app" data-page="{{ active }}">
+  <header class="tp-top">
+    <div class="tp-top-in">
+      <a class="tp-brand" href="/tlc"><span class="tp-brand-mark">TL</span>TLC People<small>HRM</small></a>
+      <nav class="tp-nav" aria-label="Điều hướng chính" data-testid="nav">
+        {% for n in nav %}
+        <a href="{{ n.path }}" class="{{ 'on' if n.key == active else '' }}" data-testid="nav-{{ n.key }}" {% if n.key == active %}aria-current="page"{% endif %}>
+          {{ n.label }}{% if n.badge %} <span class="tp-dot" data-testid="nav-badge">{{ n.badge }}</span>{% endif %}</a>
+        {% endfor %}
+      </nav>
+      <div class="tp-user">
+        <button class="tp-user-btn" id="tp-user-btn" aria-haspopup="true" data-testid="user-menu">
+          {{ avatar(person.employee_name if person else frappe.session.user, "sm") }}
+          <span class="nm" style="font-weight:700;font-size:14px">{{ person.employee_name if person else frappe.session.user }}</span>
+        </button>
+        <div class="tp-menu" id="tp-menu" role="menu">
+          <div class="who">{{ frappe.session.user }}{% if person %}<br>{{ person.designation or "" }}{% endif %}</div>
+          <a href="/tlc/me">Hồ sơ của tôi</a>
+          {% if can_desk %}<a href="/desk" data-testid="open-desk">Mở trang quản trị (desk)</a>{% endif %}
+          <a href="/?cmd=web_logout" data-testid="logout">Đăng xuất</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="tp-main" id="tp-main">
+    {% block tlc_content %}{% endblock %}
+  </main>
+
+  <nav class="tp-bottom" aria-label="Điều hướng" data-testid="bottom-nav">
+    {% for n in nav[:5] %}
+    <a href="{{ n.path }}" class="{{ 'on' if n.key == active else '' }}" data-testid="bnav-{{ n.key }}">
+      {{ icon(n.key, 22) }}<span>{{ n.label }}</span>{% if n.badge %}<span class="tp-dot">{{ n.badge }}</span>{% endif %}</a>
+    {% endfor %}
+  </nav>
+
+  {% if person and person.approver_name and balances_for_form %}
+  <div class="tp-modal" id="tp-leave" role="dialog" aria-modal="true" aria-labelledby="tp-leave-title" data-testid="leave-dialog"
+       onclick="if (event.target === this) tpCloseLeave()">
+    <div class="tp-dialog">
+      <div class="tp-dialog-h"><h3 id="tp-leave-title">Xin nghỉ phép</h3><button class="tp-x" onclick="tpCloseLeave()" aria-label="Đóng">×</button></div>
+      <form id="tp-leave-form" onsubmit="return tpSubmitLeave(event)">
+        <div class="tp-dialog-b">
+          <label class="tp-field"><span>Loại nghỉ</span>
+            <select class="tp-input" name="leave_type" data-testid="lf-type">
+              {% for b in balances_for_form %}<option value="{{ b.leave_type }}">{{ b.leave_type }} — còn {{ ("%g" % b.remaining).replace(".", ",") }} ngày</option>{% endfor %}
+            </select></label>
+          <div class="tp-row">
+            <label class="tp-field"><span>Từ ngày</span><input class="tp-input" type="date" id="lf-from" name="from_date" data-testid="lf-from" required></label>
+            <label class="tp-field"><span>Đến ngày</span><input class="tp-input" type="date" id="lf-to" name="to_date" data-testid="lf-to" required></label>
+          </div>
+          <label class="tp-check"><input type="checkbox" name="half_day" data-testid="lf-half"> Nghỉ nửa ngày (0,5 ngày)</label>
+          <div class="tp-preview" id="lf-preview" hidden data-testid="lf-preview">
+            <div><b id="lp-days">0</b><span>ngày làm việc xin nghỉ</span></div>
+            <div><b id="lp-now">0</b><span>đang còn</span></div>
+            <div><b id="lp-after" class="after">0</b><span>còn lại sau đơn</span></div>
+          </div>
+          <div class="tp-hint bad" id="lf-warn" hidden data-testid="lf-warn"></div>
+          <label class="tp-field" style="margin-top:12px"><span>Lý do</span>
+            <textarea class="tp-input" name="reason" rows="2" required data-testid="lf-reason" placeholder="Ví dụ: việc gia đình, khám sức khỏe"></textarea></label>
+          <div class="tp-sub">Đơn sẽ đến <b>{{ person.approver_name }}</b>, sau đó phòng Nhân sự. Bạn theo dõi trạng thái ở mục Nghỉ phép.</div>
+        </div>
+        <div class="tp-dialog-f">
+          <button type="button" class="tp-btn ghost" onclick="tpCloseLeave()">Huỷ</button>
+          <button type="submit" class="tp-btn primary" id="lf-submit" data-testid="lf-submit">Gửi đơn</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+  <div id="tp-toast" role="status" aria-live="polite" data-testid="toast"></div>
+</div>
+<script>document.body.dataset.tpCsrf = "{{ csrf_token }}";</script>
+<script>{% include "templates/tlc/tlc.js" %}</script>
+{% endblock %}

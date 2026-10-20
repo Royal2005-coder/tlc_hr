@@ -23,7 +23,7 @@ class TestLeaveWorkflow(IntegrationTestCase):
     def setUp(self):
         if not frappe.db.exists("User", WORKER):
             self.skipTest("TLC demo seed not loaded (bench execute tlc_hr.seed.run)")
-        self.offset = 30 + frappe.db.count("Leave Application")
+        self.offset = 41 + frappe.db.count("Leave Application") % 4  # inside the 2026 allocation
 
     def tearDown(self):
         frappe.set_user("Administrator")

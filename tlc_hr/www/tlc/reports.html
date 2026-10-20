@@ -1,0 +1,58 @@
+{% extends "templates/tlc/layout.html" %}
+{% from "templates/tlc/macros.html" import icon, avatar, dates, days with context %}
+
+{% block tlc_content %}
+<div class="tp-pagehead"><div><h1>Báo cáo nhân sự</h1><p>Số liệu trực tiếp từ hệ thống, cập nhật mỗi lần mở trang · {{ frappe.format(today, "Date") }}</p></div></div>
+
+<div class="tp-kpis" data-testid="report-kpis">
+  <div class="tp-kpi good"><div class="n" data-testid="r-headcount">{{ r.headcount }}</div><div class="l">nhân sự đang làm việc</div></div>
+  {% for label, n in r.by_workforce.items() %}<div class="tp-kpi"><div class="n" data-testid="r-wf">{{ n }}</div><div class="l">khối {{ label }}</div></div>{% endfor %}
+  <div class="tp-kpi"><div class="n">{{ r.away_today|length }}</div><div class="l">nghỉ phép hôm nay</div></div>
+  <div class="tp-kpi {% if r.waiting['Chờ quản lý duyệt'] + r.waiting['Chờ nhân sự duyệt'] %}alert{% endif %}"><div class="n" data-testid="r-waiting">{{ r.waiting['Chờ quản lý duyệt'] + r.waiting['Chờ nhân sự duyệt'] }}</div><div class="l">đơn đang chờ duyệt</div></div>
+  <div class="tp-kpi"><div class="n">{{ days(r.approved_days) }}</div><div class="l">ngày phép đã duyệt năm {{ today.year }}</div></div>
+</div>
+
+<div class="tp-grid">
+  <section class="tp-card c-7" data-testid="r-sites">
+    <div class="tp-card-h">Nhân sự theo phòng ban / địa điểm</div>
+    <div class="tp-hbars">{% for site, n in r.by_site %}
+      <div class="r" data-testid="r-site"><span>{{ site }}</span><span class="tp-bar"><span style="width: {{ (100 * n / r.site_top)|round }}%"></span></span><b>{{ n }}</b></div>{% endfor %}</div>
+  </section>
+  <section class="tp-card c-5">
+    <div class="tp-card-h">Cơ cấu</div>
+    {% set ho = r.by_workforce.get('Hội sở', 0) %}
+    <div class="tp-balance" style="margin-bottom:14px">
+      <div class="tp-ring" style="--p: {{ (100 * ho / r.headcount)|round if r.headcount else 0 }}"><div><span><b>{{ ho }}</b><small>Hội sở</small></span></div></div>
+      <div style="font-size:14px;line-height:1.8">{% for label, n in r.by_workforce.items() %}<div>Khối {{ label }}: <b>{{ n }}</b> ({{ (100 * n / r.headcount)|round|int }}%)</div>{% endfor %}
+        {% for label, n in r.by_gender.items() %}<div>{{ label }}: <b>{{ n }}</b></div>{% endfor %}</div>
+    </div>
+    <div class="tp-card-h" style="margin-top:6px">Thâm niên</div>
+    <div class="tp-hbars">{% set tmax = (r.tenure.values()|max) or 1 %}{% for label, n in r.tenure.items() %}
+      <div class="r"><span>{{ label }}</span><span class="tp-bar"><span style="width: {{ (100 * n / tmax)|round }}%"></span></span><b>{{ n }}</b></div>{% endfor %}</div>
+  </section>
+
+  <section class="tp-card c-7" data-testid="r-months">
+    <div class="tp-card-h">Ngày nghỉ phép đã duyệt theo tháng · {{ today.year }}</div>
+    <div class="tp-cols">{% for m, n in r.months.items() %}
+      <div class="col"><b>{{ days(n) if n else "" }}</b><i style="height: {{ (100 * n / r.month_peak)|round if n else 0 }}%"></i><span>T{{ m }}</span></div>{% endfor %}</div>
+  </section>
+  <section class="tp-card c-5" data-testid="r-pipeline">
+    <div class="tp-card-h">Đơn đang chờ theo cấp</div>
+    <ul class="tp-list">
+      <li><div class="t"><b>Chờ quản lý trực tiếp</b><span>đơn mới gửi</span></div><span class="badge warn" data-testid="r-wait-manager">{{ r.waiting['Chờ quản lý duyệt'] }}</span></li>
+      <li><div class="t"><b>Chờ phòng Nhân sự</b><span>đã qua quản lý</span></div><span class="badge warn" data-testid="r-wait-hr">{{ r.waiting['Chờ nhân sự duyệt'] }}</span></li>
+    </ul>
+    {% if 'TLC HR Officer' in roles or 'TLC HR Lead' in roles %}<a class="tp-btn primary sm" href="/tlc/approvals" style="margin-top:10px">Mở hộp duyệt</a>{% endif %}
+  </section>
+
+  <section class="tp-card c-12" data-testid="r-upcoming">
+    <div class="tp-card-h">Lịch nghỉ đã duyệt 14 ngày tới <a href="/tlc/team">Mở lịch vắng mặt</a></div>
+    <div class="tp-scroll"><table class="tp-table">
+      <tr><th>Nhân viên</th><th>Phòng ban</th><th>Loại</th><th>Thời gian</th><th>Số ngày</th></tr>
+      {% for x in r.away_today + r.upcoming %}
+      <tr><td>{{ avatar(x.employee_name, "sm") }} {{ x.employee_name }}</td><td>{{ site_of(x.department) }}</td><td>{{ x.leave_type }}</td><td>{{ dates(x) }}</td><td>{{ days(x.total_leave_days) }}</td></tr>
+      {% else %}<tr><td colspan="5" class="tp-empty">Chưa có lịch nghỉ nào.</td></tr>{% endfor %}
+    </table></div>
+  </section>
+</div>
+{% endblock %}

@@ -21,6 +21,8 @@ EMAIL_DOMAIN = "demo.example"
 SEED_FILE = Path(__file__).with_name("tlc_demo.json")
 LEAVE_TYPE_NAMES = {"annual": "Phép năm", "sick": "Nghỉ ốm"}
 # TLC levels that work on other people's records: HRMS must not restrict them to their own employee record.
+# Public holidays of Vietnam on a fixed solar date (Bộ luật Lao động, điều 112). Lunar holidays (Tết, Giỗ Tổ) are set by HR every year.
+VN_FIXED_HOLIDAYS = [("01-01", "Tết Dương lịch"), ("04-30", "Ngày Chiến thắng"), ("05-01", "Quốc tế Lao động"), ("09-02", "Quốc khánh")]
 COMPANY_WIDE_LEVELS = {"director", "cfo", "hr_director", "hr_officer", "period_controller", "payroll_officer"}
 
 
@@ -90,6 +92,13 @@ def holidays(data):
                 if str(holiday["date"]).startswith(str(year)):
                     holiday_list.append("holidays", {"holiday_date": holiday["date"], "description": holiday["name"]})
             holiday_list.insert()
+        holiday_list = frappe.get_doc("Holiday List", name)
+        known = {str(h.holiday_date) for h in holiday_list.holidays}
+        missing = [(f"{year}-{md}", label) for md, label in VN_FIXED_HOLIDAYS if f"{year}-{md}" not in known]
+        for date, label in missing:
+            holiday_list.append("holidays", {"holiday_date": date, "description": label, "weekly_off": 0})
+        if missing:
+            holiday_list.save()
         if not frappe.db.exists("Holiday List Assignment", {"holiday_list": name, "assigned_to": COMPANY, "docstatus": 1}):
             frappe.get_doc({"doctype": "Holiday List Assignment", "applicable_for": "Company", "assigned_to": COMPANY,
                             "holiday_list": name, "from_date": f"{year}-01-01"}).submit()
