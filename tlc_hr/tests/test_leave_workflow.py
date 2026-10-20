@@ -9,6 +9,7 @@ from tlc_hr.setup.install import APPROVED, REJECTED, TO_HR, TO_MANAGER
 
 WORKER, MANAGER, OTHER_MANAGER, HR_LEAD = "binh@demo.example", "hung@demo.example", "quang@demo.example", "hoa@demo.example"
 DIRECTOR = "thanh@demo.example"
+HR_OFFICER = "lan@demo.example"
 
 
 def next_working_day(offset):
@@ -84,3 +85,13 @@ class TestLeaveWorkflow(IntegrationTestCase):
         apply_workflow(doc, "Từ chối")
         doc.reload()
         self.assertEqual((doc.workflow_state, doc.status), (REJECTED, "Rejected"))
+
+    def test_hr_officer_decides_on_the_hr_lead_leave(self):
+        doc = self.new_request(user=HR_LEAD)
+        frappe.set_user(DIRECTOR)
+        apply_workflow(doc, "Duyệt")
+        frappe.set_user(HR_OFFICER)
+        doc.reload()
+        apply_workflow(doc, "Duyệt")
+        doc.reload()
+        self.assertEqual(doc.workflow_state, APPROVED)

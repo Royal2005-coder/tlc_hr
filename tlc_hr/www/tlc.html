@@ -2,63 +2,254 @@
 
 {% block page_content %}
 <style>
-  .tlc { max-width: 960px; margin: 0 auto; font-size: 15px; }
-  .tlc h1 { font-size: 26px; margin-bottom: 4px; }
-  .tlc .who { color: var(--text-muted); margin-bottom: 24px; }
-  .tlc .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
-  .tlc .tile { display: block; padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; color: inherit; font-weight: 600; }
-  .tlc .tile:hover { border-color: var(--primary); text-decoration: none; }
-  .tlc h2 { font-size: 18px; margin: 24px 0 8px; }
-  .tlc table { width: 100%; border-collapse: collapse; }
-  .tlc th, .tlc td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border-color); }
-  .tlc .empty { color: var(--text-muted); }
-  .tlc .count { background: var(--red-500, #e53e3e); color: #fff; border-radius: 10px; padding: 0 8px; font-size: 13px; }
+  .tlc { --ink: #1f2933; --muted: #66727f; --line: #e3e7eb; --card: #fff; --bg: #f5f7f9; --brand: #0b6e4f;
+         --ok: #1e7b34; --ok-bg: #e5f4e8; --warn: #8a5a00; --warn-bg: #fff3d6; --bad: #a12622; --bad-bg: #fde8e7;
+         max-width: 1100px; margin: 0 auto; color: var(--ink); font-size: 15px; }
+  .tlc * { box-sizing: border-box; }
+  .tlc-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px;
+              padding: 20px 0 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .tlc-head h1 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
+  .tlc-head .meta { color: var(--muted); }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; background: #e8eef3; }
+  .tag.factory { background: #fff0db; color: #7a4b00; }
+  .tag.head_office { background: #e3f0fb; color: #124a7a; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .stat .n { font-size: 28px; font-weight: 700; line-height: 1.1; }
+  .stat .l { color: var(--muted); font-size: 13px; }
+  .stat.alert .n { color: var(--bad); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid .wide { grid-column: 1 / -1; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } .tlc-head h1 { font-size: 21px; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .card h2 { font-size: 17px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .count { background: var(--bad); color: #fff; border-radius: 999px; padding: 0 9px; font-size: 13px; }
+  .empty { color: var(--muted); margin: 4px 0; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.t th { text-align: left; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  table.t td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .badge { padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok); } .badge.warn { background: var(--warn-bg); color: var(--warn); }
+  .badge.bad { background: var(--bad-bg); color: var(--bad); } .badge.muted { background: #eef0f2; color: var(--muted); }
+  .req { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  .req .who { font-weight: 700; } .req .what { color: var(--muted); font-size: 14px; margin: 2px 0 8px; }
+  .req .why { font-size: 14px; margin-bottom: 10px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 8px;
+         padding: 0 16px; font-weight: 600; font-size: 15px; line-height: 1; cursor: pointer; height: 42px; text-decoration: none; }
+  .btn:hover { text-decoration: none; }
+  .btn:focus-visible { outline: 3px solid #9cc7ff; outline-offset: 1px; }
+  .btn.primary { background: var(--brand); color: #fff; } .btn.primary:hover { background: #095a41; }
+  .btn.danger { background: #fff; color: var(--bad); border-color: #e7b3b1; } .btn.danger:hover { background: var(--bad-bg); }
+  .btn.ghost { background: #fff; color: var(--ink); border-color: var(--line); }
+  .btn[disabled] { opacity: .6; cursor: wait; }
+  form.f { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  form.f label { font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 4px; }
+  form.f .full { grid-column: 1 / -1; }
+  form.f input, form.f select, form.f textarea, .reject textarea { width: 100%; border: 1px solid #cfd6dc; border-radius: 8px; padding: 9px 10px; font-size: 15px; background: #fff; }
+  form.f .check { display: flex; align-items: center; gap: 10px; }
+  form.f .check input[type=checkbox] { appearance: auto; -webkit-appearance: checkbox; width: 20px; height: 20px; min-width: 20px; margin: 0; padding: 0; border-radius: 4px; accent-color: var(--brand); }
+  form.f .check label { display: inline; margin: 0; color: var(--ink); font-size: 15px; font-weight: 500; }
+  @media (max-width: 520px) { form.f { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat { padding: 10px 12px; } .stat .n { font-size: 24px; } .tlc-head { padding-top: 8px; } }
+  .reject { margin-top: 10px; display: none; } .reject.open { display: block; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; } .links a { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; color: var(--ink); }
+  .links a:hover { border-color: var(--brand); text-decoration: none; }
+  .bars .row { display: grid; grid-template-columns: 150px 1fr 36px; align-items: center; gap: 8px; margin: 6px 0; font-size: 14px; }
+  .bars .bar { height: 10px; background: #dbe9e3; border-radius: 6px; overflow: hidden; } .bars .bar span { display: block; height: 100%; background: var(--brand); }
+  .note { font-size: 13px; color: var(--muted); }
+  .away { color: var(--bad); font-weight: 600; }
+  #tlc-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 12px 18px; border-radius: 10px; color: #fff;
+               font-weight: 600; display: none; z-index: 1000; max-width: 90vw; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+  #tlc-toast.ok { background: var(--ok); } #tlc-toast.bad { background: var(--bad); }
 </style>
-<div class="tlc">
-  <h1>TLC HRM</h1>
-  {% if person %}
-  <div class="who">{{ person.employee_name }}{% if person.department %} · {{ person.department }}{% endif %}</div>
-  {% else %}
-  <div class="who">{{ _("Tài khoản này chưa gắn với hồ sơ nhân viên.") }}</div>
-  {% endif %}
 
-  <div class="tiles">
-    {% for tile in tiles %}<a class="tile" href="{{ tile.link }}">{{ tile.title }}</a>{% endfor %}
+<div class="tlc" data-testid="tlc-home">
+  <div class="tlc-head">
+    <div>
+      {% if person %}
+      <h1 data-testid="person-name">{{ person.employee_name }}</h1>
+      <div class="meta">
+        {{ person.designation or "" }}{% if person.department %} · {{ person.department.rsplit(" - ", 1)[0] }}{% endif %}
+        {% if person.workforce_label %}<span class="tag {{ person.tlc_workforce }}" data-testid="workforce">{{ person.workforce_label }}</span>{% endif %}
+      </div>
+      {% if person.approver_name %}<div class="note">Người duyệt nghỉ phép của bạn: <b data-testid="my-approver">{{ person.approver_name }}</b></div>{% endif %}
+      {% else %}
+      <h1>TLC HRM</h1><div class="meta">Tài khoản này chưa gắn với hồ sơ nhân viên.</div>
+      {% endif %}
+    </div>
+    <div class="note">{{ frappe.format(today, "Date") }}</div>
   </div>
 
-  <h2>Việc chờ tôi duyệt {% if inbox %}<span class="count">{{ inbox|length }}</span>{% endif %}</h2>
-  {% if inbox %}
-  <table>
-    <tr><th>Người xin</th><th>Loại</th><th>Từ</th><th>Đến</th><th>Số ngày</th><th>Bước</th></tr>
-    {% for row in inbox %}
-    <tr>
-      <td><a href="/app/leave-application/{{ row.name }}">{{ row.employee_name }}</a></td>
-      <td>{{ row.leave_type }}</td><td>{{ frappe.format(row.from_date, "Date") }}</td>
-      <td>{{ frappe.format(row.to_date, "Date") }}</td><td>{{ row.total_leave_days }}</td><td>{{ row.workflow_state }}</td>
-    </tr>
+  <div class="stats">
+    {% for b in balances %}
+    <div class="stat" data-testid="stat-balance"><div class="n">{{ "%g"|format(b.balance) }}</div><div class="l">ngày {{ b.leave_type|lower }} còn lại</div></div>
     {% endfor %}
-  </table>
-  {% else %}<p class="empty">Không có việc nào chờ bạn duyệt.</p>{% endif %}
+    {% if person %}<div class="stat" data-testid="stat-my-pending"><div class="n">{{ my_pending }}</div><div class="l">đơn của tôi đang chờ duyệt</div></div>{% endif %}
+    {% if inbox or is_manager or is_hr %}
+    <div class="stat {% if inbox %}alert{% endif %}" data-testid="stat-inbox"><div class="n">{{ inbox|length }}</div><div class="l">đơn chờ tôi duyệt</div></div>
+    {% endif %}
+    {% if team %}<div class="stat" data-testid="stat-team"><div class="n">{{ team.size }}</div><div class="l">người thuộc quyền · {{ team.away_today }} nghỉ hôm nay</div></div>{% endif %}
+    {% if company %}<div class="stat" data-testid="stat-headcount"><div class="n">{{ company.headcount }}</div><div class="l">nhân sự toàn công ty</div></div>{% endif %}
+  </div>
 
-  {% if person %}
-  <h2>Số ngày phép còn lại</h2>
-  {% if balances %}
-  <table>{% for b in balances %}<tr><td>{{ b.leave_type }}</td><td>{{ b.balance }} ngày</td></tr>{% endfor %}</table>
-  {% else %}<p class="empty">Chưa được cấp phép.</p>{% endif %}
+  <div class="grid">
+    {% if inbox or is_manager or is_hr %}
+    <section class="card wide" data-testid="inbox">
+      <h2>Việc chờ tôi duyệt {% if inbox %}<span class="count" data-testid="inbox-count">{{ inbox|length }}</span>{% endif %}</h2>
+      {% for row in inbox %}
+      <div class="req" data-testid="inbox-item" data-name="{{ row.name }}" data-employee="{{ row.employee_name }}">
+        <div class="who">{{ row.employee_name }} <span class="badge warn">{{ row.workflow_state }}</span></div>
+        <div class="what">{{ row.leave_type }} · {{ frappe.format(row.from_date, "Date") }}{% if row.to_date != row.from_date %} → {{ frappe.format(row.to_date, "Date") }}{% endif %} · {{ "%g"|format(row.total_leave_days or 0) }} ngày · {{ (row.department or "").rsplit(" - ", 1)[0] }}</div>
+        {% if row.description %}<div class="why">Lý do: {{ row.description }}</div>{% endif %}
+        <div class="actions">
+          <button class="btn primary" data-testid="approve" onclick="tlcDecide(this, '{{ row.name }}', 'approve')">Duyệt</button>
+          <button class="btn danger" data-testid="reject-open" onclick="tlcToggleReject('{{ row.name }}')">Từ chối…</button>
+          <a class="btn ghost" href="/desk/leave-application/{{ row.name }}">Xem chi tiết</a>
+        </div>
+        <div class="reject" id="reject-{{ row.name }}">
+          <textarea rows="2" data-testid="reject-reason" placeholder="Lý do từ chối (bắt buộc), ví dụ: trùng lịch sản xuất"></textarea>
+          <div class="actions" style="margin-top:8px"><button class="btn danger" data-testid="reject-confirm" onclick="tlcDecide(this, '{{ row.name }}', 'reject')">Xác nhận từ chối</button></div>
+        </div>
+      </div>
+      {% else %}<p class="empty" data-testid="inbox-empty">Không có đơn nào chờ bạn duyệt.</p>{% endfor %}
+    </section>
+    {% endif %}
 
-  <h2>Đơn gần đây của tôi</h2>
-  {% if my_requests %}
-  <table>
-    <tr><th>Loại</th><th>Từ</th><th>Đến</th><th>Số ngày</th><th>Trạng thái</th></tr>
-    {% for row in my_requests %}
-    <tr>
-      <td><a href="/app/leave-application/{{ row.name }}">{{ row.leave_type }}</a></td>
-      <td>{{ frappe.format(row.from_date, "Date") }}</td><td>{{ frappe.format(row.to_date, "Date") }}</td>
-      <td>{{ row.total_leave_days }}</td><td>{{ row.workflow_state or "" }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}<p class="empty">Bạn chưa có đơn nào.</p>{% endif %}
-  {% endif %}
+    {% if person %}
+    <section class="card" data-testid="leave-form-card">
+      <h2>Xin nghỉ phép</h2>
+      {% if not person.approver_name %}
+      <p class="note" data-testid="no-approver">Bạn không có cấp trên duyệt nghỉ phép trên hệ thống. Báo phòng Nhân sự để ghi nhận ngày nghỉ.</p>
+      {% else %}
+      <form class="f" id="leave-form" onsubmit="return tlcSubmitLeave(event)">
+        <div class="full"><label for="lf-type">Loại nghỉ</label>
+          <select id="lf-type" name="leave_type" data-testid="lf-type">
+            {% for b in balances %}<option value="{{ b.leave_type }}">{{ b.leave_type }} (còn {{ "%g"|format(b.balance) }} ngày)</option>{% endfor %}
+          </select></div>
+        <div><label for="lf-from">Từ ngày</label><input type="date" id="lf-from" name="from_date" data-testid="lf-from" required></div>
+        <div><label for="lf-to">Đến ngày</label><input type="date" id="lf-to" name="to_date" data-testid="lf-to" required></div>
+        <div class="full check"><input type="checkbox" id="lf-half" name="half_day" data-testid="lf-half"><label for="lf-half">Nghỉ nửa ngày (tính 0,5 ngày)</label></div>
+        <div class="full"><label for="lf-reason">Lý do</label><textarea id="lf-reason" name="reason" rows="2" data-testid="lf-reason" required placeholder="Ví dụ: việc gia đình"></textarea></div>
+        <div class="full"><button class="btn primary" type="submit" data-testid="lf-submit">Gửi đơn</button>
+          <span class="note"> Đơn sẽ đến {{ person.approver_name }}, sau đó phòng Nhân sự.</span></div>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="card" data-testid="my-requests">
+      <h2>Đơn của tôi</h2>
+      {% if my_requests %}
+      <table class="t">
+        <tr><th>Loại</th><th>Thời gian</th><th>Ngày</th><th>Trạng thái</th></tr>
+        {% for row in my_requests %}
+        <tr data-testid="my-request" data-name="{{ row.name }}">
+          <td>{{ row.leave_type }}</td>
+          <td>{{ frappe.format(row.from_date, "Date") }}{% if row.to_date != row.from_date %} → {{ frappe.format(row.to_date, "Date") }}{% endif %}</td>
+          <td>{{ "%g"|format(row.total_leave_days or 0) }}</td>
+          <td><span class="badge {{ state_style.get(row.workflow_state, 'muted') }}" data-testid="my-request-state">{{ row.workflow_state or "" }}</span>
+            {% if row.tlc_reject_reason %}<div class="note" data-testid="my-request-reason">Lý do: {{ row.tlc_reject_reason }}</div>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}<p class="empty">Bạn chưa có đơn nào.</p>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if team %}
+    <section class="card wide" data-testid="team">
+      <h2>Đội của tôi <span class="note">{{ team.size }} người</span></h2>
+      <div class="grid">
+        <div>
+          <table class="t">
+            <tr><th>Nhân viên</th><th>Chức danh</th><th>Hôm nay</th></tr>
+            {% for m in team.members %}
+            <tr data-testid="team-member"><td>{{ m.employee_name }}</td><td>{{ m.designation or "" }}</td>
+              <td>{% if m.away_today %}<span class="away">Nghỉ phép</span>{% else %}Đi làm{% endif %}</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div>
+          <h3 style="font-size:15px;margin:0 0 8px">Lịch nghỉ đã duyệt 14 ngày tới</h3>
+          {% for r in team.upcoming %}
+          <div class="req" data-testid="team-upcoming">{{ r.employee_name }} · {{ r.leave_type }} · {{ frappe.format(r.from_date, "Date") }}{% if r.to_date != r.from_date %} → {{ frappe.format(r.to_date, "Date") }}{% endif %}</div>
+          {% else %}<p class="empty">Chưa có ai nghỉ trong 14 ngày tới.</p>{% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if company %}
+    <section class="card wide" data-testid="company">
+      <h2>Tổng quan nhân sự TLC</h2>
+      <div class="grid">
+        <div class="bars">
+          {% set top = (company.by_site[0][1] if company.by_site else 1) %}
+          {% for site, n in company.by_site %}
+          <div class="row" data-testid="site-row"><span>{{ site }}</span><span class="bar"><span style="width: {{ (n * 100 / top)|round }}%"></span></span><b>{{ n }}</b></div>
+          {% endfor %}
+        </div>
+        <div>
+          <table class="t">
+            {% for label, n in company.by_workforce.items() %}<tr><td>Khối {{ label }}</td><td><b>{{ n }}</b> người</td></tr>{% endfor %}
+            <tr><td>Đơn chờ quản lý duyệt</td><td data-testid="waiting-manager"><b>{{ company.waiting_manager }}</b></td></tr>
+            <tr><td>Đơn chờ nhân sự duyệt</td><td data-testid="waiting-hr"><b>{{ company.waiting_hr }}</b></td></tr>
+            <tr><td>Nghỉ phép hôm nay</td><td><b>{{ company.away_today|length }}</b></td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if links %}
+    <section class="card wide" data-testid="links">
+      <h2>Mở nhanh</h2>
+      <div class="links">{% for l in links %}<a href="{{ l.link }}" data-testid="link">{{ l.title }}</a>{% endfor %}</div>
+    </section>
+    {% endif %}
+  </div>
 </div>
+<div id="tlc-toast" role="status" aria-live="polite" data-testid="toast"></div>
+
+<script>
+  const TLC_CSRF = "{{ csrf_token }}";
+  function tlcToast(text, ok) {
+    const el = document.getElementById("tlc-toast");
+    el.textContent = text; el.className = ok ? "ok" : "bad"; el.style.display = "block";
+    clearTimeout(el._t); el._t = setTimeout(() => el.style.display = "none", 4000);
+  }
+  async function tlcCall(method, args) {
+    const res = await fetch("/api/method/" + method, {
+      method: "POST", headers: {"Content-Type": "application/json", "X-Frappe-CSRF-Token": TLC_CSRF}, body: JSON.stringify(args)});
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      let msg = "Không thực hiện được.";
+      try { msg = JSON.parse(JSON.parse(data._server_messages)[0]).message; } catch (e) { if (data.exception) msg = data.exception.split(":").slice(1).join(":"); }
+      throw new Error(msg.replace(/<[^>]+>/g, ""));
+    }
+    return data.message;
+  }
+  async function tlcSubmitLeave(event) {
+    event.preventDefault();
+    const f = event.target, btn = f.querySelector("button[type=submit]");
+    btn.disabled = true;
+    try {
+      const r = await tlcCall("tlc_hr.api.submit_leave", {leave_type: f.leave_type.value, from_date: f.from_date.value,
+        to_date: f.to_date.value, half_day: f.half_day.checked ? 1 : 0, reason: f.reason.value});
+      tlcToast("Đã gửi đơn " + r.name + " (" + r.total_leave_days + " ngày) — " + r.workflow_state, true);
+      setTimeout(() => location.reload(), 1500);
+    } catch (e) { tlcToast(e.message, false); btn.disabled = false; }
+    return false;
+  }
+  function tlcToggleReject(name) { const el = document.getElementById("reject-" + name); el.classList.toggle("open"); el.querySelector("textarea").focus(); }
+  async function tlcDecide(btn, name, decision) {
+    const reason = decision === "reject" ? document.querySelector("#reject-" + name + " textarea").value : null;
+    btn.disabled = true;
+    try {
+      const r = await tlcCall("tlc_hr.api.decide", {name, decision, reason});
+      tlcToast((decision === "approve" ? "Đã duyệt " : "Đã từ chối ") + r.name + " — " + r.workflow_state, true);
+      setTimeout(() => location.reload(), 1500);
+    } catch (e) { tlcToast(e.message, false); btn.disabled = false; }
+  }
+</script>
 {% endblock %}

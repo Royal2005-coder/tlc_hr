@@ -57,7 +57,7 @@ def ensure_leave_workflow():
     states = [
         {"state": DRAFT, "doc_status": "0", "allow_edit": "Employee", "update_field": "status", "update_value": "Open"},
         {"state": TO_MANAGER, "doc_status": "0", "allow_edit": "Leave Approver", "update_field": "status", "update_value": "Open"},
-        {"state": TO_HR, "doc_status": "0", "allow_edit": "TLC HR Lead", "update_field": "status", "update_value": "Open"},
+        {"state": TO_HR, "doc_status": "0", "allow_edit": "TLC HR Officer", "update_field": "status", "update_value": "Open"},
         {"state": APPROVED, "doc_status": "1", "allow_edit": "TLC HR Lead", "update_field": "status", "update_value": "Approved"},
         {"state": REJECTED, "doc_status": "1", "allow_edit": "TLC HR Lead", "update_field": "status", "update_value": "Rejected"},
         {"state": CANCELLED, "doc_status": "2", "allow_edit": "TLC HR Lead", "update_field": "status", "update_value": "Cancelled"},
@@ -68,8 +68,11 @@ def ensure_leave_workflow():
          "condition": IS_MY_REPORT},
         {"state": TO_MANAGER, "action": "Từ chối", "next_state": REJECTED, "allowed": "Leave Approver", "allow_self_approval": 0,
          "condition": IS_MY_REPORT},
+        # The HR level is the HR department: the HR lead or an HR officer (an HR officer decides on the HR lead's own leave).
         {"state": TO_HR, "action": "Duyệt", "next_state": APPROVED, "allowed": "TLC HR Lead", "allow_self_approval": 0},
         {"state": TO_HR, "action": "Từ chối", "next_state": REJECTED, "allowed": "TLC HR Lead", "allow_self_approval": 0},
+        {"state": TO_HR, "action": "Duyệt", "next_state": APPROVED, "allowed": "TLC HR Officer", "allow_self_approval": 0},
+        {"state": TO_HR, "action": "Từ chối", "next_state": REJECTED, "allowed": "TLC HR Officer", "allow_self_approval": 0},
         {"state": APPROVED, "action": "Hủy", "next_state": CANCELLED, "allowed": "TLC HR Lead", "allow_self_approval": 0},
     ]
     if frappe.db.exists("Workflow", LEAVE_WORKFLOW):

@@ -244,3 +244,16 @@ def leave(data):
             frappe.get_doc({"doctype": "Leave Allocation", "employee": employee, "leave_type": leave_type,
                             "from_date": f"{year}-01-01", "to_date": f"{year}-12-31",
                             "new_leaves_allocated": allocation["days"]}).submit()
+
+
+def reset_leave_requests():
+    """Demo and UAT only: delete every leave request of the demo company and its ledger entries, so a UAT run starts clean."""
+    if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
+        frappe.throw("reset_leave_requests runs only on a test site (site config allow_tests)")
+    names = frappe.get_all("Leave Application", filters={"company": COMPANY}, pluck="name")
+    if names:
+        frappe.db.delete("Leave Ledger Entry", {"transaction_type": "Leave Application", "transaction_name": ["in", names]})
+        frappe.db.delete("Workflow Action", {"reference_doctype": "Leave Application", "reference_name": ["in", names]})
+        frappe.db.delete("Leave Application", {"name": ["in", names]})
+    frappe.db.commit()
+    print(f"reset: {len(names)} leave requests deleted")
