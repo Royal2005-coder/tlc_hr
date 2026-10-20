@@ -1,0 +1,18 @@
+[project]
+name = "tlc_hr"
+authors = [{ name = "TLC HRM team", email = "boygia757@gmail.com" }]
+description = "TLC HRM on Frappe HR: roles, workflows, Vietnamese rules over erpnextvn, the /tlc portal and the TLC demo seed"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0-dev,<17.0.0"
+
+[tool.ruff]
+line-length = 140
