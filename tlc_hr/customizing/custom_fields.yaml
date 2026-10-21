@@ -1,0 +1,100 @@
+version: 1
+kind: custom_fields
+description: Fields TLC adds to standard HRMS doctypes.
+custom_fields:
+- doctype: Employee
+  fields:
+  - fieldname: tlc_section
+    label: TLC
+    fieldtype: Section Break
+    insert_after: reports_to
+    collapsible: true
+  - fieldname: tlc_key
+    label: Mã TLC
+    fieldtype: Data
+    insert_after: tlc_section
+    unique: true
+    read_only: true
+  - fieldname: tlc_workforce
+    label: Khối
+    fieldtype: Select
+    options: |-
+      head_office
+      factory
+    default: head_office
+    insert_after: tlc_key
+  - fieldname: tlc_monthly_wage
+    label: Lương tháng (VND)
+    fieldtype: Currency
+    options: salary_currency
+    insert_after: tlc_workforce
+    permlevel: 1
+  - fieldname: tlc_dependents
+    label: Số người phụ thuộc
+    fieldtype: Int
+    insert_after: tlc_monthly_wage
+- doctype: Department
+  fields:
+  - fieldname: tlc_head
+    label: Trưởng bộ phận
+    fieldtype: Link
+    options: Employee
+    insert_after: department_name
+  - fieldname: tlc_wage_region
+    label: Vùng lương tối thiểu
+    fieldtype: Select
+    options: |-
+      I
+      II
+      III
+      IV
+    default: I
+    insert_after: tlc_head
+    description: Vùng theo Nghị định 293/2025/NĐ-CP của nơi làm việc; quyết định trần đóng BHTN.
+- doctype: Attendance Request
+  fields:
+  - fieldname: tlc_correction_type
+    label: Loại điều chỉnh
+    fieldtype: Select
+    insert_after: reason
+    options: |2-
+
+      Quên chấm vào
+      Quên chấm ra
+      Máy chấm công lỗi
+      Đi công tác / làm việc ngoài
+      Điều chỉnh sau chốt
+    description: 'Điều chỉnh sau chốt: chỉ HR tạo, cho ngày thuộc kỳ công đã khoá; tính vào kỳ lương kế tiếp.'
+  - fieldname: tlc_approver
+    label: Quản lý duyệt
+    fieldtype: Link
+    options: User
+    read_only: true
+    insert_after: explanation
+  - fieldname: tlc_reject_reason
+    label: Lý do từ chối
+    fieldtype: Small Text
+    insert_after: tlc_approver
+    depends_on: eval:doc.workflow_state
+    permlevel: 1
+  - fieldname: tlc_rejected_stage
+    label: Bị từ chối ở bước
+    fieldtype: Data
+    insert_after: tlc_reject_reason
+    read_only: true
+    hidden: true
+- doctype: Leave Application
+  fields:
+  - fieldname: tlc_reject_reason
+    label: Lý do từ chối
+    fieldtype: Small Text
+    insert_after: status
+    depends_on: eval:doc.workflow_state
+    description: Bắt buộc khi từ chối đơn.
+    permlevel: 1
+  - fieldname: tlc_rejected_stage
+    label: Bị từ chối ở bước
+    fieldtype: Data
+    insert_after: tlc_reject_reason
+    read_only: true
+    hidden: true

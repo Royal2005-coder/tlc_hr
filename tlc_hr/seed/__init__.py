@@ -13,7 +13,7 @@ from pathlib import Path
 import frappe
 from frappe.utils import add_days, add_years, getdate, nowdate
 
-from tlc_hr.setup.roles import FRAPPE_ROLES_OF, SELF_SERVICE, ensure_roles
+from tlc_hr.setup.roles import FRAPPE_ROLES_OF, SELF_SERVICE
 
 COMPANY = "TLC Demo"
 ABBR = "TLC"
@@ -42,7 +42,9 @@ def run():
 
 def setup_company(data):
     """Finish the setup wizard once (Vietnam, VND, Asia/Ho_Chi_Minh); later runs only check that the company exists."""
-    ensure_roles()
+    from tlc_hr.infrastructure.customizing import engine
+
+    engine.apply()  # roles, workflows, shifts, sites... before the users
     if frappe.db.exists("Company", COMPANY):
         return
     from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
@@ -76,9 +78,9 @@ def setup_company(data):
 
 
 def accounts(data):
-    from tlc_hr.setup.accounts import ensure_accounts
+    from tlc_hr.infrastructure.customizing import engine
 
-    ensure_accounts(COMPANY)
+    engine.apply()  # account types and company defaults once the chart exists
 
 
 def payroll_fields(data):
@@ -314,9 +316,7 @@ def demo_mail(data):
 
 def shifts(data):
     """Each person works the shift of their calendar at the site of their department (office hours when no calendar)."""
-    from tlc_hr.setup.attendance import SHIFT_OF_CALENDAR, assign, ensure_all, site_of
-
-    ensure_all()
+    from tlc_hr.setup.attendance import SHIFT_OF_CALENDAR, assign, site_of
     calendar_of = {row["key"]: row.get("calendar") for row in expand_people(data)}
     for employee in frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, fields=["name", "tlc_key", "department"]):
         shift = SHIFT_OF_CALENDAR.get(calendar_of.get(employee.tlc_key) or "office", "TLC Hành chính")
@@ -332,7 +332,9 @@ def checkins(data, days=DEMO_DAYS):
     """Check-ins of everyone for the last working days, at their work site; a few late arrivals and absences (stable random)."""
     import datetime as dt
 
-    from tlc_hr.setup.attendance import SITES, site_of
+    from tlc_hr.setup.attendance import site_of, sites
+
+    SITES = sites()
 
     today = getdate(nowdate())
     first = (today.replace(day=1) - dt.timedelta(days=1)).replace(day=1)  # last month is a full month to close

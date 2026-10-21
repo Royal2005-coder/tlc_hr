@@ -1,0 +1,93 @@
+version: 1
+kind: workflow
+description: Approval route of TLC Attendance Period.
+workflow:
+  name: TLC Chốt công
+  doctype: TLC Attendance Period
+  states:
+  - state: Nháp
+    allow_edit: TLC HR Officer
+    doc_status: 0
+  - state: Chờ quản lý xác nhận
+    allow_edit: TLC Line Manager
+    style: Warning
+    doc_status: 0
+  - state: Chờ nhân sự đối soát
+    allow_edit: TLC HR Officer
+    style: Warning
+    doc_status: 0
+  - state: Chờ giám đốc ký
+    allow_edit: TLC Director
+    style: Warning
+    doc_status: 0
+  - state: Đã khoá
+    doc_status: 1
+    allow_edit: TLC Director
+    style: Success
+  - state: Đã mở lại
+    doc_status: 2
+    allow_edit: TLC Director
+    style: Inverse
+  transitions:
+  - from: Nháp
+    action: Gửi xác nhận
+    to: Chờ quản lý xác nhận
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+    condition: doc.scope != "Hội sở"
+    allow_self_approval: true
+  - from: Nháp
+    action: Gửi đối soát
+    to: Chờ nhân sự đối soát
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+    condition: doc.scope == "Hội sở"
+    allow_self_approval: true
+  - from: Chờ nhân sự đối soát
+    action: Đối soát xong
+    to: Chờ giám đốc ký
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+    allow_self_approval: true
+  - from: Chờ nhân sự đối soát
+    action: Trả lại
+    to: Nháp
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+    allow_self_approval: true
+  - from: Chờ quản lý xác nhận
+    action: Xác nhận
+    to: Chờ nhân sự đối soát
+    allowed:
+    - TLC Line Manager
+    condition: doc.manager_user == frappe.session.user
+    allow_self_approval: true
+  - from: Chờ quản lý xác nhận
+    action: Trả lại
+    to: Nháp
+    allowed:
+    - TLC Line Manager
+    condition: doc.manager_user == frappe.session.user
+    allow_self_approval: true
+  - from: Chờ giám đốc ký
+    action: Ký và khoá
+    to: Đã khoá
+    allowed:
+    - TLC Director
+    allow_self_approval: true
+  - from: Chờ giám đốc ký
+    action: Trả lại
+    to: Nháp
+    allowed:
+    - TLC Director
+    allow_self_approval: true
+  - from: Đã khoá
+    action: Mở lại kỳ
+    to: Đã mở lại
+    allowed:
+    - TLC Director
+    allow_self_approval: true

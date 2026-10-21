@@ -1,13 +1,6 @@
-"""TLC roles and how each TLC level maps to the roles of Frappe HR."""
+"""TLC roles (declared in customizing/roles.yaml) and how each TLC level of the demo maps to Frappe roles."""
 
-import frappe
-
-# Roles that exist only for TLC (desk access, used by the workflows, the role workspaces and the landing page).
-TLC_ROLES = ("TLC Director", "TLC HR Lead", "TLC HR Officer", "TLC Payroll", "TLC Line Manager", "TLC Role Admin", "TLC Self Service")
-
-# Employees who approve nothing work in the Frappe HR app (/hrms); everyone else lands on the desk workspace of their role.
 SELF_SERVICE = "TLC Self Service"
-HOME_PAGE = {SELF_SERVICE: "hrms"}
 
 # TLC level of the seed -> Frappe roles given to the user. Every person also gets Employee and Employee Self Service.
 FRAPPE_ROLES_OF = {
@@ -21,12 +14,3 @@ FRAPPE_ROLES_OF = {
     "accountant": ("Accounts User",),
     "role_admin": ("TLC Role Admin",),
 }
-
-
-def ensure_roles():
-    """Create the TLC roles with desk access (idempotent)."""
-    for role in TLC_ROLES:
-        if not frappe.db.exists("Role", role):
-            frappe.get_doc({"doctype": "Role", "role_name": role, "desk_access": 1}).insert(ignore_permissions=True)
-        if HOME_PAGE.get(role) and frappe.db.get_value("Role", role, "home_page") != HOME_PAGE[role]:
-            frappe.db.set_value("Role", role, "home_page", HOME_PAGE[role])

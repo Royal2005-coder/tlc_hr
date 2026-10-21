@@ -66,18 +66,3 @@ def patch_pit_table():
         return False
     pit_calculator.TAX_BRACKETS = list(PIT_BRACKETS_2026)
     return True
-
-
-def apply_settings():
-    """Write the 2026 values into the single doctype VN Payroll Settings (after install and after every migration)."""
-    import frappe
-
-    if not frappe.db.exists("DocType", "VN Payroll Settings"):
-        return
-    settings = frappe.get_single("VN Payroll Settings")
-    changed = {key: value for key, value in SETTINGS_2026.items() if str(settings.get(key) or "") != str(value)}
-    if changed:
-        settings.update(changed)
-        settings.flags.ignore_permissions = True
-        settings.save()
-        frappe.db.commit()

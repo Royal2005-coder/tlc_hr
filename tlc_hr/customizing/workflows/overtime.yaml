@@ -1,0 +1,71 @@
+version: 1
+kind: workflow
+description: Approval route of TLC Overtime Request.
+workflow:
+  name: TLC Tăng ca
+  doctype: TLC Overtime Request
+  states:
+  - state: Nháp
+    allow_edit: TLC Line Manager
+    doc_status: 0
+  - state: Chờ người lao động đồng ý
+    allow_edit: Employee
+    style: Warning
+    doc_status: 0
+  - state: Chờ giám đốc duyệt
+    allow_edit: TLC Director
+    style: Warning
+    doc_status: 0
+  - state: Đã duyệt
+    doc_status: 1
+    allow_edit: TLC Director
+    style: Success
+  - state: Từ chối
+    allow_edit: TLC HR Lead
+    style: Danger
+    doc_status: 0
+  - state: Đã hủy
+    doc_status: 2
+    allow_edit: TLC Director
+    style: Inverse
+  transitions:
+  - from: Nháp
+    action: Đề nghị
+    to: Chờ người lao động đồng ý
+    allowed:
+    - TLC Line Manager
+    - TLC HR Lead
+    - TLC HR Officer
+    allow_self_approval: true
+  - from: Chờ người lao động đồng ý
+    action: Đồng ý
+    to: Chờ giám đốc duyệt
+    allowed:
+    - Employee
+    condition: doc.employee_user == frappe.session.user
+    allow_self_approval: true
+  - from: Chờ người lao động đồng ý
+    action: Từ chối
+    to: Từ chối
+    allowed:
+    - Employee
+    condition: doc.employee_user == frappe.session.user
+    allow_self_approval: true
+  - from: Chờ giám đốc duyệt
+    action: Duyệt
+    to: Đã duyệt
+    allowed:
+    - TLC Director
+    allow_self_approval: true
+  - from: Chờ giám đốc duyệt
+    action: Từ chối
+    to: Từ chối
+    allowed:
+    - TLC Director
+    allow_self_approval: true
+  - from: Đã duyệt
+    action: Hủy
+    to: Đã hủy
+    allowed:
+    - TLC Director
+    allow_self_approval: true

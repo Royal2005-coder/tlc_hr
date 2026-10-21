@@ -1,0 +1,18 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tools (the domain, contracts and customizing need no Frappe)
+        run: pip install "pydantic==2.12.5" "PyYAML==6.0.3" "ruff==0.8.4"
+      - name: Lint the layered code
+        run: >
+          ruff check --line-length 140 tlc_hr/contracts tlc_hr/domain tlc_hr/application tlc_hr/infrastructure
+          tlc_hr/interface tlc_hr/tests/unit tlc_hr/commands.py
+      - name: Unit tests (rules, contracts, customizing YAML, architecture)
+        run: python -m unittest discover -s tlc_hr/tests/unit -t . -v

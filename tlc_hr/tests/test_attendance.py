@@ -5,7 +5,7 @@ import datetime as dt
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from tlc_hr.setup.attendance import SITES
+from tlc_hr.setup.attendance import sites
 
 WORKER = "binh@demo.example"  # night shift 22:00-06:00 at Nhà máy 1
 
@@ -22,7 +22,7 @@ class TestCheckin(IntegrationTestCase):
         self.employee = frappe.db.get_value("Employee", {"user_id": WORKER})
         if not self.employee or not frappe.db.exists("Shift Type", "TLC Ca đêm"):
             self.skipTest("TLC demo seed with shifts not loaded")
-        self.lat, self.lon, _ = SITES["Nhà máy 1"]
+        self.lat, self.lon, _ = sites()["Nhà máy 1"]
 
     def tearDown(self):
         frappe.db.rollback()

@@ -1,0 +1,163 @@
+version: 1
+kind: records
+description: Shifts and work sites, check-in settings, overtime, leave carry-forward and the Vietnamese payroll parameters.
+records:
+- doctype: Shift Type
+  name: TLC Hành chính
+  values:
+    start_time: 08:00:00
+    end_time: '17:00:00'
+    color: Blue
+    enable_auto_attendance: 1
+    auto_update_last_sync: 1
+    determine_check_in_and_check_out: Strictly based on Log Type in Employee Checkin
+    working_hours_calculation_based_on: Every Valid Check-in and Check-out
+    begin_check_in_before_shift_start_time: 60
+    allow_check_out_after_shift_end_time: 240
+    late_entry_grace_period: 10
+    early_exit_grace_period: 10
+    enable_late_entry_marking: 1
+    enable_early_exit_marking: 1
+    working_hours_threshold_for_half_day: 4
+    working_hours_threshold_for_absent: 2
+    holiday_list: null
+    allow_overtime: 1
+    overtime_type: TLC Tăng ca
+  on_create:
+    process_attendance_after: '2026-01-01'
+- doctype: Shift Type
+  name: TLC Ca đêm
+  values:
+    start_time: '22:00:00'
+    end_time: 06:00:00
+    color: Violet
+    enable_auto_attendance: 1
+    auto_update_last_sync: 1
+    determine_check_in_and_check_out: Strictly based on Log Type in Employee Checkin
+    working_hours_calculation_based_on: Every Valid Check-in and Check-out
+    begin_check_in_before_shift_start_time: 60
+    allow_check_out_after_shift_end_time: 240
+    late_entry_grace_period: 10
+    early_exit_grace_period: 10
+    enable_late_entry_marking: 1
+    enable_early_exit_marking: 1
+    working_hours_threshold_for_half_day: 4
+    working_hours_threshold_for_absent: 2
+    holiday_list: null
+    allow_overtime: 1
+    overtime_type: TLC Tăng ca
+  on_create:
+    process_attendance_after: '2026-01-01'
+- doctype: Shift Type
+  name: TLC Cao điểm
+  values:
+    start_time: 07:00:00
+    end_time: '19:00:00'
+    color: Orange
+    enable_auto_attendance: 1
+    auto_update_last_sync: 1
+    determine_check_in_and_check_out: Strictly based on Log Type in Employee Checkin
+    working_hours_calculation_based_on: Every Valid Check-in and Check-out
+    begin_check_in_before_shift_start_time: 60
+    allow_check_out_after_shift_end_time: 240
+    late_entry_grace_period: 10
+    early_exit_grace_period: 10
+    enable_late_entry_marking: 1
+    enable_early_exit_marking: 1
+    working_hours_threshold_for_half_day: 4
+    working_hours_threshold_for_absent: 2
+    holiday_list: null
+    allow_overtime: 1
+    overtime_type: TLC Tăng ca
+  on_create:
+    process_attendance_after: '2026-01-01'
+- doctype: Shift Location
+  name: Hội sở TLC
+  values:
+    location_name: Hội sở TLC
+    latitude: 10.776889
+    longitude: 106.700806
+    checkin_radius: 200
+- doctype: Shift Location
+  name: Nhà máy 1
+  values:
+    location_name: Nhà máy 1
+    latitude: 10.850632
+    longitude: 106.77201
+    checkin_radius: 200
+- doctype: Shift Location
+  name: Nhà máy 2
+  values:
+    location_name: Nhà máy 2
+    latitude: 10.98041
+    longitude: 106.651871
+    checkin_radius: 200
+- doctype: Shift Location
+  name: Nhà máy 3
+  values:
+    location_name: Nhà máy 3
+    latitude: 10.957413
+    longitude: 106.842687
+    checkin_radius: 200
+- doctype: HR Settings
+  values:
+    allow_geolocation_tracking: 1
+    allow_employee_checkin_from_mobile_app: 1
+- doctype: Salary Component
+  name: Lương cơ bản
+  values: {}
+  on_create:
+    salary_component: Lương cơ bản
+    salary_component_abbr: LCB
+    type: Earning
+    depends_on_payment_days: 0
+- doctype: Salary Component
+  name: Tiền tăng ca
+  values: {}
+  on_create:
+    salary_component: Tiền tăng ca
+    salary_component_abbr: OT
+    type: Earning
+    depends_on_payment_days: 0
+- doctype: Overtime Type
+  name: TLC Tăng ca
+  values:
+    overtime_calculation_method: Salary Component Based
+    overtime_salary_component: Tiền tăng ca
+    standard_multiplier: 1.5
+    applicable_for_weekend: 1
+    weekend_multiplier: 2.0
+    applicable_for_public_holiday: 1
+    public_holiday_multiplier: 3.0
+    maximum_overtime_hours_allowed: 12
+  tables:
+    applicable_salary_component:
+    - salary_component: Lương cơ bản
+- doctype: Leave Type
+  name: Phép năm
+  on_create:
+    leave_type_name: Phép năm
+    max_leaves_allowed: 12
+    include_holiday: 0
+    is_lwp: 0
+  values:
+    is_carry_forward: 1
+    expire_carry_forwarded_leaves_after_days: 89
+- doctype: VN Payroll Settings
+  values:
+    base_salary: 2530000
+    personal_deduction: 15500000
+    dependent_deduction: 6200000
+    si_employee_rate: 8
+    hi_employee_rate: 1.5
+    ui_employee_rate: 1
+    si_employer_rate: 17.5
+    hi_employer_rate: 3
+    ui_employer_rate: 1
+    si_hi_ceiling_multiplier: 20
+    ui_ceiling_multiplier: 20
+    min_wage_region_1: 5310000
+    min_wage_region_2: 4730000
+    min_wage_region_3: 4140000
+    min_wage_region_4: 3700000
+    effective_date: '2026-07-01'

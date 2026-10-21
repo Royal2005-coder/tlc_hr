@@ -1,0 +1,15 @@
+version: 1
+kind: email_templates
+description: E-mails HRMS sends about leave requests.
+email_templates:
+- name: TLC Đơn nghỉ cần duyệt
+  subject: Đơn nghỉ phép {{ name }} của {{ employee_name }} cần bạn duyệt
+  html: '<p>{{ employee_name }} xin {{ leave_type }} từ {{ frappe.format(from_date, ''Date'') }} đến {{ frappe.format(to_date, ''Date'') }} ({{
+    total_leave_days }} ngày).</p><p>Lý do: {{ description or '''' }}</p><p>Trạng thái: <b>{{ workflow_state }}</b>. Mở đơn trên TLC HRM để duyệt
+    hoặc từ chối.</p>'
+  hr_setting: leave_approval_notification_template
+- name: TLC Kết quả đơn nghỉ
+  subject: 'Đơn nghỉ phép {{ name }}: {{ workflow_state }}'
+  html: '<p>Đơn {{ leave_type }} từ {{ frappe.format(from_date, ''Date'') }} đến {{ frappe.format(to_date, ''Date'') }} ({{ total_leave_days }}
+    ngày) của bạn: <b>{{ workflow_state }}</b>.</p>{% if tlc_reject_reason %}<p>Lý do từ chối: {{ tlc_reject_reason }}</p>{% endif %}'
+  hr_setting: leave_status_notification_template

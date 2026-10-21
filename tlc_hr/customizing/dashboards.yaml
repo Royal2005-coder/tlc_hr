@@ -1,0 +1,256 @@
+version: 1
+kind: dashboards
+description: Number cards and charts of the role workspaces.
+number_cards:
+- name: TLC Nhân sự đang làm việc
+  doctype: Employee
+  color: '#2f8a3c'
+  filters:
+  - - Employee
+    - status
+    - '='
+    - Active
+  dynamic_filters: []
+- name: TLC Nhân sự khối Nhà máy
+  doctype: Employee
+  color: '#b5541b'
+  filters:
+  - - Employee
+    - status
+    - '='
+    - Active
+  - - Employee
+    - tlc_workforce
+    - '='
+    - factory
+  dynamic_filters: []
+- name: TLC Nhân sự khối Hội sở
+  doctype: Employee
+  color: '#1d5fa8'
+  filters:
+  - - Employee
+    - status
+    - '='
+    - Active
+  - - Employee
+    - tlc_workforce
+    - '='
+    - head_office
+  dynamic_filters: []
+- name: TLC Đơn chờ quản lý duyệt
+  doctype: Leave Application
+  color: '#e2a400'
+  filters:
+  - - Leave Application
+    - workflow_state
+    - '='
+    - Chờ quản lý duyệt
+  dynamic_filters: []
+- name: TLC Đơn chờ nhân sự duyệt
+  doctype: Leave Application
+  color: '#e2a400'
+  filters:
+  - - Leave Application
+    - workflow_state
+    - '='
+    - Chờ nhân sự duyệt
+  dynamic_filters: []
+- name: TLC Đơn chờ tôi duyệt
+  doctype: Leave Application
+  color: '#d9480f'
+  filters:
+  - - Leave Application
+    - workflow_state
+    - '='
+    - Chờ quản lý duyệt
+  dynamic_filters:
+  - - Leave Application
+    - leave_approver
+    - '='
+    - frappe.session.user
+- name: TLC Chấm công hôm nay
+  doctype: Employee Checkin
+  color: '#0ca678'
+  filters:
+  - - Employee Checkin
+    - log_type
+    - '='
+    - IN
+  dynamic_filters:
+  - - Employee Checkin
+    - time
+    - '>='
+    - frappe.datetime.get_today()
+- name: TLC Điều chỉnh công chờ duyệt
+  doctype: Attendance Request
+  color: '#e2a400'
+  filters:
+  - - Attendance Request
+    - workflow_state
+    - in
+    - - Chờ quản lý duyệt
+      - Chờ nhân sự duyệt
+  dynamic_filters: []
+- name: TLC Đi muộn tháng này
+  doctype: Attendance
+  color: '#e8590c'
+  filters:
+  - - Attendance
+    - late_entry
+    - '='
+    - 1
+  - - Attendance
+    - docstatus
+    - '='
+    - 1
+  - - Attendance
+    - attendance_date
+    - Timespan
+    - this month
+  dynamic_filters: []
+- name: TLC Tăng ca chờ người lao động
+  doctype: TLC Overtime Request
+  color: '#e2a400'
+  filters:
+  - - TLC Overtime Request
+    - workflow_state
+    - '='
+    - Chờ người lao động đồng ý
+  dynamic_filters: []
+- name: TLC Tăng ca chờ giám đốc duyệt
+  doctype: TLC Overtime Request
+  color: '#d9480f'
+  filters:
+  - - TLC Overtime Request
+    - workflow_state
+    - '='
+    - Chờ giám đốc duyệt
+  dynamic_filters: []
+- name: TLC Giờ tăng ca tháng này
+  doctype: TLC Overtime Request
+  color: '#1d5fa8'
+  filters:
+  - - TLC Overtime Request
+    - docstatus
+    - '='
+    - 1
+  - - TLC Overtime Request
+    - ot_date
+    - Timespan
+    - this month
+  dynamic_filters: []
+  function: Sum
+  field: hours
+- name: TLC Kỳ công chờ tôi xác nhận
+  doctype: TLC Attendance Period
+  color: '#d9480f'
+  filters:
+  - - TLC Attendance Period
+    - workflow_state
+    - '='
+    - Chờ quản lý xác nhận
+  dynamic_filters:
+  - - TLC Attendance Period
+    - manager_user
+    - '='
+    - frappe.session.user
+- name: TLC Kỳ công chờ đối soát
+  doctype: TLC Attendance Period
+  color: '#e2a400'
+  filters:
+  - - TLC Attendance Period
+    - workflow_state
+    - '='
+    - Chờ nhân sự đối soát
+  dynamic_filters: []
+- name: TLC Kỳ công chờ ký
+  doctype: TLC Attendance Period
+  color: '#d9480f'
+  filters:
+  - - TLC Attendance Period
+    - workflow_state
+    - '='
+    - Chờ giám đốc ký
+  dynamic_filters: []
+- name: TLC Nghỉ phép hôm nay
+  doctype: Leave Application
+  color: '#7048e8'
+  filters:
+  - - Leave Application
+    - status
+    - '='
+    - Approved
+  dynamic_filters:
+  - - Leave Application
+    - from_date
+    - <=
+    - frappe.datetime.get_today()
+  - - Leave Application
+    - to_date
+    - '>='
+    - frappe.datetime.get_today()
+charts:
+- name: TLC Nhân sự theo phòng ban
+  chart_type: Group By
+  document_type: Employee
+  group_by_type: Count
+  group_by_based_on: department
+  number_of_groups: 12
+  type: Bar
+  filters:
+  - - Employee
+    - status
+    - '='
+    - Active
+- name: TLC Chấm công tháng này
+  chart_type: Group By
+  document_type: Attendance
+  group_by_type: Count
+  group_by_based_on: status
+  type: Donut
+  filters:
+  - - Attendance
+    - docstatus
+    - '='
+    - 1
+  - - Attendance
+    - attendance_date
+    - Timespan
+    - this month
+- name: TLC Giờ tăng ca theo bộ phận
+  chart_type: Group By
+  document_type: TLC Overtime Request
+  group_by_type: Sum
+  aggregate_function_based_on: hours
+  group_by_based_on: department
+  type: Bar
+  filters:
+  - - TLC Overtime Request
+    - docstatus
+    - '='
+    - 1
+  - - TLC Overtime Request
+    - ot_date
+    - Timespan
+    - this year
+- name: TLC Đơn nghỉ theo trạng thái
+  chart_type: Group By
+  document_type: Leave Application
+  group_by_type: Count
+  group_by_based_on: workflow_state
+  type: Donut
+  filters: []
+- name: TLC Ngày nghỉ đã duyệt theo tháng
+  chart_type: Sum
+  document_type: Leave Application
+  based_on: from_date
+  value_based_on: total_leave_days
+  timeseries: true
+  timespan: Last Year
+  time_interval: Monthly
+  type: Bar
+  filters:
+  - - Leave Application
+    - status
+    - '='
+    - Approved

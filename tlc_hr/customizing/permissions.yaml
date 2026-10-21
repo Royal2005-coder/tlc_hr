@@ -1,0 +1,60 @@
+version: 1
+kind: permissions
+description: 'Who reads and writes the reason to reject (permlevel 1): the employee reads it, deciders write it.'
+permissions:
+- doctype: Leave Application
+  role: Employee
+  permlevel: 1
+  rights: r
+- doctype: Leave Application
+  role: Leave Approver
+  permlevel: 1
+  rights: rw
+- doctype: Leave Application
+  role: TLC HR Lead
+  permlevel: 1
+  rights: rw
+- doctype: Leave Application
+  role: TLC HR Officer
+  permlevel: 1
+  rights: rw
+- doctype: Leave Application
+  role: TLC Director
+  permlevel: 1
+  rights: rw
+- doctype: Leave Application
+  role: HR Manager
+  permlevel: 1
+  rights: rw
+- doctype: Leave Application
+  role: HR User
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: Employee
+  permlevel: 1
+  rights: r
+- doctype: Attendance Request
+  role: Leave Approver
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: TLC HR Lead
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: TLC HR Officer
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: TLC Director
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: HR Manager
+  permlevel: 1
+  rights: rw
+- doctype: Attendance Request
+  role: HR User
+  permlevel: 1
+  rights: rw

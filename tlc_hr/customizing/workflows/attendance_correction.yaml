@@ -1,0 +1,66 @@
+version: 1
+kind: workflow
+description: Approval route of Attendance Request.
+workflow:
+  name: TLC Điều chỉnh công
+  doctype: Attendance Request
+  states:
+  - state: Nháp
+    allow_edit: Employee
+    doc_status: 0
+  - state: Chờ quản lý duyệt
+    allow_edit: Leave Approver
+    style: Warning
+    doc_status: 0
+  - state: Chờ nhân sự duyệt
+    allow_edit: TLC HR Officer
+    style: Warning
+    doc_status: 0
+  - state: Đã duyệt
+    doc_status: 1
+    allow_edit: TLC HR Lead
+    style: Success
+  - state: Từ chối
+    allow_edit: TLC HR Lead
+    style: Danger
+    doc_status: 0
+  - state: Đã hủy
+    doc_status: 2
+    allow_edit: TLC HR Lead
+    style: Inverse
+  transitions:
+  - from: Nháp
+    action: Gửi duyệt
+    to: Chờ quản lý duyệt
+    allowed:
+    - Employee
+    allow_self_approval: true
+  - from: Chờ quản lý duyệt
+    action: Duyệt
+    to: Chờ nhân sự duyệt
+    allowed:
+    - Leave Approver
+    condition: doc.tlc_approver == frappe.session.user
+  - from: Chờ quản lý duyệt
+    action: Từ chối
+    to: Từ chối
+    allowed:
+    - Leave Approver
+    condition: doc.tlc_approver == frappe.session.user
+  - from: Chờ nhân sự duyệt
+    action: Duyệt
+    to: Đã duyệt
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+  - from: Chờ nhân sự duyệt
+    action: Từ chối
+    to: Từ chối
+    allowed:
+    - TLC HR Lead
+    - TLC HR Officer
+  - from: Đã duyệt
+    action: Hủy
+    to: Đã hủy
+    allowed:
+    - TLC HR Lead

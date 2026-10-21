@@ -1,0 +1,19 @@
+version: 1
+kind: roles
+description: TLC roles with desk access; TLC Self Service lands on the Frappe HR app.
+roles:
+- name: TLC Director
+  desk_access: true
+- name: TLC HR Lead
+  desk_access: true
+- name: TLC HR Officer
+  desk_access: true
+- name: TLC Payroll
+  desk_access: true
+- name: TLC Line Manager
+  desk_access: true
+- name: TLC Role Admin
+  desk_access: true
+- name: TLC Self Service
+  desk_access: true
+  home_page: hrms
