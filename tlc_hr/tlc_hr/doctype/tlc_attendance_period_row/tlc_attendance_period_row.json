@@ -1,0 +1,113 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Attendance Period Row",
+ "module": "TLC HR",
+ "istable": 1,
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "employee_name",
+  "department",
+  "present_days",
+  "half_days",
+  "absent_days",
+  "leave_days",
+  "late_count",
+  "early_exit_count",
+  "ot_hours",
+  "corrections"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nhân viên",
+   "options": "Employee",
+   "in_list_view": 1,
+   "columns": 2,
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Họ tên",
+   "in_list_view": 1,
+   "columns": 2,
+   "read_only": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Bộ phận",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "present_days",
+   "fieldtype": "Float",
+   "label": "Có mặt",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "half_days",
+   "fieldtype": "Float",
+   "label": "Nửa ngày",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "absent_days",
+   "fieldtype": "Float",
+   "label": "Vắng",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "leave_days",
+   "fieldtype": "Float",
+   "label": "Nghỉ phép",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "late_count",
+   "fieldtype": "Int",
+   "label": "Đi muộn",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "early_exit_count",
+   "fieldtype": "Int",
+   "label": "Về sớm",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ot_hours",
+   "fieldtype": "Float",
+   "label": "Giờ tăng ca",
+   "in_list_view": 1,
+   "columns": 1,
+   "read_only": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "corrections",
+   "fieldtype": "Int",
+   "label": "Giải trình",
+   "read_only": 1
+  }
+ ],
+ "permissions": [],
+ "modified": "2026-10-21 11:00:00.000000",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-10-21 11:00:00.000000"
+}

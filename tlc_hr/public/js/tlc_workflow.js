@@ -3,17 +3,19 @@
 // apply_workflow reloads the document from the database, so the reason is stored first, then the decision runs.
 (() => {
 	const DOCTYPES = ["Leave Application", "Attendance Request", "TLC Overtime Request", "Travel Request", "Employee Advance",
-		"Expense Claim", "Employee Separation"];
+		"Expense Claim", "Employee Separation", "TLC Attendance Period"];
+	// actions that need a reason: refusing a request, returning a period to HR, reopening a locked period
+	const REASON_ACTIONS = ["Từ chối", "Trả lại", "Mở lại kỳ"];
 
 	function ask_reason(frm) {
-		if (frm.selected_workflow_action !== "Từ chối" || (frm.doc.tlc_reject_reason || "").trim()) {
+		if (!REASON_ACTIONS.includes(frm.selected_workflow_action) || (frm.doc.tlc_reject_reason || "").trim()) {
 			return;
 		}
 		frappe.dom.unfreeze();
 		return new Promise((resolve, reject) => {
 			let confirmed = false;
 			const dialog = frappe.prompt(
-				{ fieldname: "reason", fieldtype: "Small Text", label: __("Lý do từ chối"), reqd: 1 },
+				{ fieldname: "reason", fieldtype: "Small Text", label: __("Lý do"), reqd: 1 },
 				({ reason }) => {
 					confirmed = true;
 					frappe.dom.freeze();
@@ -27,8 +29,8 @@
 							reject(error);
 						});
 				},
-				__("Từ chối đơn"),
-				__("Từ chối")
+				__(frm.selected_workflow_action),
+				__(frm.selected_workflow_action)
 			);
 			// frappe.prompt hides the dialog before it calls the action: decide on the next tick whether it was a cancel.
 			dialog.onhide = () => setTimeout(() => {

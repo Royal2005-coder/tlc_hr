@@ -71,3 +71,20 @@ class TestAttendanceCorrection(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             frappe.get_doc({"doctype": "Attendance Request", "employee": self.employee, "from_date": self.day, "to_date": self.day,
                             "reason": "On Duty", "tlc_correction_type": "Quên chấm vào"}).insert()
+
+    def test_shift_filled_so_the_absent_day_is_corrected(self):
+        """The app form has no shift: the request takes the shift of the existing attendance and corrects that record."""
+        day = "2026-05-05"
+        frappe.set_user("Administrator")
+        absent = frappe.get_doc({"doctype": "Attendance", "employee": self.employee, "attendance_date": day, "status": "Absent",
+                                 "shift": "TLC Ca đêm", "company": frappe.db.get_value("Employee", self.employee, "company")}).submit()
+        frappe.set_user(WORKER)
+        doc = frappe.get_doc({"doctype": "Attendance Request", "employee": self.employee, "from_date": day, "to_date": day,
+                              "reason": "On Duty", "tlc_correction_type": "Quên chấm ra", "explanation": "Quên bấm Ra ca"}).insert()
+        self.assertEqual(doc.shift, "TLC Ca đêm")
+        apply_workflow(doc, "Gửi duyệt")
+        frappe.set_user(HEAD)
+        apply_workflow(frappe.get_doc(doc.doctype, doc.name), "Duyệt")
+        frappe.set_user(HR)
+        apply_workflow(frappe.get_doc(doc.doctype, doc.name), "Duyệt")
+        self.assertEqual(frappe.db.get_value("Attendance", absent.name, "status"), "Present")

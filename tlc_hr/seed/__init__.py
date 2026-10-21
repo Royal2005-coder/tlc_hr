@@ -335,20 +335,23 @@ def checkins(data, days=DEMO_DAYS):
     from tlc_hr.setup.attendance import SITES, site_of
 
     today = getdate(nowdate())
+    first = (today.replace(day=1) - dt.timedelta(days=1)).replace(day=1)  # last month is a full month to close
     work_days = []
     day = today - dt.timedelta(days=1)
-    while len(work_days) < days:
-        if day.weekday() < 5:
+    holidays = set(frappe.get_all("Holiday", filters={"parent": frappe.db.get_value("Company", COMPANY, "default_holiday_list")},
+                                  pluck="holiday_date"))
+    while len(work_days) < days or day >= first:
+        if day.weekday() < 5 and day not in holidays:
             work_days.append(day)
         day -= dt.timedelta(days=1)
     work_days.reverse()
-    rng = random.Random(20261021)
     employees = frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, fields=["name", "department", "default_shift"])
     for employee in employees:
         shift = employee.default_shift or "TLC Hành chính"
         (in_h, in_m), (out_h, out_m) = SHIFT_TIMES[shift]
         lat, lon, _radius = SITES[site_of(employee.department)]
         for work_day in work_days:
+            rng = random.Random(f"{employee.name}/{work_day}")  # the same person and day get the same outcome on every run
             roll = rng.random()
             if roll < 0.02:
                 continue  # absent
@@ -366,7 +369,7 @@ def checkins(data, days=DEMO_DAYS):
     first = work_days[0]
     for shift in SHIFT_TIMES:
         doc = frappe.get_doc("Shift Type", shift)
-        if not doc.process_attendance_after or getdate(doc.process_attendance_after) < first:
+        if not doc.process_attendance_after or getdate(doc.process_attendance_after) > first:  # process from the first demo day
             doc.process_attendance_after = first
         doc.last_sync_of_checkin = frappe.utils.now_datetime()
         doc.save(ignore_permissions=True)
@@ -386,7 +389,8 @@ def overtime(data):
     from frappe.model.workflow import apply_workflow
 
     today = getdate(nowdate())
-    past = [d for d in (today - dt.timedelta(days=n) for n in range(1, 20)) if d.weekday() < 5 and d.month == today.month][:6]
+    last_month = (today.replace(day=1) - dt.timedelta(days=1)).month
+    past = [d for d in (today - dt.timedelta(days=n) for n in range(1, 50)) if d.weekday() < 5 and d.month in (today.month, last_month)]
     upcoming = next(d for d in (today + dt.timedelta(days=n) for n in range(7, 14)) if d.weekday() < 5)
     rng = random.Random(20261022)
     workers = frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active", "tlc_workforce": "factory",
@@ -398,7 +402,7 @@ def overtime(data):
             times = OVERTIME_TIMES.get(worker.default_shift)
             if not times or "TLC Line Manager" not in frappe.get_roles(worker.leave_approver):
                 continue
-            plan = [(day, ("Đồng ý", "Duyệt")) for day in rng.sample(past, k=min(2, len(past)))]
+            plan = [(day, ("Đồng ý", "Duyệt")) for day in rng.sample(past, k=min(4, len(past)))]
             plan.append((upcoming, ((), ("Đồng ý",), None)[i % 3]))
             for day, actions in plan:
                 if actions is None or frappe.db.exists("TLC Overtime Request", {"employee": worker.name, "ot_date": day}):
@@ -427,6 +431,26 @@ def reset_overtime_requests():
     overtime(load())
     frappe.db.commit()
     print(f"reset: {len(names)} overtime requests deleted, demo overtime seeded")
+
+
+def reset_attendance_periods():
+    """Demo and UAT only: delete the attendance periods and the attendance corrections (with the attendance they wrote), then
+    let the check-in step mark those days again, so the monthly closing can be run again."""
+    if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
+        frappe.throw("reset_attendance_periods runs only on a test site (site config allow_tests)")
+    periods = frappe.get_all("TLC Attendance Period", pluck="name")
+    requests = frappe.get_all("Attendance Request", filters={"company": COMPANY}, pluck="name")
+    for doctype, names in (("TLC Attendance Period", periods), ("Attendance Request", requests)):
+        if names:
+            frappe.db.delete("Comment", {"reference_doctype": doctype, "reference_name": ["in", names]})
+            frappe.db.delete("Workflow Action", {"reference_doctype": doctype, "reference_name": ["in", names]})
+            frappe.db.delete(doctype, {"name": ["in", names]})
+    frappe.db.delete("TLC Attendance Period Row", {"parent": ["in", periods or [""]]})
+    if requests:
+        frappe.db.delete("Attendance", {"attendance_request": ["in", requests]})
+    checkins(load())
+    frappe.db.commit()
+    print(f"reset: {len(periods)} attendance periods and {len(requests)} corrections deleted, attendance re-marked")
 
 
 def reset_attendance_demo():

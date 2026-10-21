@@ -30,7 +30,8 @@ CUSTOM_FIELDS = {
     ],
     "Attendance Request": [
         {"fieldname": "tlc_correction_type", "label": "Loại điều chỉnh", "fieldtype": "Select", "insert_after": "reason",
-         "options": "\nQuên chấm vào\nQuên chấm ra\nMáy chấm công lỗi\nĐi công tác / làm việc ngoài"},
+         "options": "\nQuên chấm vào\nQuên chấm ra\nMáy chấm công lỗi\nĐi công tác / làm việc ngoài\nĐiều chỉnh sau chốt",
+         "description": "Điều chỉnh sau chốt: chỉ HR tạo, cho ngày thuộc kỳ công đã khoá; tính vào kỳ lương kế tiếp."},
         {"fieldname": "tlc_approver", "label": "Quản lý duyệt", "fieldtype": "Link", "options": "User", "read_only": 1,
          "insert_after": "explanation"},
         {"fieldname": "tlc_reject_reason", "label": "Lý do từ chối", "fieldtype": "Small Text", "insert_after": "tlc_approver",
@@ -120,6 +121,9 @@ def after_migrate():
     from tlc_hr.setup.overtime import ensure_all as ensure_overtime
 
     ensure_overtime()
+    from tlc_hr.setup.period import ensure_all as ensure_period
+
+    ensure_period()
     from tlc_hr.setup.workspaces import ensure_all
 
     ensure_all()

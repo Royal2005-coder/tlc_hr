@@ -11,10 +11,13 @@ import frappe
 
 from tlc_hr.setup.install import TO_HR, TO_MANAGER
 from tlc_hr.setup.overtime import TO_DIRECTOR, TO_WORKER
+from tlc_hr.setup.period import TO_CEO, TO_HEAD
+from tlc_hr.setup.period import TO_HR as PERIOD_TO_HR
 
 MODULE = "TLC HR"
 LEAVE = "Leave Application"
 OT = "TLC Overtime Request"
+KC = "TLC Attendance Period"
 TODAY = "frappe.datetime.get_today()"
 
 NUMBER_CARDS = {
@@ -35,6 +38,9 @@ NUMBER_CARDS = {
     "TLC Tăng ca chờ giám đốc duyệt": (OT, [[OT, "workflow_state", "=", TO_DIRECTOR]], [], "#d9480f"),
     "TLC Giờ tăng ca tháng này": (OT, [[OT, "docstatus", "=", 1], [OT, "ot_date", "Timespan", "this month"]], [], "#1d5fa8",
                                   ("Sum", "hours")),
+    "TLC Kỳ công chờ tôi xác nhận": (KC, [[KC, "workflow_state", "=", TO_HEAD]], [[KC, "manager_user", "=", "frappe.session.user"]], "#d9480f"),
+    "TLC Kỳ công chờ đối soát": (KC, [[KC, "workflow_state", "=", PERIOD_TO_HR]], [], "#e2a400"),
+    "TLC Kỳ công chờ ký": (KC, [[KC, "workflow_state", "=", TO_CEO]], [], "#d9480f"),
     "TLC Nghỉ phép hôm nay": (LEAVE, [[LEAVE, "status", "=", "Approved"]],
                               [[LEAVE, "from_date", "<=", TODAY], [LEAVE, "to_date", ">=", TODAY]], "#7048e8"),
 }
@@ -69,6 +75,7 @@ SHORTCUTS = {
     "Điều chỉnh công": ("DocType", "Attendance Request", "List", "Orange",
                         [["Attendance Request", "workflow_state", "in", [TO_MANAGER, TO_HR]]]),
     "Tăng ca": ("DocType", OT, "List", "Orange", [[OT, "workflow_state", "in", [TO_WORKER, TO_DIRECTOR]]]),
+    "Chốt công": ("DocType", KC, "List", "Blue", [[KC, "workflow_state", "in", [TO_HEAD, PERIOD_TO_HR, TO_CEO]]]),
     "Phân ca": ("DocType", "Shift Assignment", "List", "Grey", None),
     # The report needs a period: the shortcut opens it on the current year (refreshed at every migration).
     "Số dư phép": ("URL", "/desk/query-report/Employee Leave Balance?from_date={year}-01-01&to_date={year}-12-31", "", "Grey", None),
@@ -84,22 +91,25 @@ WORKSPACES = {
         "roles": ["TLC Line Manager"], "icon": "users", "sequence": 1,
         "cards": ["TLC Đơn chờ tôi duyệt", "TLC Điều chỉnh công chờ duyệt", "TLC Nhân sự đang làm việc", "TLC Chấm công hôm nay",
                   "TLC Đi muộn tháng này",
-                  "TLC Tăng ca chờ người lao động", "TLC Giờ tăng ca tháng này", "TLC Nghỉ phép hôm nay"],
+                  "TLC Tăng ca chờ người lao động", "TLC Giờ tăng ca tháng này", "TLC Kỳ công chờ tôi xác nhận",
+                  "TLC Nghỉ phép hôm nay"],
         "charts": ["TLC Chấm công tháng này", "TLC Đơn nghỉ theo trạng thái"],
         "quick_list": (LEAVE, "Đơn chờ quản lý duyệt", [[LEAVE, "workflow_state", "=", TO_MANAGER]]),
-        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Nhân viên", "Sơ đồ tổ chức",
+        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Chốt công", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Nhân viên",
+                      "Sơ đồ tổ chức",
                       "Số dư phép",
                       "Ứng dụng Frappe HR"],
     },
     "TLC Nhân sự": {
         "roles": ["TLC HR Lead", "TLC HR Officer"], "icon": "hr", "sequence": 2,
         "cards": ["TLC Nhân sự đang làm việc", "TLC Nhân sự khối Hội sở", "TLC Nhân sự khối Nhà máy", "TLC Đơn chờ nhân sự duyệt",
-                  "TLC Điều chỉnh công chờ duyệt", "TLC Chấm công hôm nay", "TLC Đi muộn tháng này", "TLC Giờ tăng ca tháng này",
-                  "TLC Nghỉ phép hôm nay"],
+                  "TLC Điều chỉnh công chờ duyệt", "TLC Kỳ công chờ đối soát", "TLC Chấm công hôm nay", "TLC Đi muộn tháng này",
+                  "TLC Giờ tăng ca tháng này", "TLC Nghỉ phép hôm nay"],
         "charts": ["TLC Chấm công tháng này", "TLC Giờ tăng ca theo bộ phận", "TLC Nhân sự theo phòng ban",
                    "TLC Ngày nghỉ đã duyệt theo tháng"],
         "quick_list": (LEAVE, "Đơn chờ nhân sự duyệt", [[LEAVE, "workflow_state", "=", TO_HR]]),
-        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Phân ca", "Nhân viên",
+        "shortcuts": ["Đơn chờ duyệt", "Điều chỉnh công", "Tăng ca", "Chốt công", "Lịch nghỉ phép", "Chấm công", "Bảng công", "Phân ca",
+                      "Nhân viên",
                       "Cấp phép năm", "Lịch nghỉ lễ",
                       "Tham số lương Việt Nam",
                       "Số dư phép", "Sơ đồ tổ chức", "Yêu cầu cần xử lý"],
@@ -107,12 +117,12 @@ WORKSPACES = {
     "TLC Điều hành": {
         "roles": ["TLC Director"], "icon": "dashboard", "sequence": 3,
         "cards": ["TLC Nhân sự đang làm việc", "TLC Nhân sự khối Hội sở", "TLC Nhân sự khối Nhà máy", "TLC Đơn chờ tôi duyệt",
-                  "TLC Tăng ca chờ giám đốc duyệt", "TLC Đơn chờ quản lý duyệt", "TLC Đơn chờ nhân sự duyệt", "TLC Chấm công hôm nay",
+                  "TLC Tăng ca chờ giám đốc duyệt", "TLC Kỳ công chờ ký", "TLC Đơn chờ quản lý duyệt", "TLC Đơn chờ nhân sự duyệt", "TLC Chấm công hôm nay",
                   "TLC Giờ tăng ca tháng này", "TLC Nghỉ phép hôm nay"],
         "charts": ["TLC Chấm công tháng này", "TLC Giờ tăng ca theo bộ phận", "TLC Nhân sự theo phòng ban",
                    "TLC Ngày nghỉ đã duyệt theo tháng"],
         "quick_list": (LEAVE, "Đơn chờ tôi duyệt", [[LEAVE, "workflow_state", "=", TO_MANAGER]]),
-        "shortcuts": ["Đơn chờ duyệt", "Tăng ca", "Lịch nghỉ phép", "Nhân viên", "Sơ đồ tổ chức", "Số dư phép"],
+        "shortcuts": ["Đơn chờ duyệt", "Tăng ca", "Chốt công", "Lịch nghỉ phép", "Nhân viên", "Sơ đồ tổ chức", "Số dư phép"],
     },
 }
 

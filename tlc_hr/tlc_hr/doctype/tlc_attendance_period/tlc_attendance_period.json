@@ -1,0 +1,308 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Attendance Period",
+ "module": "TLC HR",
+ "is_submittable": 1,
+ "track_changes": 1,
+ "engine": "InnoDB",
+ "autoname": "format:TLC-KC-{#####}",
+ "naming_rule": "Expression",
+ "title_field": "title",
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "search_fields": "scope,period_month",
+ "description": "Kỳ công tháng: HR tổng hợp, trưởng nhà máy xác nhận, HR đối soát, CEO ký và khoá.",
+ "field_order": [
+  "title",
+  "company",
+  "scope",
+  "period_month",
+  "column_break_head",
+  "from_date",
+  "to_date",
+  "manager_user",
+  "section_totals",
+  "employee_count",
+  "present_days",
+  "half_days",
+  "column_break_totals",
+  "absent_days",
+  "leave_days",
+  "late_count",
+  "ot_hours",
+  "section_open",
+  "open_count",
+  "open_items",
+  "section_rows",
+  "rows",
+  "section_sign",
+  "locked_at",
+  "locked_by",
+  "tlc_reject_reason",
+  "tlc_rejected_stage",
+  "workflow_state",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Tiêu đề",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Công ty",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "scope",
+   "fieldtype": "Select",
+   "label": "Phạm vi",
+   "options": "Nhà máy 1\nNhà máy 2\nNhà máy 3\nHội sở",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "period_month",
+   "fieldtype": "Data",
+   "label": "Tháng (YYYY-MM)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Ví dụ 2026-09"
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "Từ ngày",
+   "read_only": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "Đến ngày",
+   "read_only": 1
+  },
+  {
+   "fieldname": "manager_user",
+   "fieldtype": "Link",
+   "label": "Trưởng nhà máy xác nhận",
+   "options": "User",
+   "read_only": 1,
+   "description": "Khối hội sở không có bước này."
+  },
+  {
+   "fieldname": "section_totals",
+   "fieldtype": "Section Break",
+   "label": "Tổng hợp"
+  },
+  {
+   "fieldname": "employee_count",
+   "fieldtype": "Int",
+   "label": "Số người",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "present_days",
+   "fieldtype": "Float",
+   "label": "Ngày có mặt",
+   "read_only": 1
+  },
+  {
+   "fieldname": "half_days",
+   "fieldtype": "Float",
+   "label": "Ngày nửa công",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_totals",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "absent_days",
+   "fieldtype": "Float",
+   "label": "Ngày vắng",
+   "read_only": 1
+  },
+  {
+   "fieldname": "leave_days",
+   "fieldtype": "Float",
+   "label": "Ngày nghỉ phép",
+   "read_only": 1
+  },
+  {
+   "fieldname": "late_count",
+   "fieldtype": "Int",
+   "label": "Lượt đi muộn",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ot_hours",
+   "fieldtype": "Float",
+   "label": "Giờ tăng ca đã duyệt",
+   "read_only": 1,
+   "precision": "2"
+  },
+  {
+   "fieldname": "section_open",
+   "fieldtype": "Section Break",
+   "label": "Việc chưa xử lý"
+  },
+  {
+   "fieldname": "open_count",
+   "fieldtype": "Int",
+   "label": "Số việc chưa xử lý",
+   "read_only": 1,
+   "in_list_view": 1,
+   "description": "Phải bằng 0 mới gửi xác nhận, đối soát hay ký được."
+  },
+  {
+   "fieldname": "open_items",
+   "fieldtype": "Small Text",
+   "label": "Danh sách",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_rows",
+   "fieldtype": "Section Break",
+   "label": "Bảng công theo người"
+  },
+  {
+   "fieldname": "rows",
+   "fieldtype": "Table",
+   "label": "Chi tiết",
+   "options": "TLC Attendance Period Row",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_sign",
+   "fieldtype": "Section Break",
+   "label": "Ký và khoá"
+  },
+  {
+   "fieldname": "locked_at",
+   "fieldtype": "Datetime",
+   "label": "Khoá lúc",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "locked_by",
+   "fieldtype": "Link",
+   "label": "Người ký",
+   "options": "User",
+   "read_only": 1,
+   "no_copy": 1
+  },
+  {
+   "fieldname": "tlc_reject_reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do trả lại / mở lại",
+   "no_copy": 1,
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.workflow_state"
+  },
+  {
+   "fieldname": "tlc_rejected_stage",
+   "fieldtype": "Data",
+   "label": "Trả lại từ bước",
+   "read_only": 1,
+   "no_copy": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "label": "Trạng thái",
+   "options": "Workflow State",
+   "read_only": 1,
+   "hidden": 1,
+   "no_copy": 1,
+   "allow_on_submit": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Sửa từ",
+   "options": "TLC Attendance Period",
+   "read_only": 1,
+   "no_copy": 1,
+   "print_hide": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1,
+   "amend": 1,
+   "delete": 1
+  },
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "amend": 1,
+   "delete": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "create": 1,
+   "write": 1,
+   "amend": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "write": 1,
+   "submit": 1,
+   "cancel": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "write": 1
+  }
+ ],
+ "modified": "2026-10-21 11:00:00.000000",
+ "owner": "Administrator",
+ "modified_by": "Administrator",
+ "creation": "2026-10-21 11:00:00.000000"
+}
