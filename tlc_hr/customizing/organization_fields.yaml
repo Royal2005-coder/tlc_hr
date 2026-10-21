@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "kind": "custom_fields",
+  "custom_fields": [
+    {
+      "doctype": "Department",
+      "fields": [
+        {
+          "fieldname": "tlc_organization_code",
+          "fieldtype": "Data",
+          "label": "TLC organization code",
+          "unique": true,
+          "description": "Stable organizational unit code; legacy departments may be backfilled independently."
+        },
+        {
+          "fieldname": "tlc_organization_level",
+          "fieldtype": "Select",
+          "label": "Organization level",
+          "options": "Company\nDivision\nDepartment\nTeam"
+        }
+      ]
+    },
+    {
+      "doctype": "Shift Location",
+      "fields": [
+        {
+          "fieldname": "tlc_organization_holiday_list",
+          "fieldtype": "Link",
+          "options": "Holiday List",
+          "label": "Worksite holiday calendar"
+        },
+        {
+          "fieldname": "tlc_organization_shift_type",
+          "fieldtype": "Link",
+          "options": "Shift Type",
+          "label": "Worksite default shift / attendance rule",
+          "description": "Reference default only. Use native Shift Assignment for employee schedules and auto attendance."
+        }
+      ]
+    }
+  ]
+}

@@ -10,7 +10,7 @@ frappe.ui.form.on("TLC Attendance Period", {
 	refresh(frm) {
 		if (!frm.is_new() && ["Nháp", undefined, null, ""].includes(frm.doc.workflow_state) && frm.has_perm("write")) {
 			frm.add_custom_button(__("Làm mới tổng hợp"), () =>
-				frappe.call("tlc_hr.tlc_hr.doctype.tlc_attendance_period.tlc_attendance_period.refresh", { name: frm.doc.name })
+				frappe.call("tlc_hr.interface.attendance.refresh_period", { name: frm.doc.name })
 					.then(() => frm.reload_doc()));
 		}
 		if (frm.is_new()) return;

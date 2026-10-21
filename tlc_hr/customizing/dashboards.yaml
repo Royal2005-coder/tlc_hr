@@ -189,6 +189,16 @@ number_cards:
     - to_date
     - '>='
     - frappe.datetime.get_today()
+- name: TLC Bảng lương chờ ký
+  doctype: Payroll Entry
+  color: '#d9480f'
+  filters:
+  - [Payroll Entry, workflow_state, '=', Chờ giám đốc ký]
+- name: TLC Bảng lương chờ chi
+  doctype: Payroll Entry
+  color: '#e2a400'
+  filters:
+  - [Payroll Entry, workflow_state, '=', Đã ký]
 charts:
 - name: TLC Nhân sự theo phòng ban
   chart_type: Group By

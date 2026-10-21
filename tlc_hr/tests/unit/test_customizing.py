@@ -19,10 +19,12 @@ class TestCustomizingFiles(unittest.TestCase):
         self.assertTrue({"TLC Nghỉ phép", "TLC Điều chỉnh công", "TLC Tăng ca", "TLC Chốt công"} <= names)
         self.assertTrue({"TLC Quản lý", "TLC Nhân sự", "TLC Điều hành"} <= {w.title for w in self.bundle.workspaces})
 
-    def test_every_workflow_starts_in_draft(self):
+    def test_every_workflow_starts_unsubmitted(self):
+        # Native Job Offer uses its own draft label; the invariant is doc_status 0 and a way out.
         for wf in self.bundle.workflows:
-            self.assertEqual(wf.states[0].state, "Nháp", wf.name)
-            self.assertTrue(any(t.from_state == "Nháp" for t in wf.transitions), wf.name)
+            first = wf.states[0]
+            self.assertEqual(first.doc_status, 0, wf.name)
+            self.assertTrue(any(t.from_state == first.state for t in wf.transitions), wf.name)
 
     def test_statutory_values_match_the_code(self):
         from tlc_hr.vn.statutory import SETTINGS_2026
@@ -56,6 +58,31 @@ class TestContracts(unittest.TestCase):
     def test_workspace_with_unknown_card_is_refused(self):
         with self.assertRaises(ValidationError):
             Bundle.model_validate({"workspaces": [{"title": "W", "roles": ["Employee"], "icon": "users", "sequence": 1, "cards": ["Không có"]}]})
+
+    def test_kind_must_match_its_payload(self):
+        for payload in ({"version": 1, "kind": "roles", "records": []},
+                        {"version": 1, "kind": "roles", "roles": []},
+                        {"version": 1, "kind": "roles", "roles": [{"name": "R"}], "accounts": None}):
+            with self.subTest(payload=payload), self.assertRaises(ValidationError):
+                CustomizingFile.model_validate(payload)
+
+    def test_managed_identities_must_be_unique(self):
+        resources = (
+            {"permissions": [{"doctype": "D", "role": "R", "rights": "r"}] * 2},
+            {"records": [{"doctype": "D", "name": "N"}] * 2},
+            {"custom_fields": [{"doctype": "D", "fields": [{"fieldname": "f", "fieldtype": "Data"}]}] * 2},
+            {"shortcuts": [{"label": "S", "type": "DocType", "link_to": "D"}] * 2},
+        )
+        for payload in resources:
+            with self.subTest(payload=payload), self.assertRaises(ValidationError):
+                Bundle.model_validate(payload)
+
+    def test_workflow_state_and_transition_roles_must_be_unique(self):
+        state = {"state": "Nháp", "doc_status": 0, "allow_edit": "Employee"}
+        for states, roles in (([state, state], ["Employee"]), ([state], []), ([state], ["Employee", "Employee"])):
+            with self.subTest(states=states, roles=roles), self.assertRaises(ValidationError):
+                WorkflowSpec.model_validate({"name": "W", "doctype": "D", "states": states,
+                                             "transitions": [{"from": "Nháp", "action": "A", "to": "Nháp", "allowed": roles}]})
 
     def test_strict_types(self):
         with self.assertRaises(ValidationError):

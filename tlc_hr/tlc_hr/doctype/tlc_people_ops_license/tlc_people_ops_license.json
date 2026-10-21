@@ -1,0 +1,73 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops License",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-LICENSE-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "system_name",
+    "seats",
+    "expires_on",
+    "supplier",
+    "evidence"
+  ],
+  "fields": [
+    {
+      "fieldname": "system_name",
+      "fieldtype": "Data",
+      "label": "System Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "seats",
+      "fieldtype": "Int",
+      "label": "Seats",
+      "reqd": 1
+    },
+    {
+      "fieldname": "expires_on",
+      "fieldtype": "Date",
+      "label": "Expires On",
+      "reqd": 1
+    },
+    {
+      "fieldname": "supplier",
+      "fieldtype": "Link",
+      "label": "Supplier",
+      "options": "Supplier"
+    },
+    {
+      "fieldname": "evidence",
+      "fieldtype": "Attach",
+      "label": "Evidence",
+      "reqd": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

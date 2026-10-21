@@ -3,9 +3,9 @@
     bench --site <site> tlc config validate      the YAML matches the contracts (no site write)
     bench --site <site> tlc config plan          what apply would change on the site (exit code 2 when something differs)
     bench --site <site> tlc config apply         write the declared customizing (idempotent)
-    bench --site <site> tlc config export-workflow <name>   a workflow edited on the desk, as YAML for tlc_hr/customizing
+    bench --site <site> tlc config export <kind> [name]   a workflow edited on the desk, as YAML for tlc_hr/customizing
     bench --site <site> tlc doctor               operational checks: shifts, sites, approvers, accounts, closing
-    bench --site <site> tlc seed run|reset-leave|reset-overtime|reset-periods   demo data (test sites only for resets)
+    bench --site <site> tlc seed run|reset-leave|reset-overtime|reset-periods|reset-payroll   demo data (test sites only)
 """
 
 import click
@@ -50,6 +50,7 @@ def plan(context):
     try:
         changes = engine.plan()
     finally:
+        frappe.db.rollback()
         frappe.destroy()
     for change in changes:
         click.echo(str(change))
@@ -68,6 +69,9 @@ def apply(context):
     try:
         changes = engine.apply()
         frappe.db.commit()
+    except Exception:
+        frappe.db.rollback()
+        raise
     finally:
         frappe.destroy()
     for change in changes:
@@ -75,31 +79,27 @@ def apply(context):
     click.echo(f"Đã ghi {len(changes)} thay đổi" if changes else "Không có thay đổi")
 
 
-@config.command("export-workflow")
-@click.argument("name")
+@config.command("export")
+@click.argument("kind", type=click.Choice(["roles", "custom_fields", "permissions", "workflow", "email_templates",
+                                            "dashboards", "workspaces", "records", "accounts"]))
+@click.argument("name", required=False)
 @pass_context
-def export_workflow(context, name):
-    """Print a workflow of the site as customizing YAML (to bring a change made on the desk back into git)."""
+def export(context, kind, name):
+    """Print managed site configuration as schema-valid YAML; workflow requires NAME."""
     import yaml
+
+    from tlc_hr.infrastructure.customizing.exporter import export_file
+    from tlc_hr.infrastructure.customizing.loader import load_bundle
 
     connect(context)
     try:
-        wf = frappe.get_doc("Workflow", name)
-        styles = {r.state: frappe.db.get_value("Workflow State", r.state, "style") or "" for r in wf.states}
-        grouped = {}
-        for t in wf.transitions:
-            grouped.setdefault((t.state, t.action, t.next_state, t.condition or None, bool(t.allow_self_approval)), []).append(t.allowed)
+        output = export_file(kind, load_bundle(), name)
+    except ValueError as exc:
+        raise click.ClickException(str(exc)) from exc
     finally:
+        frappe.db.rollback()
         frappe.destroy()
-    doc = {"version": 1, "kind": "workflow", "workflow": {
-        "name": wf.name, "doctype": wf.document_type,
-        "states": [{k: v for k, v in {"state": r.state, "doc_status": int(r.doc_status), "allow_edit": r.allow_edit, "style": styles[r.state],
-                                      "update_field": r.update_field, "update_value": r.update_value}.items() if v not in (None, "")}
-                   for r in wf.states],
-        "transitions": [{k: v for k, v in {"from": k0, "action": a, "to": to, "allowed": roles, "condition": cond,
-                                           "allow_self_approval": selfok}.items() if v not in (None, False)}
-                        for (k0, a, to, cond, selfok), roles in grouped.items()]}}
-    click.echo(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False, width=140))
+    click.echo(yaml.safe_dump(output, allow_unicode=True, sort_keys=False, width=140))
 
 
 @tlc.command("doctor")
@@ -120,16 +120,37 @@ def doctor(context):
 
 
 @tlc.command("seed")
-@click.argument("step", type=click.Choice(["run", "reset-leave", "reset-overtime", "reset-periods"]))
+@click.argument("step", type=click.Choice(["run", "reset-leave", "reset-overtime", "reset-periods", "reset-payroll", "salary", "reset-travel", "organization",
+                                          "recruitment", "reset-recruitment", "lifecycle", "reset-lifecycle", "people-ops",
+                                          "payroll-compliance", "travel-finance", "services", "reset-services"]))
 @pass_context
 def seed(context, step):
     """Demo data of TLC (made-up people); resets only on a site with allow_tests."""
+    from importlib import import_module
+
     from tlc_hr import seed as demo
 
     connect(context)
     try:
-        {"run": demo.run, "reset-leave": demo.reset_leave_requests, "reset-overtime": demo.reset_overtime_requests,
-         "reset-periods": demo.reset_attendance_periods}[step]()
+        steps = {"run": demo.run, "reset-leave": demo.reset_leave_requests, "reset-overtime": demo.reset_overtime_requests,
+                 "reset-periods": demo.reset_attendance_periods, "reset-payroll": demo.reset_payroll,
+                 "salary": lambda: demo.salary_assignments(demo.load())}
+        if step == "reset-travel":
+            from tlc_hr.seed.travel_finance import reset as reset_travel
+            steps[step] = reset_travel
+        if step == "reset-recruitment":
+            from tlc_hr.seed.recruitment import reset as reset_recruitment
+            steps[step] = reset_recruitment
+        if step == "reset-lifecycle":
+            from tlc_hr.seed.lifecycle import reset as reset_lifecycle
+            steps[step] = reset_lifecycle
+        if step == "reset-services":
+            from tlc_hr.seed.services import reset as reset_services
+            steps[step] = reset_services
+        if step in ("organization", "recruitment", "lifecycle", "people-ops", "payroll-compliance", "travel-finance", "services"):
+            module = {"people-ops": "people_ops", "payroll-compliance": "payroll_compliance", "travel-finance": "travel_finance"}.get(step, step)
+            steps[step] = import_module(f"tlc_hr.seed.{module}").run
+        steps[step]()
         frappe.db.commit()
     finally:
         frappe.destroy()

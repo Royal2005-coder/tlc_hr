@@ -1,0 +1,115 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Discipline",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-DISCIPLINE-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "employee",
+    "status",
+    "reason",
+    "violation_report",
+    "employee_explanation",
+    "decision",
+    "sanction",
+    "expunge_on",
+    "executed_on",
+    "proposed_by"
+  ],
+  "fields": [
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "label": "Employee",
+      "in_list_view": 1,
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "default": "Proposal",
+      "in_list_view": 1,
+      "options": "Proposal\nHR Review\nDirector Review\nApproved\nRejected\nExecuted\nExpunged",
+      "reqd": 1
+    },
+    {
+      "fieldname": "reason",
+      "fieldtype": "Small Text",
+      "label": "Reason",
+      "reqd": 1
+    },
+    {
+      "fieldname": "violation_report",
+      "fieldtype": "Attach",
+      "label": "Violation Report"
+    },
+    {
+      "fieldname": "employee_explanation",
+      "fieldtype": "Attach",
+      "label": "Employee Explanation"
+    },
+    {
+      "fieldname": "decision",
+      "fieldtype": "Attach",
+      "label": "Decision"
+    },
+    {
+      "fieldname": "sanction",
+      "fieldtype": "Small Text",
+      "label": "Sanction"
+    },
+    {
+      "fieldname": "expunge_on",
+      "fieldtype": "Date",
+      "label": "Expunge On"
+    },
+    {
+      "fieldname": "executed_on",
+      "fieldtype": "Date",
+      "label": "Executed On"
+    },
+    {
+      "fieldname": "proposed_by",
+      "fieldtype": "Link",
+      "label": "Proposed By",
+      "read_only": 1,
+      "options": "User"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Line Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    },
+    {
+      "role": "TLC Director",
+      "read": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

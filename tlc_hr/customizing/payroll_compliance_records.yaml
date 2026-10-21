@@ -1,0 +1,825 @@
+{
+  "version": 1,
+  "kind": "records",
+  "description": "Payroll decisions, evidence and native Additional Salary source records. No external filing certification.",
+  "records": [
+    {
+      "doctype": "DocType",
+      "name": "TLC Payroll Review",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "payroll_entry",
+            "fieldtype": "Link",
+            "label": "Payroll Entry",
+            "options": "Payroll Entry",
+            "reqd": 1
+          },
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "issue",
+            "fieldtype": "Select",
+            "label": "Issue",
+            "options": "Variance\nSalary decision\nData quality",
+            "reqd": 1
+          },
+          {
+            "fieldname": "review_fingerprint",
+            "fieldtype": "Data",
+            "label": "Review Fingerprint",
+            "read_only": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reviewed_by",
+            "fieldtype": "Link",
+            "label": "Reviewed By",
+            "read_only": 1,
+            "options": "User"
+          },
+          {
+            "fieldname": "reviewed_on",
+            "fieldtype": "Datetime",
+            "label": "Reviewed On",
+            "read_only": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Payroll Adjustment",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "original_slip",
+            "fieldtype": "Link",
+            "label": "Original Slip",
+            "options": "Salary Slip",
+            "reqd": 1
+          },
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "read_only": 1,
+            "options": "Employee"
+          },
+          {
+            "fieldname": "salary_component",
+            "fieldtype": "Link",
+            "label": "Salary Component",
+            "options": "Salary Component",
+            "reqd": 1
+          },
+          {
+            "fieldname": "direction",
+            "fieldtype": "Select",
+            "label": "Direction",
+            "options": "Increase\nDecrease",
+            "reqd": 1
+          },
+          {
+            "fieldname": "amount",
+            "fieldtype": "Currency",
+            "label": "Amount",
+            "reqd": 1
+          },
+          {
+            "fieldname": "payroll_date",
+            "fieldtype": "Date",
+            "label": "Payroll Date",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "applied_payroll",
+            "fieldtype": "Link",
+            "label": "Applied Payroll",
+            "read_only": 1,
+            "options": "Payroll Entry"
+          },
+          {
+            "fieldname": "additional_salary",
+            "fieldtype": "Link",
+            "label": "Additional Salary",
+            "read_only": 1,
+            "options": "Additional Salary"
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Payroll Bonus",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "frequency",
+            "fieldtype": "Select",
+            "label": "Frequency",
+            "options": "Monthly\nYearly",
+            "reqd": 1
+          },
+          {
+            "fieldname": "period_start",
+            "fieldtype": "Date",
+            "label": "Period Start",
+            "reqd": 1
+          },
+          {
+            "fieldname": "period_end",
+            "fieldtype": "Date",
+            "label": "Period End",
+            "reqd": 1
+          },
+          {
+            "fieldname": "payroll_date",
+            "fieldtype": "Date",
+            "label": "Payroll Date",
+            "reqd": 1
+          },
+          {
+            "fieldname": "multiplier",
+            "fieldtype": "Float",
+            "label": "Multiplier",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reference_salary",
+            "fieldtype": "Currency",
+            "label": "Reference Salary",
+            "read_only": 1
+          },
+          {
+            "fieldname": "amount",
+            "fieldtype": "Currency",
+            "label": "Amount",
+            "read_only": 1
+          },
+          {
+            "fieldname": "formula",
+            "fieldtype": "Small Text",
+            "label": "Formula",
+            "read_only": 1
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "applied_payroll",
+            "fieldtype": "Link",
+            "label": "Applied Payroll",
+            "read_only": 1,
+            "options": "Payroll Entry"
+          },
+          {
+            "fieldname": "additional_salary",
+            "fieldtype": "Link",
+            "label": "Additional Salary",
+            "read_only": 1,
+            "options": "Additional Salary"
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Insurance Change",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "insurance_number",
+            "fieldtype": "Data",
+            "label": "Insurance Number",
+            "reqd": 1
+          },
+          {
+            "fieldname": "change_type",
+            "fieldtype": "Select",
+            "label": "Change Type",
+            "options": "Join\nStop\nBase Change",
+            "reqd": 1
+          },
+          {
+            "fieldname": "effective_on",
+            "fieldtype": "Date",
+            "label": "Effective On",
+            "reqd": 1
+          },
+          {
+            "fieldname": "contribution_base",
+            "fieldtype": "Currency",
+            "label": "Contribution Base",
+            "reqd": 1
+          },
+          {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Prepared\nFiled\nAccepted\nRejected",
+            "reqd": 1
+          },
+          {
+            "fieldname": "filing_reference",
+            "fieldtype": "Data",
+            "label": "Filing Reference"
+          },
+          {
+            "fieldname": "filed_on",
+            "fieldtype": "Date",
+            "label": "Filed On"
+          },
+          {
+            "fieldname": "response_on",
+            "fieldtype": "Date",
+            "label": "Response On"
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Insurance Benefit",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "leave_application",
+            "fieldtype": "Link",
+            "label": "Leave Application",
+            "options": "Leave Application",
+            "reqd": 1
+          },
+          {
+            "fieldname": "benefit_type",
+            "fieldtype": "Select",
+            "label": "Benefit Type",
+            "options": "Sickness\nMaternity\nRecovery",
+            "reqd": 1
+          },
+          {
+            "fieldname": "actual_from",
+            "fieldtype": "Date",
+            "label": "Actual From",
+            "reqd": 1
+          },
+          {
+            "fieldname": "actual_to",
+            "fieldtype": "Date",
+            "label": "Actual To",
+            "reqd": 1
+          },
+          {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Prepared\nFiled\nAccepted\nPaid\nRejected",
+            "reqd": 1
+          },
+          {
+            "fieldname": "filing_reference",
+            "fieldtype": "Data",
+            "label": "Filing Reference"
+          },
+          {
+            "fieldname": "filed_on",
+            "fieldtype": "Date",
+            "label": "Filed On"
+          },
+          {
+            "fieldname": "approved_amount",
+            "fieldtype": "Currency",
+            "label": "Approved Amount"
+          },
+          {
+            "fieldname": "received_amount",
+            "fieldtype": "Currency",
+            "label": "Received Amount"
+          },
+          {
+            "fieldname": "received_on",
+            "fieldtype": "Date",
+            "label": "Received On"
+          },
+          {
+            "fieldname": "payment_reference",
+            "fieldtype": "Data",
+            "label": "Payment Reference"
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Salary Review Line",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 1,
+        "is_submittable": 0,
+        "autoname": "hash"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "old_base",
+            "fieldtype": "Currency",
+            "label": "Old Base",
+            "read_only": 1
+          },
+          {
+            "fieldname": "new_base",
+            "fieldtype": "Currency",
+            "label": "New Base",
+            "reqd": 1
+          },
+          {
+            "fieldname": "assignment",
+            "fieldtype": "Link",
+            "label": "Assignment",
+            "read_only": 1,
+            "options": "Salary Structure Assignment"
+          }
+        ],
+        "permissions": []
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Salary Review",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-PC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "company",
+            "fieldtype": "Link",
+            "label": "Company",
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "department",
+            "fieldtype": "Link",
+            "label": "Department",
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "effective_on",
+            "fieldtype": "Date",
+            "label": "Effective On",
+            "reqd": 1
+          },
+          {
+            "fieldname": "annual_budget_increase",
+            "fieldtype": "Currency",
+            "label": "Annual Budget Increase",
+            "reqd": 1
+          },
+          {
+            "fieldname": "review_stage",
+            "fieldtype": "Select",
+            "label": "Review Stage",
+            "default": "Draft",
+            "options": "Draft\nHR Reviewed",
+            "reqd": 1
+          },
+          {
+            "fieldname": "hr_reviewed_by",
+            "fieldtype": "Link",
+            "label": "Hr Reviewed By",
+            "read_only": 1,
+            "options": "User"
+          },
+          {
+            "fieldname": "hr_reviewed_on",
+            "fieldtype": "Datetime",
+            "label": "Hr Reviewed On",
+            "read_only": 1
+          },
+          {
+            "fieldname": "employees",
+            "fieldtype": "Table",
+            "label": "Employees",
+            "options": "TLC Salary Review Line",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC Payroll",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "Accounts User",
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "submit": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          },
+          {
+            "role": "TLC Line Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1
+          }
+        ]
+      }
+    }
+  ]
+}

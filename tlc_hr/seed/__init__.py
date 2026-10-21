@@ -23,7 +23,7 @@ LEAVE_TYPE_NAMES = {"annual": "Phép năm", "sick": "Nghỉ ốm"}
 # TLC levels that work on other people's records: HRMS must not restrict them to their own employee record.
 # Public holidays of Vietnam on a fixed solar date (Bộ luật Lao động, điều 112). Lunar holidays (Tết, Giỗ Tổ) are set by HR every year.
 VN_FIXED_HOLIDAYS = [("01-01", "Tết Dương lịch"), ("04-30", "Ngày Chiến thắng"), ("05-01", "Quốc tế Lao động"), ("09-02", "Quốc khánh")]
-COMPANY_WIDE_LEVELS = {"director", "cfo", "hr_director", "hr_officer", "period_controller", "payroll_officer"}
+COMPANY_WIDE_LEVELS = {"director", "cfo", "hr_director", "hr_officer", "period_controller", "payroll_officer", "accountant"}
 
 
 def load():
@@ -33,11 +33,17 @@ def load():
 def run():
     """Create the whole demo step by step; each finished step is committed, so a rerun continues where a failure stopped."""
     data = load()
-    for step in (setup_company, accounts, holidays, departments, designations, people, payroll_fields, leave, shifts, checkins,
-                 demo_mail, overtime):
+    for step in (setup_company, accounts, holidays, departments, designations, people, payroll_fields, salary_assignments, leave,
+                 shifts, checkins, demo_mail, overtime):
         step(data)
         frappe.db.commit()
         print("seed:", step.__name__, "done")
+    from tlc_hr.seed import lifecycle, organization, payroll_compliance, people_ops, recruitment, services, travel_finance
+
+    for module in (organization, recruitment, lifecycle, people_ops, payroll_compliance, travel_finance, services):
+        module.run(data)
+        frappe.db.commit()
+        print("seed:", module.__name__, "done")
 
 
 def setup_company(data):
@@ -94,6 +100,36 @@ def payroll_fields(data):
             values["vn_number_of_dependents"] = row.tlc_dependents or 0
         if values:
             frappe.db.set_value("Employee", row.name, values)
+
+
+def salary_assignments(data):
+    """Assign the declared structure from its effective date without rewriting salary history."""
+    from tlc_hr.infrastructure.customizing.loader import load_bundle
+
+    specification = load_bundle().payroll
+    if not specification:
+        frappe.throw("Chưa khai báo cấu trúc lương TLC trong customizing/payroll.yaml.")
+    structure = specification.structure.name
+    if not frappe.db.exists("Salary Structure", {"name": structure, "company": COMPANY, "docstatus": 1}):
+        frappe.throw(f"Cấu trúc lương {structure} chưa được áp dụng cho {COMPANY}.")
+    effective = specification.structure.effective_from or getdate(f"{getdate(nowdate()).year}-01-01")
+    for person in frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"},
+                                 fields=["name", "tlc_monthly_wage", "date_of_joining"]):
+        if not person.tlc_monthly_wage:
+            continue
+        start = max(effective, getdate(person.date_of_joining)) if person.date_of_joining else effective
+        existing = frappe.db.get_value("Salary Structure Assignment",
+                                        {"employee": person.name, "from_date": start, "docstatus": 1},
+                                        ["name", "salary_structure"], as_dict=True)
+        if existing:
+            if existing.salary_structure != structure:
+                if frappe.db.exists("Salary Slip", {"salary_structure": existing.salary_structure, "docstatus": 1}):
+                    frappe.throw(f"{person.name}: đã có phiếu lương dùng cấu trúc {existing.salary_structure}; "
+                                 "không tự đổi cấu trúc đã trả lương.")
+                frappe.db.set_value("Salary Structure Assignment", existing.name, "salary_structure", structure)
+            continue
+        frappe.get_doc({"doctype": "Salary Structure Assignment", "employee": person.name, "salary_structure": structure,
+                        "company": COMPANY, "from_date": start, "base": person.tlc_monthly_wage}).insert().submit()
 
 
 def holidays(data):
@@ -453,6 +489,29 @@ def reset_attendance_periods():
     checkins(load())
     frappe.db.commit()
     print(f"reset: {len(periods)} attendance periods and {len(requests)} corrections deleted, attendance re-marked")
+
+
+def reset_payroll():
+    """Demo and UAT only: delete the payroll entries of the demo company with their payslips, additional salaries and journal
+    entries (ledger rows included), so a month can be computed again."""
+    if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
+        frappe.throw("reset_payroll runs only on a test site (site config allow_tests)")
+    entries = frappe.get_all("Payroll Entry", filters={"company": COMPANY}, pluck="name")
+    slips = frappe.get_all("Salary Slip", filters={"payroll_entry": ["in", entries or [""]]}, pluck="name")
+    journals = list({r.parent for r in frappe.get_all("Journal Entry Account", filters={"reference_type": "Payroll Entry",
+                                                                                        "reference_name": ["in", entries or [""]]}, fields=["parent"])})
+    journals += frappe.get_all("Salary Slip", filters={"name": ["in", slips or [""]], "journal_entry": ["is", "set"]}, pluck="journal_entry")
+    journals = sorted(set(journals))
+    for table, field, names in (("GL Entry", "voucher_no", journals), ("Payment Ledger Entry", "voucher_no", journals),
+                                ("Journal Entry Account", "parent", journals), ("Journal Entry", "name", journals),
+                                ("Salary Detail", "parent", slips), ("Salary Slip", "name", slips),
+                                ("Additional Salary", "ref_docname", entries), ("Payroll Employee Detail", "parent", entries),
+                                ("Workflow Action", "reference_name", entries), ("Comment", "reference_name", entries),
+                                ("Payroll Entry", "name", entries)):
+        if names:
+            frappe.db.delete(table, {field: ["in", names]})
+    frappe.db.commit()
+    print(f"reset: {len(entries)} payroll entries, {len(slips)} payslips, {len(journals)} journal entries deleted")
 
 
 def reset_attendance_demo():

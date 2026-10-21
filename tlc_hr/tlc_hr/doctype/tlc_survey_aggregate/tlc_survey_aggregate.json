@@ -1,0 +1,53 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Survey Aggregate",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 0,
+ "field_order": [
+  "campaign",
+  "department",
+  "question_key",
+  "option_value",
+  "response_count"
+ ],
+ "fields": [
+  {
+   "fieldname": "campaign",
+   "fieldtype": "Link",
+   "label": "Khảo sát",
+   "reqd": 1,
+   "options": "TLC Survey Campaign"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Bộ phận",
+   "reqd": 1,
+   "options": "Department"
+  },
+  {
+   "fieldname": "question_key",
+   "fieldtype": "Data",
+   "label": "Mã câu hỏi",
+   "reqd": 1
+  },
+  {
+   "fieldname": "option_value",
+   "fieldtype": "Data",
+   "label": "Lựa chọn",
+   "reqd": 1
+  },
+  {
+   "fieldname": "response_count",
+   "fieldtype": "Int",
+   "label": "Tổng",
+   "reqd": 1
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

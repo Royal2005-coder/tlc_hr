@@ -1,0 +1,98 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Meal Enrollment",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "employee",
+  "meal_date",
+  "status",
+  "reason",
+  "absence_source"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nhân viên",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Employee"
+  },
+  {
+   "fieldname": "meal_date",
+   "fieldtype": "Date",
+   "label": "Ngày ăn",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "default": "Enrolled",
+   "reqd": 1,
+   "options": "Enrolled\nCancelled"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do thay đổi"
+  },
+  {
+   "fieldname": "absence_source",
+   "fieldtype": "Data",
+   "label": "Hồ sơ vắng mặt",
+   "read_only": 1
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

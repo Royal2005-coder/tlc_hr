@@ -1,4 +1,4 @@
-"""Actions of the /tlc home: ask for leave and decide on a request in one call.
+"""Public API of TLC HRM (interface layer, stable paths for clients and the AI tools): leave requests and decision support.
 
 Both go through the workflow TLC Nghỉ phép, so its roles, conditions and the no-self-approval rule stay the only authority.
 """
@@ -8,7 +8,7 @@ from frappe import _
 from frappe.model.workflow import apply_workflow
 from frappe.utils import cint, flt, getdate
 
-from tlc_hr.setup.install import DRAFT, TO_HR, TO_MANAGER
+from tlc_hr.domain.shared import DRAFT, TO_HR, TO_MANAGER
 
 DECISIONS = {"approve": "Duyệt", "reject": "Từ chối"}
 

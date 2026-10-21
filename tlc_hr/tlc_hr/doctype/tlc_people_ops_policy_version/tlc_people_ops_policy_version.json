@@ -1,0 +1,96 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Policy Version",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-POLICY-VERSION-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "policy_code",
+    "version",
+    "effective_from",
+    "body",
+    "policy_file",
+    "designation",
+    "branch",
+    "status"
+  ],
+  "fields": [
+    {
+      "fieldname": "policy_code",
+      "fieldtype": "Data",
+      "label": "Policy Code",
+      "reqd": 1
+    },
+    {
+      "fieldname": "version",
+      "fieldtype": "Int",
+      "label": "Version",
+      "reqd": 1
+    },
+    {
+      "fieldname": "effective_from",
+      "fieldtype": "Date",
+      "label": "Effective From",
+      "reqd": 1
+    },
+    {
+      "fieldname": "body",
+      "fieldtype": "Text Editor",
+      "label": "Body",
+      "reqd": 1
+    },
+    {
+      "fieldname": "policy_file",
+      "fieldtype": "Attach",
+      "label": "Policy File"
+    },
+    {
+      "fieldname": "designation",
+      "fieldtype": "Link",
+      "label": "Designation",
+      "options": "Designation"
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "default": "Draft",
+      "in_list_view": 1,
+      "options": "Draft\nPublished\nRetired",
+      "reqd": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

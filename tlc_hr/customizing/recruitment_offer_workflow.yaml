@@ -1,0 +1,19 @@
+version: 1
+kind: workflow
+workflow:
+  name: TLC Recruitment Offer Approval
+  doctype: Job Offer
+  send_email_alert: true
+  states:
+    - {state: Recruitment Draft, doc_status: 0, allow_edit: TLC HR Officer}
+    - {state: Recruitment HR Review, doc_status: 0, allow_edit: TLC HR Lead}
+    - {state: Recruitment CEO Review, doc_status: 0, allow_edit: TLC Director}
+    - {state: Recruitment Approved, doc_status: 1, allow_edit: TLC HR Officer}
+    - {state: Recruitment Cancelled, doc_status: 2, allow_edit: TLC HR Lead, update_field: status, update_value: Cancelled}
+  transitions:
+    - {from: Recruitment Draft, action: Submit Offer, to: Recruitment HR Review, allowed: [TLC HR Officer, TLC HR Lead], allow_self_approval: true}
+    - {from: Recruitment HR Review, action: Review Offer, to: Recruitment CEO Review, allowed: [TLC HR Lead]}
+    - {from: Recruitment HR Review, action: Return Offer, to: Recruitment Draft, allowed: [TLC HR Lead]}
+    - {from: Recruitment CEO Review, action: Return Offer, to: Recruitment Draft, allowed: [TLC Director]}
+    - {from: Recruitment CEO Review, action: Approve Offer, to: Recruitment Approved, allowed: [TLC Director]}
+    - {from: Recruitment Approved, action: Cancel For Amendment, to: Recruitment Cancelled, allowed: [TLC HR Lead]}

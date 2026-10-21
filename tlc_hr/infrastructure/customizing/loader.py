@@ -18,8 +18,8 @@ class CustomizingError(Exception):
 def read_file(path: Path) -> CustomizingFile:
     try:
         return CustomizingFile.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
-    except (ValidationError, yaml.YAMLError) as exc:
-        raise CustomizingError(f"{path.relative_to(ROOT.parent)}: {exc}") from exc
+    except (ValidationError, yaml.YAMLError, OSError) as exc:
+        raise CustomizingError(f"{path}: {exc}") from exc
 
 
 def load_bundle(root: Path = ROOT) -> Bundle:
@@ -27,7 +27,7 @@ def load_bundle(root: Path = ROOT) -> Bundle:
     if not files:
         raise CustomizingError(f"no customizing YAML under {root}")
     merged = {kind: [] for kind in LIST_KINDS}
-    merged["workflows"], merged["accounts"] = [], None
+    merged["workflows"], merged["accounts"], merged["payroll"] = [], None, None
     for path in files:
         spec = read_file(path)
         for kind in LIST_KINDS:
@@ -38,6 +38,10 @@ def load_bundle(root: Path = ROOT) -> Bundle:
             if merged["accounts"]:
                 raise CustomizingError(f"{path.name}: accounts declared twice")
             merged["accounts"] = spec.accounts
+        if spec.payroll:
+            if merged["payroll"]:
+                raise CustomizingError(f"{path.name}: payroll declared twice")
+            merged["payroll"] = spec.payroll
     try:
         return Bundle.model_validate(merged)
     except ValidationError as exc:

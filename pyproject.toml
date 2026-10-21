@@ -1,15 +1,18 @@
 [project]
 name = "tlc_hr"
 authors = [{ name = "TLC HRM team", email = "boygia757@gmail.com" }]
-description = "TLC HRM on Frappe HR: roles, workflows, Vietnamese rules over erpnextvn, the /tlc portal and the TLC demo seed"
-requires-python = ">=3.10"
+description = "TLC HRM on native Frappe HR: declarative configuration, approval workflows and Vietnamese HR rules"
+requires-python = ">=3.14,<3.15"
 readme = "README.md"
 dynamic = ["version"]
-dependencies = []
+dependencies = ["pydantic>=2.12,<3", "PyYAML>=6,<7"]
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+include = ["tlc_hr/customizing/*.yaml", "tlc_hr/customizing/**/*.yaml"]
 
 [tool.bench.frappe-dependencies]
 frappe = ">=16.0.0-dev,<17.0.0"

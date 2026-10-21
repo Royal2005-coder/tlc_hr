@@ -7,7 +7,8 @@ from frappe.model.workflow import apply_workflow
 from frappe.tests import IntegrationTestCase
 from frappe.utils import add_days
 
-from tlc_hr.attendance.period import employees_in
+from tlc_hr.infrastructure.frappe.attendance import FrappeAttendanceRepository
+from tlc_hr.interface.attendance import guard
 from tlc_hr.setup.period import CARRY_FORWARD_DAYS
 
 WORKER, HEAD, OTHER_HEAD, HR, HR2, CEO = ("f2w01@demo.example", "nm2@demo.example", "hung@demo.example", "lan@demo.example",
@@ -56,7 +57,7 @@ class TestAttendancePeriod(IntegrationTestCase):
         doc = self.period()
         row = next(r for r in doc.rows if r.employee == self.worker)
         self.assertEqual((doc.employee_count, row.present_days, doc.title),
-                         (len(employees_in("Nhà máy 2", self.company, doc.from_date)), 1, "Kỳ công 03/2026 · Nhà máy 2"))
+                         (len(FrappeAttendanceRepository().people(self.company, "Nhà máy 2", doc.from_date)), 1, "Kỳ công 03/2026 · Nhà máy 2"))
         self.assertEqual((str(doc.from_date), str(doc.to_date), doc.manager_user), ("2026-03-01", "2026-03-31", HEAD))
 
     def test_factory_chain_locks_the_month(self):
@@ -74,6 +75,45 @@ class TestAttendancePeriod(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             frappe.get_doc({"doctype": "Attendance Request", "employee": self.worker, "from_date": LOCKED_DAY, "to_date": LOCKED_DAY,
                             "reason": "On Duty", "tlc_correction_type": "Máy chấm công lỗi", "explanation": "Máy lỗi"}).insert()
+
+    def test_guard_covers_all_six_doctypes_and_open_ended_shifts(self):
+        self.lock()
+        examples = (
+            {"doctype": "Attendance", "attendance_date": LOCKED_DAY},
+            {"doctype": "Employee Checkin", "time": f"{LOCKED_DAY} 08:00:00"},
+            {"doctype": "Leave Application", "from_date": LOCKED_DAY, "to_date": LOCKED_DAY},
+            {"doctype": "Attendance Request", "from_date": LOCKED_DAY, "to_date": LOCKED_DAY},
+            {"doctype": "TLC Overtime Request", "ot_date": LOCKED_DAY},
+            {"doctype": "Shift Assignment", "start_date": "2026-02-01", "end_date": "2026-04-30"},
+            {"doctype": "Shift Assignment", "start_date": "2026-02-01"},
+        )
+        for example in examples:
+            with self.subTest(doctype=example["doctype"], end=example.get("end_date")):
+                doc = frappe.get_doc({**example, "employee": self.worker})
+                for event in ("validate", "before_cancel", "on_trash"):
+                    with self.subTest(event=event), self.assertRaises(frappe.ValidationError):
+                        guard(doc, event)
+
+    def test_moving_an_existing_record_out_of_a_locked_day_is_blocked(self):
+        self.lock()
+        doc = frappe.get_doc({"doctype": "Attendance", "employee": self.worker, "attendance_date": "2026-04-02"})
+        doc._doc_before_save = frappe.get_doc({"doctype": "Attendance", "employee": self.worker, "attendance_date": LOCKED_DAY})
+        with self.assertRaises(frappe.ValidationError):
+            guard(doc, "validate")
+
+    def test_post_lock_context_does_not_unlock_other_doctypes_or_dates(self):
+        self.lock()
+        frappe.flags.tlc_post_lock = {"employee": self.worker, "start": frappe.utils.getdate(LOCKED_DAY),
+                                     "end": frappe.utils.getdate(LOCKED_DAY)}
+        try:
+            allowed = frappe.get_doc({"doctype": "Attendance", "employee": self.worker, "attendance_date": LOCKED_DAY})
+            guard(allowed, "validate")
+            for example in ({"doctype": "Employee Checkin", "time": f"{LOCKED_DAY} 08:00:00"},
+                            {"doctype": "Attendance", "attendance_date": DAY}):
+                with self.subTest(example=example), self.assertRaises(frappe.ValidationError):
+                    guard(frappe.get_doc({**example, "employee": self.worker}), "validate")
+        finally:
+            frappe.flags.tlc_post_lock = False
 
     def test_open_request_blocks_the_period(self):
         frappe.set_user(WORKER)
@@ -134,6 +174,18 @@ class TestAttendancePeriod(IntegrationTestCase):
         self.period()
         with self.assertRaises(frappe.ValidationError):
             self.period()
+
+    def test_carried_ledger_expiry_uses_calendar_date_in_leap_year(self):
+        from tlc_hr.interface.people import carried_leave_validate
+
+        allocation = frappe.get_doc({"doctype": "Leave Allocation", "employee": self.worker, "leave_type": "Phép năm",
+                                     "from_date": "2028-01-01", "to_date": "2028-12-31", "new_leaves_allocated": 12})
+        allocation.insert(ignore_permissions=True)
+        entry = frappe.get_doc({"doctype": "Leave Ledger Entry", "employee": self.worker, "leave_type": "Phép năm",
+                                "transaction_type": "Leave Allocation", "transaction_name": allocation.name,
+                                "from_date": "2028-01-01", "to_date": "2028-03-29", "is_carry_forward": 1, "is_expired": 0})
+        carried_leave_validate(entry)
+        self.assertEqual(str(entry.to_date), "2028-03-30")
 
     def test_annual_leave_carried_until_30_march(self):
         self.assertEqual(frappe.db.get_value("Leave Type", "Phép năm", "expire_carry_forwarded_leaves_after_days"), CARRY_FORWARD_DAYS)

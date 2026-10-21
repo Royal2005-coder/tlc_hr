@@ -1,0 +1,100 @@
+version: 1
+kind: custom_fields
+description: PO 4.2 and 4.6 extensions on native HRMS documents; payment remains native accounting, never a bank simulation.
+custom_fields:
+- doctype: Company
+  fields:
+  - {fieldname: tlc_travel_report_days, label: Hạn báo cáo công tác (ngày), fieldtype: Int, default: '3', insert_after: default_currency}
+  - {fieldname: tlc_allow_advance_payroll_recovery, label: Chính sách cho phép thu hồi tạm ứng qua lương, fieldtype: Check, default: '0', insert_after: tlc_travel_report_days}
+- doctype: Travel Request
+  fields:
+  - {fieldname: tlc_trip_section, label: Công tác TLC, fieldtype: Section Break, insert_after: travel_funding}
+  - {fieldname: tlc_funded, label: Công tác có phí, fieldtype: Check, default: '0', insert_after: tlc_trip_section}
+  - {fieldname: tlc_destination, label: Nơi đến, fieldtype: Data, insert_after: tlc_funded}
+  - {fieldname: tlc_from_date, label: Ngày đi, fieldtype: Date, insert_after: tlc_destination}
+  - {fieldname: tlc_from_session, label: Buổi đi, fieldtype: Select, options: "AM\nPM", default: AM, insert_after: tlc_from_date}
+  - {fieldname: tlc_to_date, label: Ngày về, fieldtype: Date, insert_after: tlc_from_session}
+  - {fieldname: tlc_to_session, label: Buổi về, fieldtype: Select, options: "AM\nPM", default: PM, insert_after: tlc_to_date}
+  - {fieldname: tlc_budget, label: Tổng dự toán, fieldtype: Currency, read_only: true, insert_after: tlc_to_session}
+  - {fieldname: tlc_requested_advance, label: Số đề nghị tạm ứng (có thể bằng 0), fieldtype: Currency, insert_after: tlc_budget}
+  - {fieldname: tlc_manager_user, label: Quản lý duyệt, fieldtype: Link, options: User, read_only: true, insert_after: tlc_requested_advance}
+  - {fieldname: tlc_employee_user, label: Tài khoản nhân viên, fieldtype: Link, options: User, read_only: true, hidden: true}
+  - {fieldname: tlc_skip_manager, label: Bỏ cấp trùng, fieldtype: Check, read_only: true, hidden: true}
+  - {fieldname: tlc_approved_on, label: Giám đốc duyệt lúc, fieldtype: Datetime, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_employee_advance, label: Tạm ứng công tác, fieldtype: Link, options: Employee Advance, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_report_section, label: Báo cáo công tác thực tế, fieldtype: Section Break}
+  - {fieldname: tlc_report_due, label: Hạn báo cáo, fieldtype: Date, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_actual_from_date, label: Ngày đi thực tế, fieldtype: Date, allow_on_submit: true}
+  - {fieldname: tlc_actual_from_session, label: Buổi đi thực tế, fieldtype: Select, options: "AM\nPM", default: AM, allow_on_submit: true}
+  - {fieldname: tlc_actual_to_date, label: Ngày về thực tế, fieldtype: Date, allow_on_submit: true}
+  - {fieldname: tlc_actual_to_session, label: Buổi về thực tế, fieldtype: Select, options: "AM\nPM", default: PM, allow_on_submit: true}
+  - {fieldname: tlc_trip_result, label: Kết quả công việc, fieldtype: Small Text, allow_on_submit: true}
+  - {fieldname: tlc_expense_claim, label: Quyết toán chi phí, fieldtype: Link, options: Expense Claim, allow_on_submit: true}
+  - {fieldname: tlc_report_approved_on, label: Báo cáo được duyệt lúc, fieldtype: Datetime, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_reject_reason, label: Lý do trả lại/từ chối/hủy, fieldtype: Small Text, allow_on_submit: true, no_copy: true}
+  - {fieldname: tlc_rejected_stage, label: Trả lại từ bước, fieldtype: Data, read_only: true, allow_on_submit: true, no_copy: true}
+- doctype: Employee Advance
+  fields:
+  - {fieldname: tlc_finance_section, label: Tạm ứng TLC, fieldtype: Section Break, insert_after: purpose}
+  - {fieldname: tlc_needed_on, label: Ngày cần tiền, fieldtype: Date, insert_after: tlc_finance_section}
+  - {fieldname: tlc_settlement_due, label: Hạn quyết toán, fieldtype: Date, insert_after: tlc_needed_on}
+  - {fieldname: tlc_cost_center, label: Trung tâm chi phí, fieldtype: Link, options: Cost Center, insert_after: tlc_settlement_due}
+  - {fieldname: tlc_travel_request, label: Mã công tác gốc, fieldtype: Link, options: Travel Request, insert_after: tlc_cost_center}
+  - {fieldname: tlc_receiving_account, label: Tài khoản nhận (hồ sơ nhân viên), fieldtype: Data, read_only: true, insert_after: tlc_travel_request}
+  - {fieldname: tlc_manager_user, label: Quản lý duyệt, fieldtype: Link, options: User, read_only: true}
+  - {fieldname: tlc_employee_user, label: Tài khoản nhân viên, fieldtype: Link, options: User, read_only: true, hidden: true}
+  - {fieldname: tlc_skip_manager, label: Bỏ cấp trùng, fieldtype: Check, read_only: true, hidden: true}
+  - {fieldname: tlc_payment_entry, label: Chứng từ chi tạm ứng, fieldtype: Link, options: Payment Entry, allow_on_submit: true}
+  - {fieldname: tlc_payroll_consent, label: Tôi đồng ý thu hồi khoản tạm ứng này qua lương theo chính sách, fieldtype: Check, default: '0', allow_on_submit: true}
+  - {fieldname: tlc_consent_evidence, label: Thỏa thuận khấu trừ có chữ ký, fieldtype: Attach, allow_on_submit: true}
+  - {fieldname: tlc_consent_by, label: Nhân viên xác nhận, fieldtype: Link, options: User, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_consent_at, label: Đồng ý lúc, fieldtype: Datetime, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_reject_reason, label: Lý do trả lại/từ chối, fieldtype: Small Text, no_copy: true, allow_on_submit: true}
+  - {fieldname: tlc_rejected_stage, label: Trả lại từ bước, fieldtype: Data, read_only: true, no_copy: true, allow_on_submit: true}
+- doctype: Expense Claim
+  fields:
+  - {fieldname: tlc_travel_request, label: Mã công tác gốc, fieldtype: Link, options: Travel Request, insert_after: employee}
+  - {fieldname: tlc_manager_user, label: Quản lý duyệt, fieldtype: Link, options: User, read_only: true}
+  - {fieldname: tlc_employee_user, label: Tài khoản nhân viên, fieldtype: Link, options: User, read_only: true, hidden: true}
+  - {fieldname: tlc_skip_manager, label: Bỏ cấp trùng, fieldtype: Check, read_only: true, hidden: true}
+  - {fieldname: tlc_advance_paid, label: Đã ứng, fieldtype: Currency, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_difference, label: Đã ứng trừ thực chi, fieldtype: Currency, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_settlement_branch, label: Nhánh quyết toán, fieldtype: Select, options: "equal\nrefund\ntop_up", read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_payment_entry, label: Chứng từ chi bù, fieldtype: Link, options: Payment Entry, allow_on_submit: true}
+  - {fieldname: tlc_refund_entry, label: Bút toán hoàn ứng, fieldtype: Link, options: Journal Entry, allow_on_submit: true}
+  - {fieldname: tlc_received_by, label: Nhân viên xác nhận nhận tiền, fieldtype: Link, options: User, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_received_on, label: Xác nhận nhận tiền lúc, fieldtype: Datetime, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_settled_on, label: Hoàn tất quyết toán lúc, fieldtype: Datetime, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_reject_reason, label: Lý do trả lại/từ chối, fieldtype: Small Text, no_copy: true, allow_on_submit: true}
+  - {fieldname: tlc_rejected_stage, label: Trả lại từ bước, fieldtype: Data, read_only: true, no_copy: true, allow_on_submit: true}
+- doctype: Expense Claim Detail
+  fields:
+  - {fieldname: tlc_receipt, label: Hóa đơn/chứng từ, fieldtype: Attach, insert_after: description}
+- doctype: Expense Claim Type
+  fields:
+  - {fieldname: tlc_non_trade, label: Chi phí non-trade được Kế toán chấp thuận, fieldtype: Check, default: '0', insert_after: expense_type}
+- doctype: Payment Entry
+  fields:
+  - {fieldname: tlc_bank_proof, label: Ủy nhiệm chi/chứng từ ngân hàng, fieldtype: Attach, insert_after: reference_date}
+- doctype: Journal Entry
+  fields:
+  - {fieldname: tlc_bank_proof, label: Ủy nhiệm chi/chứng từ ngân hàng, fieldtype: Attach, insert_after: cheque_date}
+- doctype: Attendance
+  fields:
+  - {fieldname: tlc_on_duty, label: Công tác / On Duty, fieldtype: Check, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_travel_request, label: Nguồn công tác, fieldtype: Link, options: Travel Request, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_duty_sessions, label: Buổi công tác, fieldtype: Data, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_before_travel_status, label: Trạng thái trước công tác, fieldtype: Data, read_only: true, hidden: true, allow_on_submit: true}
+- doctype: Attendance Request
+  fields:
+  - {fieldname: tlc_travel_request, label: Nguồn báo cáo công tác, fieldtype: Link, options: Travel Request, read_only: true}
+  - {fieldname: tlc_travel_effect_key, label: Khóa điều chỉnh công tác, fieldtype: Data, read_only: true, unique: true, hidden: true}
+  - {fieldname: tlc_workday_delta, label: Chênh lệch công chuyển kỳ sau, fieldtype: Float, read_only: true}
+  - {fieldname: tlc_adjustment_payroll, label: Đã phân bổ kỳ lương, fieldtype: Link, options: Payroll Entry, read_only: true, allow_on_submit: true}
+  - {fieldname: tlc_adjustment_salary, label: Khoản lương điều chỉnh, fieldtype: Link, options: Additional Salary, read_only: true, allow_on_submit: true}
+- doctype: Additional Salary
+  fields:
+  - {fieldname: tlc_travel_adjustment, label: Điều chỉnh công tác sau chốt, fieldtype: Link, options: Attendance Request, read_only: true, unique: true}
+- doctype: File
+  fields:
+  - {fieldname: tlc_finance_snapshot, label: Bản chụp chứng từ TLC bất biến, fieldtype: Check, read_only: true, hidden: true}

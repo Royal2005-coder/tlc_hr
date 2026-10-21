@@ -9,7 +9,7 @@ class RecordApplier(ResourceApplier):
     kind = "record"
 
     def items(self, bundle):
-        return bundle.records
+        return [spec for spec in bundle.records if spec.doctype != "DocType"]
 
     def name_of(self, spec):
         return f"{spec.doctype}: {spec.name}" if spec.name else spec.doctype
@@ -20,16 +20,21 @@ class RecordApplier(ResourceApplier):
         return frappe.db.get_value(spec.doctype, spec.name, list(spec.values), as_dict=True) if spec.values else {}
 
     def diff(self, spec):
+        if not frappe.db.exists("DocType", spec.doctype):
+            return ()
         if spec.name is not None and not frappe.db.exists(spec.doctype, spec.name):
             return ()
         found = list(differing(self.current(spec), spec.values) or ())
         if spec.tables:
             doc = frappe.get_doc(spec.doctype, spec.name or spec.doctype)
             for table, rows in spec.tables.items():
-                current = [r.as_dict() for r in doc.get(table)]
+                current = self.current_rows(doc, table, rows)
                 if len(current) != len(rows) or any(not same(c.get(k), v) for c, r in zip(current, rows) for k, v in r.items()):
                     found.append(table)
         return tuple(found) or None
+
+    def current_rows(self, doc, table, declared):
+        return [r.as_dict() for r in doc.get(table)]
 
     def write(self, spec):
         if spec.name is None:
@@ -45,6 +50,34 @@ class RecordApplier(ResourceApplier):
             doc.set(table, [dict(r) for r in rows])
         doc.flags.ignore_permissions = True
         doc.save() if not doc.is_new() else doc.insert()
+
+
+class DocTypeApplier(RecordApplier):
+    """Create declared DDIC records before custom fields, permissions and workflows use them."""
+
+    kind = "doctype"
+    # fields Frappe adds by itself (amended_from on a submittable DocType): not part of the declaration
+    SYSTEM_FIELDS = frozenset({"amended_from"})
+
+    def current_rows(self, doc, table, declared):
+        rows = [r.as_dict() for r in doc.get(table)]
+        if table != "fields":
+            return rows
+        named = {r.get("fieldname") for r in declared}
+        return [r for r in rows if r.get("fieldname") in named or r.get("fieldname") not in self.SYSTEM_FIELDS]
+
+    def items(self, bundle):
+        pending = {spec.name: spec for spec in bundle.records if spec.doctype == "DocType"}
+        ordered = []
+        while pending:
+            ready = [name for name, spec in pending.items()
+                     if not any(row.get("fieldtype") in ("Table", "Table MultiSelect") and row.get("options") in pending
+                                for row in spec.tables.get("fields", []))]
+            if not ready:
+                raise ValueError(f"cyclic child DocType dependencies: {sorted(pending)}")
+            for name in ready:
+                ordered.append(pending.pop(name))
+        return ordered
 
 
 class AccountApplier(ResourceApplier):

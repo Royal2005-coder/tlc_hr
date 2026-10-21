@@ -1,0 +1,135 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Survey Campaign",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "title",
+  "description",
+  "department",
+  "status",
+  "opens_on",
+  "closes_on",
+  "minimum_results",
+  "version",
+  "previous_version",
+  "questions",
+  "privacy_notice"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Tiêu đề",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Mô tả"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Phòng ban (trống = toàn công ty)",
+   "options": "Department"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "default": "Draft",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Draft\nOpen\nPaused\nClosed\nArchived"
+  },
+  {
+   "fieldname": "opens_on",
+   "fieldtype": "Date",
+   "label": "Mở từ",
+   "reqd": 1
+  },
+  {
+   "fieldname": "closes_on",
+   "fieldtype": "Date",
+   "label": "Đóng hết ngày",
+   "reqd": 1
+  },
+  {
+   "fieldname": "minimum_results",
+   "fieldtype": "Int",
+   "label": "Ngưỡng công bố tối thiểu",
+   "default": "5",
+   "reqd": 1
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Int",
+   "label": "Phiên bản",
+   "default": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "previous_version",
+   "fieldtype": "Link",
+   "label": "Phiên bản trước",
+   "read_only": 1,
+   "options": "TLC Survey Campaign"
+  },
+  {
+   "fieldname": "questions",
+   "fieldtype": "Table",
+   "label": "Câu hỏi",
+   "reqd": 1,
+   "options": "TLC Survey Question"
+  },
+  {
+   "fieldname": "privacy_notice",
+   "fieldtype": "HTML",
+   "label": "Ẩn danh",
+   "options": "<p>Ẩn danh thật: không lưu từng phiếu; chỉ lưu tổng theo bộ phận. Không nhập thông tin nhận dạng. Kết quả chỉ công bố khi đã đóng và đủ ngưỡng.</p>"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

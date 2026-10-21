@@ -1,7 +1,8 @@
 """Monthly attendance closing: the names the code shares with customizing/workflows/attendance_period.yaml.
 
 Annual leave of a year may be used until 30 March of the next year (BRD HR-CP-12): the Leave Type declares a carried part that
-expires after 89 days from 1 January (31 + 28 + 30; one day earlier in a leap year), see customizing/records.yaml.
+uses 89 days as the non-leap-year default in customizing/records.yaml. The Leave Ledger Entry adapter enforces 30 March
+in every year, including leap years; the fixed HRMS setting alone is insufficient.
 """
 
 WORKFLOW = "TLC Chốt công"

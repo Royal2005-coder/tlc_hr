@@ -1,0 +1,882 @@
+{
+  "version": 1,
+  "kind": "records",
+  "description": "Missing lifecycle evidence and effective records; native HRMS remains system of record.",
+  "records": [
+    {
+      "doctype": "DocType",
+      "name": "TLC Lifecycle Evidence",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 1,
+        "is_submittable": 0,
+        "autoname": "hash"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "item",
+            "fieldtype": "Data",
+            "label": "Item",
+            "reqd": 1
+          },
+          {
+            "fieldname": "category",
+            "fieldtype": "Select",
+            "label": "Category",
+            "options": "Document\nAsset\nAccount\nHandover\nTraining",
+            "reqd": 1
+          },
+          {
+            "fieldname": "required",
+            "fieldtype": "Check",
+            "label": "Required",
+            "default": "1"
+          },
+          {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Pending\nReceived\nNot Applicable\nReturned\nLost\nDamaged\nDisabled",
+            "reqd": 1
+          },
+          {
+            "fieldname": "confirmed_by",
+            "fieldtype": "Link",
+            "label": "Confirmed By",
+            "options": "User"
+          },
+          {
+            "fieldname": "confirmed_on",
+            "fieldtype": "Datetime",
+            "label": "Confirmed On"
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence"
+          },
+          {
+            "fieldname": "notes",
+            "fieldtype": "Small Text",
+            "label": "Notes"
+          }
+        ],
+        "permissions": []
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employment Contract",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "contract_number",
+            "fieldtype": "Data",
+            "label": "Contract Number",
+            "reqd": 1,
+            "unique": 1
+          },
+          {
+            "fieldname": "contract_type",
+            "fieldtype": "Select",
+            "label": "Contract Type",
+            "options": "Probation\nFixed term\nIndefinite\nService\nApprenticeship",
+            "reqd": 1
+          },
+          {
+            "fieldname": "signed_on",
+            "fieldtype": "Date",
+            "label": "Signed On",
+            "reqd": 1
+          },
+          {
+            "fieldname": "valid_from",
+            "fieldtype": "Date",
+            "label": "Valid From",
+            "reqd": 1
+          },
+          {
+            "fieldname": "valid_to",
+            "fieldtype": "Date",
+            "label": "Valid To"
+          },
+          {
+            "fieldname": "signatory",
+            "fieldtype": "Data",
+            "label": "Signatory",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "parent_contract",
+            "fieldtype": "Link",
+            "label": "Parent Contract",
+            "options": "TLC Employment Contract"
+          },
+          {
+            "fieldname": "change_summary",
+            "fieldtype": "Small Text",
+            "label": "Change Summary"
+          },
+          {
+            "fieldname": "legal_exception",
+            "fieldtype": "Small Text",
+            "label": "Legal Exception"
+          },
+          {
+            "fieldname": "legal_evidence",
+            "fieldtype": "Attach",
+            "label": "Legal Evidence"
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employee Dependent",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "dependent_name",
+            "fieldtype": "Data",
+            "label": "Dependent Name",
+            "reqd": 1
+          },
+          {
+            "fieldname": "date_of_birth",
+            "fieldtype": "Date",
+            "label": "Date Of Birth",
+            "reqd": 1
+          },
+          {
+            "fieldname": "gender",
+            "fieldtype": "Link",
+            "label": "Gender",
+            "options": "Gender"
+          },
+          {
+            "fieldname": "relationship",
+            "fieldtype": "Select",
+            "label": "Relationship",
+            "options": "Child\nSpouse\nParent\nOther",
+            "reqd": 1
+          },
+          {
+            "fieldname": "identity_number",
+            "fieldtype": "Data",
+            "label": "Identity Number",
+            "reqd": 1
+          },
+          {
+            "fieldname": "tax_number",
+            "fieldtype": "Data",
+            "label": "Tax Number"
+          },
+          {
+            "fieldname": "valid_from",
+            "fieldtype": "Date",
+            "label": "Valid From",
+            "reqd": 1
+          },
+          {
+            "fieldname": "valid_to",
+            "fieldtype": "Date",
+            "label": "Valid To"
+          },
+          {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Pending\nVerified\nRejected\nStopped",
+            "reqd": 1,
+            "default": "Pending"
+          },
+          {
+            "fieldname": "end_reason",
+            "fieldtype": "Small Text",
+            "label": "End Reason"
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "notes",
+            "fieldtype": "Small Text",
+            "label": "Notes"
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employee Document",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "document_type",
+            "fieldtype": "Select",
+            "label": "Document Type",
+            "options": "Identity\nCV\nBiography\nDegree\nCertificate\nPassport\nVisa\nWork permit\nHealth\nTax\nSocial insurance",
+            "reqd": 1
+          },
+          {
+            "fieldname": "document_number",
+            "fieldtype": "Data",
+            "label": "Document Number"
+          },
+          {
+            "fieldname": "issued_on",
+            "fieldtype": "Date",
+            "label": "Issued On"
+          },
+          {
+            "fieldname": "expires_on",
+            "fieldtype": "Date",
+            "label": "Expires On"
+          },
+          {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Pending\nVerified\nRejected\nExpired",
+            "reqd": 1,
+            "default": "Pending"
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employee Change Request",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "field",
+            "fieldtype": "Select",
+            "label": "Field",
+            "options": "bank_ac_no\nbank_name\npan_number\ncustom_tax_code\ncustom_social_insurance_number\npassport_number\ncell_number\npersonal_email\ncurrent_address\npermanent_address",
+            "reqd": 1
+          },
+          {
+            "fieldname": "new_value",
+            "fieldtype": "Small Text",
+            "label": "New Value",
+            "reqd": 1
+          },
+          {
+            "fieldname": "old_value",
+            "fieldtype": "Small Text",
+            "label": "Old Value",
+            "read_only": 1
+          },
+          {
+            "fieldname": "effective_on",
+            "fieldtype": "Date",
+            "label": "Effective On",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          },
+          {
+            "fieldname": "applied_on",
+            "fieldtype": "Datetime",
+            "label": "Applied On",
+            "read_only": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "Employee",
+            "create": 1,
+            "read": 1,
+            "write": 1,
+            "if_owner": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Probation Review",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "job",
+            "fieldtype": "Link",
+            "label": "Job",
+            "options": "Designation",
+            "reqd": 1
+          },
+          {
+            "fieldname": "category",
+            "fieldtype": "Select",
+            "label": "Category",
+            "options": "Enterprise manager\nCollege or higher\nTechnical or vocational\nOther work",
+            "reqd": 1
+          },
+          {
+            "fieldname": "start_date",
+            "fieldtype": "Date",
+            "label": "Start Date",
+            "reqd": 1
+          },
+          {
+            "fieldname": "end_date",
+            "fieldtype": "Date",
+            "label": "End Date",
+            "reqd": 1
+          },
+          {
+            "fieldname": "counted_days",
+            "fieldtype": "Int",
+            "label": "Counted Days",
+            "read_only": 1
+          },
+          {
+            "fieldname": "self_review",
+            "fieldtype": "Small Text",
+            "label": "Self Review",
+            "reqd": 1
+          },
+          {
+            "fieldname": "manager_review",
+            "fieldtype": "Small Text",
+            "label": "Manager Review"
+          },
+          {
+            "fieldname": "hr_review",
+            "fieldtype": "Small Text",
+            "label": "Hr Review"
+          },
+          {
+            "fieldname": "decision",
+            "fieldtype": "Select",
+            "label": "Decision",
+            "options": "\nOfficial\nExtend\nEnd"
+          },
+          {
+            "fieldname": "result_contract",
+            "fieldtype": "Link",
+            "label": "Result Contract",
+            "options": "TLC Employment Contract"
+          },
+          {
+            "fieldname": "result_separation",
+            "fieldtype": "Link",
+            "label": "Result Separation",
+            "options": "Employee Separation"
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "Employee",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "if_owner": 1
+          },
+          {
+            "role": "TLC Line Manager",
+            "read": 1,
+            "write": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "write": 1,
+            "submit": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employment Episode",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "start_date",
+            "fieldtype": "Date",
+            "label": "Start Date",
+            "reqd": 1
+          },
+          {
+            "fieldname": "end_date",
+            "fieldtype": "Date",
+            "label": "End Date"
+          },
+          {
+            "fieldname": "event",
+            "fieldtype": "Select",
+            "label": "Event",
+            "options": "Joined\nOfficial\nMaternity\nLong leave\nSuspended\nLeft\nRehired",
+            "reqd": 1
+          },
+          {
+            "fieldname": "reference_doctype",
+            "fieldtype": "Link",
+            "label": "Reference Doctype",
+            "options": "DocType"
+          },
+          {
+            "fieldname": "reference_name",
+            "fieldtype": "Dynamic Link",
+            "label": "Reference Name",
+            "options": "reference_doctype"
+          },
+          {
+            "fieldname": "reason",
+            "fieldtype": "Small Text",
+            "label": "Reason",
+            "reqd": 1
+          },
+          {
+            "fieldname": "evidence",
+            "fieldtype": "Attach",
+            "label": "Evidence",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Employment Snapshot",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "track_changes": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "format:TLC-LC-{#####}"
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "employee",
+            "fieldtype": "Link",
+            "label": "Employee",
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "valid_from",
+            "fieldtype": "Date",
+            "label": "Valid From",
+            "reqd": 1
+          },
+          {
+            "fieldname": "valid_to",
+            "fieldtype": "Date",
+            "label": "Valid To"
+          },
+          {
+            "fieldname": "source_doctype",
+            "fieldtype": "Link",
+            "label": "Source Doctype",
+            "options": "DocType",
+            "reqd": 1
+          },
+          {
+            "fieldname": "source_name",
+            "fieldtype": "Dynamic Link",
+            "label": "Source Name",
+            "options": "source_doctype",
+            "reqd": 1
+          },
+          {
+            "fieldname": "snapshot_json",
+            "fieldtype": "Long Text",
+            "label": "Snapshot Json",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1,
+            "print": 1,
+            "report": 1,
+            "export": 1
+          }
+        ]
+      }
+    }
+  ]
+}

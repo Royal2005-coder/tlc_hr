@@ -1,0 +1,120 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Room Reservation",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "employee",
+  "room",
+  "subject",
+  "starts_at",
+  "ends_at",
+  "status",
+  "reason",
+  "external_export_notice"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Người đặt",
+   "reqd": 1,
+   "options": "Employee"
+  },
+  {
+   "fieldname": "room",
+   "fieldtype": "Link",
+   "label": "Phòng",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "TLC Meeting Room"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Cuộc họp",
+   "reqd": 1
+  },
+  {
+   "fieldname": "starts_at",
+   "fieldtype": "Datetime",
+   "label": "Bắt đầu",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "ends_at",
+   "fieldtype": "Datetime",
+   "label": "Kết thúc",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "default": "Booked",
+   "reqd": 1,
+   "options": "Booked\nCancelled"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do hủy"
+  },
+  {
+   "fieldname": "external_export_notice",
+   "fieldtype": "HTML",
+   "label": "Lịch ngoài",
+   "options": "<p>Chỉ xuất tệp iCalendar. Không đồng bộ Outlook; không bảo đảm chặn lịch bên ngoài.</p>"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

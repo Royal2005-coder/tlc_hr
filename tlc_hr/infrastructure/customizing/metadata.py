@@ -151,7 +151,8 @@ class WorkflowApplier(ResourceApplier):
         doc = frappe.get_doc("Workflow", spec.name)
         states, transitions = self.rows(spec)
         found = []
-        if doc.document_type != spec.doctype or not doc.is_active or bool(doc.send_email_alert) != spec.send_email_alert:
+        if (doc.document_type != spec.doctype or not doc.is_active or bool(doc.send_email_alert) != spec.send_email_alert
+                or doc.workflow_state_field != "workflow_state" or doc.override_status):
             found.append("settings")
         if self.states([r.as_dict() for r in doc.states]) != self.states(states):
             found.append("states")

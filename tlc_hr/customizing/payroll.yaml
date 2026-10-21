@@ -1,0 +1,43 @@
+version: 1
+kind: payroll
+description: |
+  Salary components of TLC with their accounts (TT200 numbers) and the salary structure "TLC Lương 2026".
+  A formula is either an HRMS expression or a reference to the rules of domain/payroll.py:
+  @contribution (insurance of the row's abbreviation), @pit, @lunch. A submitted structure is never edited:
+  a new law gets a new structure name here.
+payroll:
+  components:
+  - {abbr: LCB, name: Lương cơ bản, type: Earning, account: "6421", depends_on_payment_days: true}
+  - {abbr: PCAT, name: Phụ cấp ăn trưa, type: Earning, account: "6421", depends_on_payment_days: true}
+  - {abbr: TH, name: Thưởng, type: Earning, account: "6421"}
+  - {abbr: PCTN, name: Phụ cấp trách nhiệm, type: Earning, account: "6421"}
+  - {abbr: PCDT, name: Phụ cấp điện thoại, type: Earning, account: "6421"}
+  - {abbr: PCXX, name: Phụ cấp xăng xe, type: Earning, account: "6421"}
+  - {abbr: OT, name: Tiền tăng ca, type: Earning, account: "6421"}
+  - {abbr: OTP, name: Phụ trội tăng ca, type: Earning, account: "6421"}
+  - {abbr: TCA, name: Điều chỉnh công sau chốt, type: Earning, account: "6421"}
+  - {abbr: TCK, name: Khấu trừ công sau chốt, type: Deduction, account: "6421"}
+  - {abbr: BHXH_NLD, name: BHXH (NLĐ 8%), type: Deduction, account: "3383"}
+  - {abbr: BHYT_NLD, name: BHYT (NLĐ 1.5%), type: Deduction, account: "3384"}
+  - {abbr: BHTN_NLD, name: BHTN (NLĐ 1%), type: Deduction, account: "3386"}
+  - {abbr: TNCN, name: Thuế TNCN, type: Deduction, account: "3335"}
+  - {abbr: BHXH_DN_TLC, name: TLC BHXH (DN 17.5%), type: Employer Contribution, account: "6421", liability_account: "3383"}
+  - {abbr: BHYT_DN_TLC, name: TLC BHYT (DN 3%), type: Employer Contribution, account: "6421", liability_account: "3384"}
+  - {abbr: BHTN_DN_TLC, name: TLC BHTN (DN 1%), type: Employer Contribution, account: "6421", liability_account: "3386"}
+  - {abbr: KPCD_DN_TLC, name: TLC KPCĐ (DN 2%), type: Employer Contribution, account: "6421", liability_account: "3382"}
+  structure:
+    name: TLC Lương 2026.2
+    effective_from: 2026-07-01
+    earnings:
+    - {abbr: LCB, formula: 'tlc_effective_base if tlc_effective_base else base'}
+    - {abbr: PCAT, formula: "@lunch", condition: 'tlc_workforce == "factory"'}
+    deductions:
+    - {abbr: BHXH_NLD, formula: "@contribution"}
+    - {abbr: BHYT_NLD, formula: "@contribution"}
+    - {abbr: BHTN_NLD, formula: "@contribution"}
+    - {abbr: TNCN, formula: "@pit"}
+    employer_contributions:
+    - {abbr: BHXH_DN_TLC, formula: "@contribution"}
+    - {abbr: BHYT_DN_TLC, formula: "@contribution"}
+    - {abbr: BHTN_DN_TLC, formula: "@contribution"}
+    - {abbr: KPCD_DN_TLC, formula: "@contribution"}

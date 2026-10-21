@@ -5,13 +5,16 @@ frozen. The models describe *what* the site must contain; infrastructure/customi
 No Frappe import here: the contracts are validated in plain Python, in CI and with `bench tlc config validate`.
 """
 
-from typing import Literal
+from datetime import date
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
 Scalar = str | int | float | bool | None
 Filter = list[Scalar | list[Scalar]]
 RIGHTS = {"r": "read", "w": "write", "c": "create", "d": "delete", "s": "submit", "x": "cancel", "a": "amend"}
+# Frappe exports flags as 0/1; the contract accepts both and stores a real bool.
+Boolish = Annotated[bool, BeforeValidator(lambda value: bool(value) if isinstance(value, int) else value)]
 
 
 class Spec(BaseModel):
@@ -35,13 +38,13 @@ class CustomFieldSpec(Spec):
     depends_on: str | None = None
     fetch_from: str | None = None
     permlevel: int = 0
-    reqd: bool = False
-    read_only: bool = False
-    hidden: bool = False
-    allow_on_submit: bool = False
-    no_copy: bool = False
-    unique: bool = False
-    collapsible: bool = False
+    reqd: Boolish = False
+    read_only: Boolish = False
+    hidden: Boolish = False
+    allow_on_submit: Boolish = False
+    no_copy: Boolish = False
+    unique: Boolish = False
+    collapsible: Boolish = False
 
 
 class CustomFieldGroup(Spec):
@@ -93,6 +96,10 @@ class WorkflowSpec(Spec):
     @model_validator(mode="after")
     def transitions_use_declared_states(self):
         declared = {s.state for s in self.states}
+        if not declared or len(declared) != len(self.states):
+            raise ValueError(f"workflow {self.name}: states must be non-empty and unique")
+        if any(not t.allowed or len(set(t.allowed)) != len(t.allowed) for t in self.transitions):
+            raise ValueError(f"workflow {self.name}: each transition needs unique allowed roles")
         for t in self.transitions:
             missing = {t.from_state, t.to} - declared
             if missing:
@@ -182,8 +189,45 @@ class AccountsSpec(Spec):
     company_defaults: dict[str, str]
 
 
+class ComponentSpec(Spec):
+    abbr: str
+    name: str
+    type: Literal["Earning", "Deduction", "Employer Contribution"]
+    account: str  # account number of the TT200 chart
+    liability_account: str | None = None  # for an employer contribution
+    depends_on_payment_days: bool = False
+
+
+class StructureRowSpec(Spec):
+    abbr: str
+    formula: str  # an HRMS expression, or @contribution / @pit / @lunch (rendered from domain/payroll.py)
+    condition: str | None = None
+
+
+class StructureSpec(Spec):
+    name: str
+    payroll_frequency: Literal["Monthly"] = "Monthly"
+    effective_from: date | None = None
+    earnings: list[StructureRowSpec]
+    deductions: list[StructureRowSpec]
+    employer_contributions: list[StructureRowSpec] = []
+
+
+class PayrollSpec(Spec):
+    components: list[ComponentSpec]
+    structure: StructureSpec
+
+    @model_validator(mode="after")
+    def rows_use_declared_components(self):
+        declared = {c.abbr for c in self.components}
+        missing = sorted({r.abbr for r in self.structure.earnings + self.structure.deductions + self.structure.employer_contributions} - declared)
+        if missing:
+            raise ValueError(f"structure {self.structure.name}: undeclared components {missing}")
+        return self
+
+
 Kind = Literal["roles", "custom_fields", "permissions", "workflow", "email_templates", "dashboards", "workspaces", "records",
-               "accounts"]
+               "accounts", "payroll"]
 
 
 class CustomizingFile(Spec):
@@ -203,6 +247,23 @@ class CustomizingFile(Spec):
     workspaces: list[WorkspaceSpec] = []
     records: list[RecordSpec] = []
     accounts: AccountsSpec | None = None
+    payroll: PayrollSpec | None = None
+
+    @model_validator(mode="after")
+    def payload_matches_kind(self):
+        payloads = {
+            "roles": {"roles"}, "custom_fields": {"custom_fields"}, "permissions": {"permissions"},
+            "workflow": {"workflow"}, "email_templates": {"email_templates"},
+            "dashboards": {"number_cards", "charts"}, "workspaces": {"shortcuts", "workspaces"},
+            "records": {"records"}, "accounts": {"accounts"}, "payroll": {"payroll"},
+        }
+        allowed = payloads[self.kind]
+        supplied = self.model_fields_set - {"version", "kind", "description"}
+        if supplied - allowed:
+            raise ValueError(f"kind {self.kind}: unexpected payloads {sorted(supplied - allowed)}")
+        if not any(getattr(self, key) for key in allowed):
+            raise ValueError(f"kind {self.kind}: declare a non-empty payload")
+        return self
 
 
 class Bundle(Spec):
@@ -219,9 +280,23 @@ class Bundle(Spec):
     workspaces: list[WorkspaceSpec] = []
     records: list[RecordSpec] = []
     accounts: AccountsSpec | None = None
+    payroll: PayrollSpec | None = None
 
     @model_validator(mode="after")
     def references_resolve(self):
+        identities = (
+            ("custom field", [(g.doctype, f.fieldname) for g in self.custom_fields for f in g.fields]),
+            ("permission", [(p.doctype, p.role, p.permlevel) for p in self.permissions]),
+            ("record", [(r.doctype, r.name) for r in self.records]),
+            ("email template", [t.name for t in self.email_templates]),
+            ("shortcut", [s.label for s in self.shortcuts]),
+        )
+        for kind, names in identities:
+            seen = set()
+            for name in names:
+                if name in seen:
+                    raise ValueError(f"{kind} declared twice: {name}")
+                seen.add(name)
         cards, charts, shortcuts = ({c.name for c in self.number_cards}, {c.name for c in self.charts},
                                     {s.label for s in self.shortcuts})
         for ws in self.workspaces:

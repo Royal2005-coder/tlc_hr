@@ -1,0 +1,155 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Service Request",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "employee",
+  "service",
+  "subject",
+  "description",
+  "handler",
+  "status",
+  "due_date",
+  "holiday_list",
+  "sla_days",
+  "paused_on",
+  "reason",
+  "resolution",
+  "satisfaction"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nhân viên",
+   "reqd": 1,
+   "options": "Employee"
+  },
+  {
+   "fieldname": "service",
+   "fieldtype": "Link",
+   "label": "Dịch vụ",
+   "reqd": 1,
+   "options": "TLC Service Catalog"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Nội dung",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Chi tiết",
+   "reqd": 1
+  },
+  {
+   "fieldname": "handler",
+   "fieldtype": "Link",
+   "label": "Người xử lý",
+   "read_only": 1,
+   "options": "User"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "default": "Requested",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Requested\nProcessing\nWaiting Information\nResolved\nClosed\nCancelled"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Hạn SLA",
+   "read_only": 1
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Lịch SLA",
+   "read_only": 1,
+   "options": "Holiday List"
+  },
+  {
+   "fieldname": "sla_days",
+   "fieldtype": "Int",
+   "label": "SLA ban đầu",
+   "read_only": 1
+  },
+  {
+   "fieldname": "paused_on",
+   "fieldtype": "Date",
+   "label": "Tạm dừng từ",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do / thông tin bổ sung"
+  },
+  {
+   "fieldname": "resolution",
+   "fieldtype": "Small Text",
+   "label": "Kết quả xử lý"
+  },
+  {
+   "fieldname": "satisfaction",
+   "fieldtype": "Select",
+   "label": "Hài lòng",
+   "options": "\n1\n2\n3\n4\n5"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

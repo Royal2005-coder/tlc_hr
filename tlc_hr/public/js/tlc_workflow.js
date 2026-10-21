@@ -3,7 +3,9 @@
 // apply_workflow reloads the document from the database, so the reason is stored first, then the decision runs.
 (() => {
 	const DOCTYPES = ["Leave Application", "Attendance Request", "TLC Overtime Request", "Travel Request", "Employee Advance",
-		"Expense Claim", "Employee Separation", "TLC Attendance Period"];
+		"Expense Claim", "Employee Separation", "TLC Attendance Period", "Payroll Entry", "TLC Employment Contract",
+		"TLC Employee Dependent", "TLC Employee Document", "TLC Employee Change Request", "TLC Probation Review",
+		"TLC Employment Episode", "Employee Promotion", "Employee Transfer", "Job Requisition", "Job Offer"];
 	// actions that need a reason: refusing a request, returning a period to HR, reopening a locked period
 	const REASON_ACTIONS = ["Từ chối", "Trả lại", "Mở lại kỳ"];
 

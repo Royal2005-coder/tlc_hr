@@ -1,0 +1,81 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Training Requirement",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-TRAINING-REQUIREMENT-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "training_program",
+    "designation",
+    "branch",
+    "recurrence_days",
+    "due_days",
+    "enabled"
+  ],
+  "fields": [
+    {
+      "fieldname": "training_program",
+      "fieldtype": "Link",
+      "label": "Training Program",
+      "options": "Training Program",
+      "reqd": 1
+    },
+    {
+      "fieldname": "designation",
+      "fieldtype": "Link",
+      "label": "Designation",
+      "options": "Designation"
+    },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "label": "Branch",
+      "options": "Branch"
+    },
+    {
+      "fieldname": "recurrence_days",
+      "fieldtype": "Int",
+      "label": "Recurrence Days",
+      "reqd": 1
+    },
+    {
+      "fieldname": "due_days",
+      "fieldtype": "Int",
+      "label": "Due Days",
+      "default": "30"
+    },
+    {
+      "fieldname": "enabled",
+      "fieldtype": "Check",
+      "label": "Enabled",
+      "default": "1"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

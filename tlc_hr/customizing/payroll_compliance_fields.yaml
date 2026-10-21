@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "kind": "custom_fields",
+  "description": "Effective payroll snapshots and reviewed salary decisions.",
+  "custom_fields": [
+    {
+      "doctype": "Company",
+      "fields": [
+        {
+          "fieldname": "tlc_payroll_variance_percent",
+          "fieldtype": "Percent",
+          "label": "Tlc Payroll Variance Percent",
+          "default": "20",
+          "description": "Company review threshold; not a statutory rate. Zero requires explanations for every changed payroll."
+        }
+      ]
+    },
+    {
+      "doctype": "Salary Slip",
+      "fields": [
+        {
+          "fieldname": "tlc_effective_base",
+          "fieldtype": "Currency",
+          "label": "Tlc Effective Base",
+          "read_only": 1
+        },
+        {
+          "fieldname": "tlc_effective_dependents",
+          "fieldtype": "Int",
+          "label": "Tlc Effective Dependents",
+          "read_only": 1
+        },
+        {
+          "fieldname": "tlc_salary_segments",
+          "fieldtype": "Long Text",
+          "label": "Tlc Salary Segments",
+          "read_only": 1,
+          "hidden": 1
+        },
+        {
+          "fieldname": "tlc_payroll_fingerprint",
+          "fieldtype": "Data",
+          "label": "Tlc Payroll Fingerprint",
+          "read_only": 1,
+          "hidden": 1
+        }
+      ]
+    },
+    {
+      "doctype": "Payroll Entry",
+      "fields": [
+        {
+          "fieldname": "tlc_approval_fingerprint",
+          "fieldtype": "Data",
+          "label": "Tlc Approval Fingerprint",
+          "read_only": 1,
+          "hidden": 1,
+          "allow_on_submit": 1
+        }
+      ]
+    },
+    {
+      "doctype": "Salary Structure Assignment",
+      "fields": [
+        {
+          "fieldname": "tlc_previous_base",
+          "fieldtype": "Currency",
+          "label": "Tlc Previous Base",
+          "read_only": 1
+        },
+        {
+          "fieldname": "tlc_decision_reason",
+          "fieldtype": "Select",
+          "label": "Tlc Decision Reason",
+          "options": "Periodic\nPromotion\nMarket\nSpecial"
+        },
+        {
+          "fieldname": "tlc_decision_evidence",
+          "fieldtype": "Attach",
+          "label": "Tlc Decision Evidence"
+        },
+        {
+          "fieldname": "tlc_decision_approved_by",
+          "fieldtype": "Link",
+          "label": "Tlc Decision Approved By",
+          "read_only": 1,
+          "options": "User"
+        },
+        {
+          "fieldname": "tlc_salary_review",
+          "fieldtype": "Link",
+          "label": "Tlc Salary Review",
+          "read_only": 1,
+          "options": "TLC Salary Review"
+        }
+      ]
+    },
+    {
+      "doctype": "Additional Salary",
+      "fields": [
+        {
+          "fieldname": "tlc_compliance_source",
+          "fieldtype": "Data",
+          "label": "Tlc Compliance Source",
+          "read_only": 1,
+          "unique": 1,
+          "no_copy": 1
+        }
+      ]
+    }
+  ]
+}

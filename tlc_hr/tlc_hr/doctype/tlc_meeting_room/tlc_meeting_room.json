@@ -1,0 +1,80 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Meeting Room",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "field:room_name",
+ "track_changes": 1,
+ "field_order": [
+  "room_name",
+  "capacity",
+  "equipment",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "room_name",
+   "fieldtype": "Data",
+   "label": "Tên phòng",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "capacity",
+   "fieldtype": "Int",
+   "label": "Sức chứa",
+   "reqd": 1
+  },
+  {
+   "fieldname": "equipment",
+   "fieldtype": "Small Text",
+   "label": "Thiết bị"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Có thể đặt",
+   "default": "1"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "room_name"
+}

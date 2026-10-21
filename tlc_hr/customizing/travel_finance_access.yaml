@@ -1,0 +1,27 @@
+version: 1
+kind: permissions
+description: Desk access stays native; hooks narrow every manager to the reporting/factory scope.
+permissions:
+- {doctype: Travel Request, role: TLC Self Service, rights: rwcsx}
+- {doctype: Travel Request, role: TLC Line Manager, rights: rwcs}
+- {doctype: Travel Request, role: TLC Director, rights: rws}
+- {doctype: Travel Request, role: Accounts User, rights: rwcsx}
+- {doctype: Travel Request, role: TLC HR Lead, rights: r}
+- {doctype: Employee Advance, role: TLC Self Service, rights: rwcsx}
+- {doctype: Employee Advance, role: TLC Line Manager, rights: rwcs}
+- {doctype: Employee Advance, role: TLC Director, rights: rws}
+- {doctype: Employee Advance, role: Accounts User, rights: rwcsx}
+- {doctype: Employee Advance, role: TLC HR Lead, rights: r}
+- {doctype: Expense Claim, role: TLC Self Service, rights: rwcsx}
+- {doctype: Expense Claim, role: TLC Line Manager, rights: rwcs}
+- {doctype: Expense Claim, role: TLC Director, rights: rws}
+- {doctype: Expense Claim, role: Accounts User, rights: rwcsx}
+- {doctype: Expense Claim, role: TLC HR Lead, rights: r}
+- {doctype: Expense Claim Type, role: Accounts User, rights: rwc}
+- {doctype: Payment Entry, role: Accounts User, rights: rwcsx}
+- {doctype: Purpose of Travel, role: TLC Self Service, rights: r}
+- {doctype: Expense Claim Type, role: TLC Self Service, rights: r}
+- {doctype: Cost Center, role: TLC Self Service, rights: r}
+- {doctype: Account, role: TLC Self Service, rights: r}
+- {doctype: Account, role: TLC Line Manager, rights: r}
+- {doctype: Account, role: TLC Director, rights: r}

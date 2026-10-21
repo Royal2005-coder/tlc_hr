@@ -1,0 +1,46 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Survey Question",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 0,
+ "field_order": [
+  "question_key",
+  "label",
+  "options",
+  "hidden"
+ ],
+ "fields": [
+  {
+   "fieldname": "question_key",
+   "fieldtype": "Data",
+   "label": "Mã câu hỏi ổn định",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Câu hỏi",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "options",
+   "fieldtype": "Small Text",
+   "label": "Lựa chọn (mỗi dòng một lựa chọn)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hidden",
+   "fieldtype": "Check",
+   "label": "Ẩn câu hỏi"
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "istable": 1
+}

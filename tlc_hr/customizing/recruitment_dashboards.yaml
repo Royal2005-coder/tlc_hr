@@ -1,0 +1,38 @@
+version: 1
+kind: dashboards
+number_cards:
+  - name: TLC Recruitment Open Vacancies
+    doctype: Job Opening
+    color: '#2563eb'
+    filters: [[status, '=', Open]]
+  - name: TLC Recruitment Remaining Headcount
+    doctype: Job Opening
+    color: '#b45309'
+    function: Sum
+    field: tlc_remaining
+    filters: [[status, '=', Open]]
+  - name: TLC Recruitment Offers Pending HR
+    doctype: Job Offer
+    color: '#b45309'
+    filters: [[workflow_state, '=', Recruitment HR Review]]
+  - name: TLC Recruitment Offers Pending CEO
+    doctype: Job Offer
+    color: '#b45309'
+    filters: [[workflow_state, '=', Recruitment CEO Review]]
+  - name: TLC Recruitment Accepted Offers
+    doctype: Job Offer
+    color: '#15803d'
+    filters: [[docstatus, '=', 1], [status, '=', Accepted]]
+charts:
+  - name: TLC Recruitment Application Pipeline
+    chart_type: Group By
+    document_type: Job Applicant
+    type: Bar
+    group_by_type: Count
+    group_by_based_on: tlc_pipeline
+  - name: TLC Recruitment Offer Responses
+    chart_type: Group By
+    document_type: Job Offer
+    type: Donut
+    group_by_type: Count
+    group_by_based_on: tlc_offer_stage

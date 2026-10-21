@@ -1,0 +1,28 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Benefit Claim",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-CLAIM-{YYYY}-{#####}",
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": ["employee", "policy", "event_date", "amount", "evidence", "status", "reason", "payment_channel", "payment_reference", "paid_on"],
+  "fields": [
+    {"fieldname": "employee", "fieldtype": "Link", "label": "Employee", "options": "Employee", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "policy", "fieldtype": "Link", "label": "Policy", "options": "TLC People Ops Benefit Policy", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "event_date", "fieldtype": "Date", "label": "Event Date", "reqd": 1},
+    {"fieldname": "amount", "fieldtype": "Currency", "label": "Amount", "read_only": 1},
+    {"fieldname": "evidence", "fieldtype": "Attach", "label": "Evidence"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nPending\nApproved\nRejected\nPaid", "default": "Draft", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "reason", "fieldtype": "Small Text", "label": "Reason"},
+    {"fieldname": "payment_channel", "fieldtype": "Data", "label": "Payment Channel"},
+    {"fieldname": "payment_reference", "fieldtype": "Data", "label": "Payment Reference"},
+    {"fieldname": "paid_on", "fieldtype": "Date", "label": "Paid On"}
+  ],
+  "permissions": [
+    {"role": "TLC HR Lead", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1, "export": 1, "print": 1, "email": 1, "share": 1},
+    {"role": "TLC HR Officer", "read": 1, "write": 1, "create": 1, "report": 1, "export": 1, "print": 1, "email": 1},
+    {"role": "TLC Self Service", "read": 1, "write": 1, "create": 1, "print": 1, "email": 1},
+    {"role": "Accounts User", "read": 1, "write": 1, "submit": 0, "print": 1, "email": 1}
+  ]
+}

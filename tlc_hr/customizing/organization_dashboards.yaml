@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "kind": "workspaces",
+  "shortcuts": [
+    {
+      "label": "Organization administrative tree",
+      "type": "DocType",
+      "link_to": "Department",
+      "doc_view": "Tree"
+    },
+    {
+      "label": "Organization reporting chart (primary only)",
+      "type": "Page",
+      "link_to": "organizational-chart"
+    },
+    {
+      "label": "Organization positions",
+      "type": "DocType",
+      "link_to": "TLC Organization Position"
+    },
+    {
+      "label": "Organization assignments",
+      "type": "DocType",
+      "link_to": "TLC Organization Assignment"
+    },
+    {
+      "label": "Organization co-leaders",
+      "type": "DocType",
+      "link_to": "TLC Organization Reporting Line"
+    },
+    {
+      "label": "Organization headcount",
+      "type": "DocType",
+      "link_to": "TLC Organization Headcount"
+    },
+    {
+      "label": "Organization effective changes",
+      "type": "DocType",
+      "link_to": "TLC Organization Change"
+    },
+    {
+      "label": "Organization worksites",
+      "type": "DocType",
+      "link_to": "Shift Location"
+    }
+  ]
+}

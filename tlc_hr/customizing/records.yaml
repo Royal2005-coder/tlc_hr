@@ -103,22 +103,6 @@ records:
   values:
     allow_geolocation_tracking: 1
     allow_employee_checkin_from_mobile_app: 1
-- doctype: Salary Component
-  name: Lương cơ bản
-  values: {}
-  on_create:
-    salary_component: Lương cơ bản
-    salary_component_abbr: LCB
-    type: Earning
-    depends_on_payment_days: 0
-- doctype: Salary Component
-  name: Tiền tăng ca
-  values: {}
-  on_create:
-    salary_component: Tiền tăng ca
-    salary_component_abbr: OT
-    type: Earning
-    depends_on_payment_days: 0
 - doctype: Overtime Type
   name: TLC Tăng ca
   values:
@@ -161,3 +145,8 @@ records:
     min_wage_region_3: 4140000
     min_wage_region_4: 3700000
     effective_date: '2026-07-01'
+- doctype: Payroll Settings
+  values:
+    payroll_based_on: Attendance
+    consider_unmarked_attendance_as: Present
+    include_holidays_in_total_working_days: 0

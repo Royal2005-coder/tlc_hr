@@ -1,0 +1,33 @@
+version: 1
+kind: workflow
+description: PO 4.2 sequential authorization; document hooks independently enforce scope and no self approval.
+workflow:
+  name: TLC Employee Advance
+  doctype: Employee Advance
+  states:
+  - {state: Nháp, doc_status: 0, allow_edit: TLC Self Service}
+  - {state: Chờ quản lý duyệt, doc_status: 0, allow_edit: TLC Line Manager}
+  - {state: Chờ giám đốc duyệt, doc_status: 0, allow_edit: TLC Director}
+  - {state: Bổ sung thông tin, doc_status: 0, allow_edit: TLC Self Service}
+  - {state: Từ chối, doc_status: 0, allow_edit: TLC Self Service}
+  - {state: Chờ kế toán kiểm tra, doc_status: 0, allow_edit: Accounts User}
+  - {state: Hoàn tất, doc_status: 1, allow_edit: Accounts User}
+  - {state: Chờ chi, doc_status: 1, allow_edit: Accounts User}
+  - {state: Đã chi, doc_status: 1, allow_edit: Accounts User}
+  transitions:
+  - {from: Nháp, action: Gửi duyệt, to: Chờ quản lý duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: not doc.tlc_skip_manager}
+  - {from: Nháp, action: Gửi giám đốc, to: Chờ giám đốc duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: doc.tlc_skip_manager}
+  - {from: Bổ sung thông tin, action: Gửi duyệt, to: Chờ quản lý duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: not doc.tlc_skip_manager}
+  - {from: Bổ sung thông tin, action: Gửi giám đốc, to: Chờ giám đốc duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: doc.tlc_skip_manager}
+  - {from: Từ chối, action: Gửi duyệt, to: Chờ quản lý duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: not doc.tlc_skip_manager}
+  - {from: Từ chối, action: Gửi giám đốc, to: Chờ giám đốc duyệt, allowed: [TLC Self Service, TLC Line Manager], allow_self_approval: true, condition: doc.tlc_skip_manager}
+  - {from: Chờ quản lý duyệt, action: Duyệt, to: Chờ giám đốc duyệt, allowed: [TLC Line Manager], allow_self_approval: true}
+  - {from: Chờ quản lý duyệt, action: Trả lại, to: Bổ sung thông tin, allowed: [TLC Line Manager], allow_self_approval: true}
+  - {from: Chờ quản lý duyệt, action: Từ chối, to: Từ chối, allowed: [TLC Line Manager], allow_self_approval: true}
+  - {from: Chờ giám đốc duyệt, action: Duyệt, to: Chờ kế toán kiểm tra, allowed: [TLC Director], allow_self_approval: true}
+  - {from: Chờ giám đốc duyệt, action: Trả lại, to: Bổ sung thông tin, allowed: [TLC Director], allow_self_approval: true}
+  - {from: Chờ giám đốc duyệt, action: Từ chối, to: Từ chối, allowed: [TLC Director], allow_self_approval: true}
+  - {from: Chờ kế toán kiểm tra, action: Hồ sơ hợp lệ, to: Chờ chi, allowed: [Accounts User], allow_self_approval: true}
+  - {from: Chờ kế toán kiểm tra, action: Trả lại, to: Bổ sung thông tin, allowed: [Accounts User], allow_self_approval: true}
+  - {from: Chờ chi, action: Xác nhận đã chi, to: Đã chi, allowed: [Accounts User], allow_self_approval: true, condition: doc.tlc_payment_entry}
+  - {from: Đã chi, action: Hoàn tất quyết toán, to: Hoàn tất, allowed: [Accounts User], allow_self_approval: true}

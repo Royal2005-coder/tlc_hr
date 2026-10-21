@@ -17,7 +17,9 @@ Thử nhanh một thay đổi mà chưa build image: chạy `~/tlc-hr/hot-sync.s
 ## Kiểm tra sau mỗi thay đổi
 
 ```
-kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc config plan   # phải: Không có thay đổi
+kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc config validate # kiểm tra schema contract
+kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc config plan     # phải: Không có thay đổi
+kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc config export <kind> [name] # xuất cấu hình ra YAML
 kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc doctor        # phải: toàn OK
 ```
 
@@ -43,6 +45,7 @@ kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc doctor   
 | Duyệt giải trình báo trùng chấm công | Form app không có ca nên HRMS tạo bảng công mới | Đã sửa: giải trình tự lấy ca của ngày đó (`events.attendance_request_validate`) |
 | Seed tháng trước toàn "Có mặt" | Số ngẫu nhiên lệch khi chạy lại seed | Đã sửa: kết quả cố định theo người và ngày |
 | Thẻ workspace trống | Khối nội dung phải gọi theo nhãn dòng con (tên thẻ bỏ "TLC ") | Applier workspace đã xử lý |
+| Lỗi DDL khi apply schema | MariaDB ngầm commit DDL (Custom Field, DocType), rollback không khôi phục cột SQL | Phục hồi site từ bản snapshot/backup trước khi chạy lại migrate |
 
 ## Bảo mật
 

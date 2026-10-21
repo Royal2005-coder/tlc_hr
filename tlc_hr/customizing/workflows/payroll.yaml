@@ -1,0 +1,24 @@
+version: 1
+kind: workflow
+description: |
+  Payroll of a month (Payroll Entry): HR computes it once every attendance period of the month is locked, sends it to the CEO,
+  the CEO signs (the payslips are posted and appear in the Frappe HR app) or returns it with a reason, the accountant confirms the
+  bank payment with its reference (payment is not approval).
+workflow:
+  name: TLC Bảng lương
+  doctype: Payroll Entry
+  states:
+  - {state: Nháp, doc_status: 0, allow_edit: TLC Payroll}
+  - {state: Đã tính lương, doc_status: 1, allow_edit: TLC Payroll, style: Primary}
+  - {state: Chờ giám đốc ký, doc_status: 1, allow_edit: TLC Director, style: Warning}
+  - {state: Đã ký, doc_status: 1, allow_edit: Accounts User, style: Success}
+  - {state: Đã chi, doc_status: 1, allow_edit: Accounts User, style: Success}
+  - {state: Đã hủy, doc_status: 2, allow_edit: TLC HR Lead, style: Inverse}
+  transitions:
+  - {from: Nháp, action: Tính lương, to: Đã tính lương, allowed: [TLC Payroll, TLC HR Lead], allow_self_approval: true}
+  - {from: Đã tính lương, action: Gửi ký, to: Chờ giám đốc ký, allowed: [TLC Payroll, TLC HR Lead], allow_self_approval: true}
+  - {from: Đã tính lương, action: Hủy, to: Đã hủy, allowed: [TLC Payroll, TLC HR Lead], allow_self_approval: true}
+  - {from: Chờ giám đốc ký, action: Ký duyệt, to: Đã ký, allowed: [TLC Director], allow_self_approval: true}
+  - {from: Chờ giám đốc ký, action: Trả lại, to: Đã tính lương, allowed: [TLC Director], allow_self_approval: true}
+  - {from: Đã ký, action: Xác nhận đã chi, to: Đã chi, allowed: [Accounts User], allow_self_approval: true,
+     condition: doc.tlc_bank_reference and doc.tlc_paid_on}

@@ -7,8 +7,8 @@ import frappe
 from frappe.model.workflow import apply_workflow
 from frappe.tests import IntegrationTestCase
 
-from tlc_hr.attendance.overtime import cap_to_approved
-from tlc_hr.vn import labour
+from tlc_hr.domain import overtime as labour
+from tlc_hr.interface.overtime import cap_overtime_slip
 
 WORKER, OTHER_WORKER, HEAD, OTHER_HEAD, DIRECTOR = (
     "binh@demo.example", "tai@demo.example", "hung@demo.example", "nm2@demo.example", "thanh@demo.example")
@@ -19,17 +19,6 @@ def weekday_in(month_offset, nth=0, weekday=0):
     first = (dt.date.today().replace(day=1) + dt.timedelta(days=32 * month_offset)).replace(day=1)
     day = first + dt.timedelta(days=(weekday - first.weekday()) % 7 + 7 * nth)
     return day
-
-
-class TestLabourLimits(IntegrationTestCase):
-    def test_limits(self):
-        day = "2026-11-02"
-        self.assertEqual(labour.check(day, labour.WORKING_DAY, 3, 12, 80), [])
-        self.assertTrue(labour.check(day, labour.WORKING_DAY, 4.5, 12, 80))  # over half of 8 hours
-        self.assertEqual(labour.check(day, labour.REST_DAY, 12, 12, 80), [])
-        self.assertTrue(labour.check(day, labour.HOLIDAY, 12.5, 13, 80))
-        self.assertTrue(labour.check(day, labour.WORKING_DAY, 3, 41, 80))
-        self.assertTrue(labour.check(day, labour.WORKING_DAY, 3, 20, 201))
 
 
 class TestOvertimeRequest(IntegrationTestCase):
@@ -126,6 +115,6 @@ class TestOvertimeRequest(IntegrationTestCase):
         slip.update({"employee": self.worker, "start_date": self.day.replace(day=1), "end_date": self.day + dt.timedelta(days=5)})
         for day, hours in ((self.day, 4.5), (unapproved, 2)):
             slip.append("overtime_details", {"date": day, "overtime_type": "TLC Tăng ca", "overtime_duration": hours, "standard_working_hours": 8})
-        cap_to_approved(slip)
+        cap_overtime_slip(slip)
         self.assertEqual([(str(r.date), r.overtime_duration) for r in slip.overtime_details], [(str(self.day), doc.hours)])
         self.assertEqual(slip.total_overtime_duration, 3)

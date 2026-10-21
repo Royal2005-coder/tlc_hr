@@ -1,0 +1,97 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Service Catalog",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "field:service_name",
+ "track_changes": 1,
+ "field_order": [
+  "service_name",
+  "handler",
+  "holiday_list",
+  "sla_days",
+  "instructions",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_name",
+   "fieldtype": "Data",
+   "label": "Tên dịch vụ",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "handler",
+   "fieldtype": "Link",
+   "label": "Người xử lý",
+   "reqd": 1,
+   "options": "User"
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Lịch làm việc",
+   "reqd": 1,
+   "options": "Holiday List"
+  },
+  {
+   "fieldname": "sla_days",
+   "fieldtype": "Int",
+   "label": "SLA (ngày làm việc)",
+   "reqd": 1,
+   "default": "2"
+  },
+  {
+   "fieldname": "instructions",
+   "fieldtype": "Text Editor",
+   "label": "Hướng dẫn"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Đang áp dụng",
+   "default": "1"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "service_name"
+}

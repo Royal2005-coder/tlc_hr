@@ -1,0 +1,656 @@
+{
+  "version": 1,
+  "kind": "records",
+  "description": "Additive native Desk organization resources; requires DocType-before-record ordering.",
+  "records": [
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Change Item",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 1,
+        "is_submittable": 0,
+        "autoname": "hash",
+        "track_changes": 1,
+        "allow_import": 0
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "source_department",
+            "label": "Source Department",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "target_department",
+            "label": "Target Department",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "new_parent",
+            "label": "New Parent",
+            "fieldtype": "Link",
+            "options": "Department"
+          },
+          {
+            "fieldname": "new_title",
+            "label": "New Title",
+            "fieldtype": "Data"
+          },
+          {
+            "fieldname": "previous_parent",
+            "label": "Previous Parent",
+            "fieldtype": "Link",
+            "read_only": 1,
+            "options": "Department"
+          },
+          {
+            "fieldname": "previous_title",
+            "label": "Previous Title",
+            "fieldtype": "Data",
+            "read_only": 1
+          }
+        ],
+        "permissions": []
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Position",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 0,
+        "is_submittable": 0,
+        "autoname": "field:position_code",
+        "track_changes": 1,
+        "allow_import": 1
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "position_code",
+            "label": "Position Code",
+            "fieldtype": "Data",
+            "unique": 1,
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "position_title",
+            "label": "Position Title",
+            "fieldtype": "Data",
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "company",
+            "label": "Company",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "department",
+            "label": "Department",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "designation",
+            "label": "Designation",
+            "fieldtype": "Link",
+            "options": "Designation",
+            "reqd": 1
+          },
+          {
+            "fieldname": "grade",
+            "label": "Grade",
+            "fieldtype": "Link",
+            "options": "Employee Grade",
+            "reqd": 1
+          },
+          {
+            "fieldname": "job_description",
+            "label": "Job Description",
+            "fieldtype": "Text Editor",
+            "reqd": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Assignment",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 0,
+        "is_submittable": 0,
+        "autoname": "hash",
+        "track_changes": 1,
+        "allow_import": 1
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "company",
+            "label": "Company",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "employee",
+            "label": "Employee",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "department",
+            "label": "Department",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "position",
+            "label": "Position",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "TLC Organization Position",
+            "reqd": 1
+          },
+          {
+            "fieldname": "start_date",
+            "label": "Start Date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "end_date",
+            "label": "End Date",
+            "fieldtype": "Date"
+          },
+          {
+            "fieldname": "is_primary",
+            "label": "Is Primary",
+            "fieldtype": "Check"
+          },
+          {
+            "fieldname": "organization_warning",
+            "label": "Organization Warning",
+            "fieldtype": "Small Text",
+            "read_only": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Reporting Line",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 0,
+        "is_submittable": 0,
+        "autoname": "hash",
+        "track_changes": 1,
+        "allow_import": 1
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "company",
+            "label": "Company",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "department",
+            "label": "Department",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Department",
+            "reqd": 1
+          },
+          {
+            "fieldname": "employee",
+            "label": "Employee",
+            "fieldtype": "Link",
+            "description": "Leave empty for a department co-leader; explicit employee lines apply only in this department.",
+            "options": "Employee"
+          },
+          {
+            "fieldname": "leader",
+            "label": "Leader",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Employee",
+            "reqd": 1
+          },
+          {
+            "fieldname": "start_date",
+            "label": "Start Date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "end_date",
+            "label": "End Date",
+            "fieldtype": "Date"
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Headcount",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 0,
+        "is_submittable": 0,
+        "autoname": "hash",
+        "track_changes": 1,
+        "allow_import": 1
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "company",
+            "label": "Company",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "position",
+            "label": "Position",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "TLC Organization Position",
+            "reqd": 1
+          },
+          {
+            "fieldname": "department",
+            "label": "Department",
+            "fieldtype": "Link",
+            "read_only": 1,
+            "in_list_view": 1,
+            "options": "Department"
+          },
+          {
+            "fieldname": "as_on",
+            "label": "As On",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "capacity",
+            "label": "Capacity",
+            "fieldtype": "Int",
+            "non_negative": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "used",
+            "label": "Used",
+            "fieldtype": "Int",
+            "read_only": 1,
+            "in_list_view": 1
+          },
+          {
+            "fieldname": "vacant",
+            "label": "Vacant",
+            "fieldtype": "Int",
+            "read_only": 1,
+            "in_list_view": 1
+          },
+          {
+            "fieldname": "excess",
+            "label": "Excess",
+            "fieldtype": "Int",
+            "read_only": 1,
+            "in_list_view": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 0,
+            "cancel": 0,
+            "amend": 0
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "DocType",
+      "name": "TLC Organization Change",
+      "values": {
+        "module": "TLC HR",
+        "custom": 1,
+        "istable": 0,
+        "is_submittable": 1,
+        "autoname": "hash",
+        "track_changes": 1,
+        "allow_import": 1
+      },
+      "tables": {
+        "fields": [
+          {
+            "fieldname": "company",
+            "label": "Company",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "options": "Company",
+            "reqd": 1
+          },
+          {
+            "fieldname": "change_type",
+            "label": "Change Type",
+            "fieldtype": "Select",
+            "in_list_view": 1,
+            "options": "Rename\nReparent\nSplit\nMerge",
+            "reqd": 1
+          },
+          {
+            "fieldname": "effective_date",
+            "label": "Effective Date",
+            "fieldtype": "Date",
+            "in_list_view": 1,
+            "reqd": 1
+          },
+          {
+            "fieldname": "reason",
+            "label": "Reason",
+            "fieldtype": "Small Text",
+            "reqd": 1
+          },
+          {
+            "fieldname": "decision_attachment",
+            "label": "Decision Attachment",
+            "fieldtype": "Attach"
+          },
+          {
+            "fieldname": "changes",
+            "label": "Changes",
+            "fieldtype": "Table",
+            "options": "TLC Organization Change Item",
+            "reqd": 1
+          },
+          {
+            "fieldname": "applied_on",
+            "label": "Applied On",
+            "fieldtype": "Date",
+            "read_only": 1,
+            "no_copy": 1
+          }
+        ],
+        "permissions": [
+          {
+            "role": "TLC HR Lead",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1
+          },
+          {
+            "role": "TLC HR Officer",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1
+          },
+          {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 0,
+            "report": 1,
+            "export": 1,
+            "print": 1,
+            "submit": 1,
+            "cancel": 1,
+            "amend": 1
+          },
+          {
+            "role": "TLC Director",
+            "read": 1,
+            "report": 1,
+            "export": 1,
+            "print": 1
+          }
+        ]
+      }
+    },
+    {
+      "doctype": "Client Script",
+      "name": "TLC Organization Headcount Refresh",
+      "values": {
+        "dt": "TLC Organization Headcount",
+        "view": "Form",
+        "enabled": 1,
+        "script": "frappe.ui.form.on('TLC Organization Headcount', {refresh(frm) { if (!frm.is_new() && frappe.model.can_write(frm.doctype)) frm.add_custom_button(__('Recalculate headcount'), () => frappe.call({method: 'tlc_hr.interface.organization.assess_headcount', args: {name: frm.doc.name}, callback(r) {if (r.message) frm.set_value(r.message);}})); }});"
+      }
+    }
+  ]
+}

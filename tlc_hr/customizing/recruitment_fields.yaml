@@ -1,0 +1,65 @@
+version: 1
+kind: custom_fields
+custom_fields:
+  - doctype: Job Requisition
+    fields:
+      - {fieldname: tlc_jd, fieldtype: Attach, label: JD Attachment}
+      - {fieldname: tlc_request_type, fieldtype: Select, label: Recruitment Type, options: "New\nReplacement\nExpansion\nProject", default: New}
+      - {fieldname: tlc_replaced_employee, fieldtype: Link, label: Replaced Employee, options: Employee}
+      - {fieldname: tlc_location, fieldtype: Link, label: Work Location, options: Branch}
+      - {fieldname: tlc_positions, fieldtype: Table, label: Recruitment Positions, options: TLC Recruitment Position}
+  - doctype: Job Opening
+    fields:
+      - {fieldname: tlc_position_key, fieldtype: Data, label: Requisition Position Key, read_only: true, unique: true, no_copy: true}
+      - {fieldname: tlc_required, fieldtype: Int, label: Required Headcount}
+      - {fieldname: tlc_accepted, fieldtype: Int, label: Accepted Headcount, read_only: true}
+      - {fieldname: tlc_remaining, fieldtype: Int, label: Remaining Headcount, read_only: true}
+      - {fieldname: tlc_progress, fieldtype: Percent, label: Hiring Progress, read_only: true}
+      - {fieldname: tlc_needed_by, fieldtype: Date, label: TLC Needed By}
+      - {fieldname: tlc_jd, fieldtype: Attach, label: JD Attachment}
+      - {fieldname: tlc_request_type, fieldtype: Data, label: Recruitment Type, read_only: true}
+      - {fieldname: tlc_replaced_employee, fieldtype: Link, label: Replaced Employee, options: Employee, read_only: true}
+      - {fieldname: tlc_reason, fieldtype: Small Text, label: Recruitment Reason, read_only: true}
+      - {fieldname: tlc_cancellation_approved_by, fieldtype: Link, label: Cancellation Approved By, options: User, no_copy: true}
+  - doctype: Job Applicant
+    fields:
+      - {fieldname: tlc_candidate, fieldtype: Link, label: Canonical Candidate, options: TLC Recruitment Candidate, read_only: true, no_copy: true}
+      - {fieldname: tlc_identity, fieldtype: Data, label: Identity Number}
+      - {fieldname: tlc_birth_date, fieldtype: Date, label: Date of Birth}
+      - {fieldname: tlc_gender, fieldtype: Data, label: Gender}
+      - {fieldname: tlc_address, fieldtype: Small Text, label: Address}
+      - {fieldname: tlc_education, fieldtype: Small Text, label: Education}
+      - {fieldname: tlc_experience, fieldtype: Small Text, label: Experience}
+      - {fieldname: tlc_portfolio, fieldtype: Data, label: Portfolio}
+      - {fieldname: tlc_received_on, fieldtype: Date, label: Received On, read_only: true, no_copy: true}
+      - {fieldname: tlc_pipeline, fieldtype: Select, label: Recruitment Pipeline, default: New, options: "New\nCV Screening\nHR Interview\nTechnical Interview\nFinal Interview\nOffer\nOffer Accepted\nJoined\nRejected\nTalent Pool\nWithdrawn"}
+      - {fieldname: tlc_disposition_reason, fieldtype: Select, label: Disposition Reason, options: "\nTechnical fit\nCulture fit\nSalary\nInterview result\nAnother offer\nUnavailable\nPersonal\nOther"}
+  - doctype: Interview Type
+    fields:
+      - {fieldname: tlc_final_round, fieldtype: Check, label: TLC Final Round}
+  - doctype: Interview
+    fields:
+      - {fieldname: tlc_mode, fieldtype: Select, label: Interview Mode, options: "Onsite\nOnline\nPhone", default: Onsite}
+      - {fieldname: tlc_candidate_confirmed, fieldtype: Check, label: Candidate Confirmed}
+  - doctype: Job Applicant Source
+    fields:
+      - {fieldname: tlc_cost, fieldtype: Currency, label: Recruitment Source Cost}
+  - doctype: Job Offer
+    fields:
+      - {fieldname: tlc_department, fieldtype: Link, label: Department, options: Department}
+      - {fieldname: tlc_grade, fieldtype: Link, label: Grade, options: Employee Grade}
+      - {fieldname: tlc_hiring_manager, fieldtype: Link, label: Hiring Manager, options: Employee}
+      - {fieldname: tlc_location, fieldtype: Link, label: Work Location, options: Branch}
+      - {fieldname: tlc_working_hours, fieldtype: Data, label: Working Hours}
+      - {fieldname: tlc_work_mode, fieldtype: Select, label: Work Mode, options: "Onsite\nHybrid\nRemote", default: Onsite}
+      - {fieldname: tlc_joining_date, fieldtype: Date, label: Expected Joining Date}
+      - {fieldname: tlc_probation_months, fieldtype: Int, label: Probation Months}
+      - {fieldname: tlc_probation_salary, fieldtype: Currency, label: Probation Salary}
+      - {fieldname: tlc_salary, fieldtype: Currency, label: Official Salary}
+      - {fieldname: tlc_allowances, fieldtype: Small Text, label: Allowances}
+      - {fieldname: tlc_bonus, fieldtype: Small Text, label: Bonus}
+      - {fieldname: tlc_benefits, fieldtype: Small Text, label: Benefits}
+      - {fieldname: tlc_contract_type, fieldtype: Link, label: Contract Type, options: Employment Type}
+      - {fieldname: tlc_exception_file, fieldtype: Attach, label: Exception Approval File}
+      - {fieldname: tlc_offer_stage, fieldtype: Select, label: Offer Stage, default: Draft, no_copy: true, allow_on_submit: true, options: "Draft\nPending Approval\nApproved\nSent\nNegotiating\nAccepted\nRejected\nExpired"}
+      - {fieldname: tlc_offer_rejection_reason, fieldtype: Select, label: Offer Rejection Reason, allow_on_submit: true, options: "\nSalary\nAnother offer\nJoining date\nPersonal\nOther"}

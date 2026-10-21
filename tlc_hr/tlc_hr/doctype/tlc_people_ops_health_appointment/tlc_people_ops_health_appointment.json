@@ -1,0 +1,113 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Health Appointment",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-HEALTH-APPOINTMENT-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "employee",
+    "scheduled_at",
+    "provider",
+    "responsible_hr",
+    "status",
+    "completed_on",
+    "result",
+    "result_file"
+  ],
+  "fields": [
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "label": "Employee",
+      "in_list_view": 1,
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "scheduled_at",
+      "fieldtype": "Datetime",
+      "label": "Scheduled At",
+      "reqd": 1
+    },
+    {
+      "fieldname": "provider",
+      "fieldtype": "Data",
+      "label": "Provider",
+      "reqd": 1
+    },
+    {
+      "fieldname": "responsible_hr",
+      "fieldtype": "Link",
+      "label": "Responsible Hr",
+      "options": "User",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "default": "Scheduled",
+      "in_list_view": 1,
+      "options": "Scheduled\nCompleted\nCancelled",
+      "reqd": 1
+    },
+    {
+      "fieldname": "completed_on",
+      "fieldtype": "Date",
+      "label": "Completed On"
+    },
+    {
+      "fieldname": "result",
+      "fieldtype": "Small Text",
+      "label": "Result",
+      "permlevel": 1
+    },
+    {
+      "fieldname": "result_file",
+      "fieldtype": "Attach",
+      "label": "Result File",
+      "permlevel": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1,
+      "create": 0,
+      "write": 1
+    },
+    {
+      "role": "TLC HR Lead",
+      "permlevel": 1,
+      "read": 1,
+      "write": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "permlevel": 1,
+      "read": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

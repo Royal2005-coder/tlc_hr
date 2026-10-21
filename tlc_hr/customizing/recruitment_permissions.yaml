@@ -1,0 +1,17 @@
+version: 1
+kind: permissions
+permissions:
+  - {doctype: Job Requisition, role: TLC Line Manager, rights: rwc}
+  - {doctype: Job Requisition, role: TLC HR Officer, rights: rwc}
+  - {doctype: Job Requisition, role: TLC HR Lead, rights: rwc}
+  - {doctype: Job Requisition, role: TLC Director, rights: rw}
+  - {doctype: Job Opening, role: TLC HR Officer, rights: rwc}
+  - {doctype: Job Opening, role: TLC HR Lead, rights: rwc}
+  - {doctype: Job Opening, role: TLC Director, rights: rw}
+  - {doctype: Job Applicant, role: TLC HR Officer, rights: rwc}
+  - {doctype: Job Applicant, role: TLC HR Lead, rights: rwc}
+  - {doctype: Interview, role: TLC HR Officer, rights: rwcsxa}
+  - {doctype: Interview, role: TLC HR Lead, rights: rwcsxa}
+  - {doctype: Job Offer, role: TLC HR Officer, rights: rwc}
+  - {doctype: Job Offer, role: TLC HR Lead, rights: rwcxa}
+  - {doctype: Job Offer, role: TLC Director, rights: rws}

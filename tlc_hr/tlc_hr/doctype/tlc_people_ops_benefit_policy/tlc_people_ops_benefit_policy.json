@@ -1,0 +1,74 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Benefit Policy",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-BENEFIT-POLICY-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "event",
+    "effective_from",
+    "effective_to",
+    "amount",
+    "policy_file"
+  ],
+  "fields": [
+    {
+      "fieldname": "event",
+      "fieldtype": "Select",
+      "label": "Event",
+      "options": "Marriage\nBirth\nHospitalization\nBereavement",
+      "reqd": 1
+    },
+    {
+      "fieldname": "effective_from",
+      "fieldtype": "Date",
+      "label": "Effective From",
+      "reqd": 1
+    },
+    {
+      "fieldname": "effective_to",
+      "fieldtype": "Date",
+      "label": "Effective To",
+      "reqd": 1
+    },
+    {
+      "fieldname": "amount",
+      "fieldtype": "Currency",
+      "label": "Amount",
+      "reqd": 1
+    },
+    {
+      "fieldname": "policy_file",
+      "fieldtype": "Attach",
+      "label": "Policy File",
+      "reqd": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

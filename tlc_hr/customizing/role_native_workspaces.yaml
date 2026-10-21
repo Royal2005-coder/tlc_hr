@@ -1,0 +1,132 @@
+version: 1
+kind: workspaces
+description: Supplemental native Desk resources; employee default remains /hrms. Factory isolation is enforced by server permissions, never by workspace visibility or URL filters.
+shortcuts:
+- label: ESS Trang chủ Frappe HR
+  type: URL
+  url: /hrms/home
+  color: Green
+- label: ESS Số dư và đơn nghỉ
+  type: URL
+  url: /hrms/dashboard/leaves
+- label: ESS Chấm công của tôi
+  type: URL
+  url: /hrms/dashboard/attendance
+- label: ESS Phiếu lương của tôi
+  type: URL
+  url: /hrms/dashboard/salary-slips
+- label: ESS Đồng ý tăng ca
+  type: DocType
+  link_to: TLC Overtime Request
+  doc_view: List
+- label: ESS Việc được giao
+  type: DocType
+  link_to: ToDo
+  doc_view: List
+- label: Nhà máy nhân sự và định biên
+  type: DocType
+  link_to: Employee
+  doc_view: List
+- label: Nhà máy ca được phân
+  type: DocType
+  link_to: Shift Assignment
+  doc_view: List
+- label: Nhà máy bảng công ngoại lệ
+  type: DocType
+  link_to: Attendance
+  doc_view: List
+- label: Nhà máy giải trình công
+  type: DocType
+  link_to: Attendance Request
+  doc_view: List
+- label: Nhà máy duyệt phép
+  type: DocType
+  link_to: Leave Application
+  doc_view: List
+- label: Nhà máy chốt kỳ công
+  type: DocType
+  link_to: TLC Attendance Period
+  doc_view: List
+- label: HR Theo dõi hạn công việc
+  type: DocType
+  link_to: ToDo
+  doc_view: List
+- label: HR Hội nhập
+  type: DocType
+  link_to: Employee Onboarding
+  doc_view: List
+- label: HR Nghỉ việc
+  type: DocType
+  link_to: Employee Separation
+  doc_view: List
+- label: HR Tuyển dụng
+  type: DocType
+  link_to: Job Opening
+  doc_view: List
+- label: Điều hành chi phí lương
+  type: DocType
+  link_to: Salary Slip
+  doc_view: List
+- label: Điều hành ký bảng lương
+  type: DocType
+  link_to: Payroll Entry
+  doc_view: List
+- label: Điều hành ký kỳ công
+  type: DocType
+  link_to: TLC Attendance Period
+  doc_view: List
+- label: Điều hành duyệt tăng ca
+  type: DocType
+  link_to: TLC Overtime Request
+  doc_view: List
+- label: Kế toán tạm ứng
+  type: DocType
+  link_to: Employee Advance
+  doc_view: List
+- label: Kế toán quyết toán chi phí
+  type: DocType
+  link_to: Expense Claim
+  doc_view: List
+workspaces:
+- title: TLC Cá nhân
+  roles: [TLC Self Service]
+  icon: user
+  sequence: 10
+  cards: [TLC ESS Đơn nghỉ đang xử lý, TLC ESS Tăng ca chờ đồng ý, TLC ESS Phiếu lương đã phát hành, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
+  shortcuts: [ESS Trang chủ Frappe HR, ESS Số dư và đơn nghỉ, ESS Chấm công của tôi, ESS Phiếu lương của tôi, ESS Đồng ý tăng ca, ESS Việc được giao]
+- title: TLC Nhà máy
+  roles: [TLC Line Manager]
+  icon: users
+  sequence: 11
+  cards: [TLC Nhà máy nhân sự trong phạm vi, TLC Nhà máy ngoại lệ đi muộn, TLC Nhà máy ngoại lệ về sớm, TLC Nhà máy ca được phân tháng này, TLC Đơn chờ tôi duyệt, TLC Kỳ công chờ tôi xác nhận, TLC Việc được giao quá hạn]
+  shortcuts: [Nhà máy nhân sự và định biên, Nhà máy ca được phân, Nhà máy bảng công ngoại lệ, Nhà máy giải trình công, Nhà máy duyệt phép, Nhà máy chốt kỳ công, ESS Đồng ý tăng ca]
+- title: TLC HR Hạn xử lý
+  roles: [TLC HR Lead, TLC HR Officer]
+  icon: hr
+  sequence: 12
+  cards: [TLC HR Việc mở đến hạn tuần này, TLC HR Việc mở quá hạn, TLC Đơn chờ nhân sự duyệt, TLC Kỳ công chờ đối soát, TLC Vị trí tuyển dụng đang mở]
+  shortcuts: [HR Theo dõi hạn công việc, HR Hội nhập, HR Nghỉ việc, HR Tuyển dụng, Nhà máy chốt kỳ công]
+  quick_list:
+    doctype: ToDo
+    label: Công việc HR còn mở
+    filters:
+    - [ToDo, status, '=', Open]
+- title: TLC CEO Chi phí
+  roles: [TLC Director]
+  icon: dashboard
+  sequence: 13
+  cards: [TLC Nhân sự đang làm việc, TLC Điều hành lương gross tháng này, TLC Điều hành lương net tháng này, TLC Vị trí tuyển dụng đang mở, TLC Bảng lương chờ ký, TLC Kỳ công chờ ký, TLC Tăng ca chờ giám đốc duyệt]
+  charts: [TLC Điều hành gross theo phòng ban, TLC Giờ tăng ca theo bộ phận]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Điều hành ký kỳ công, Điều hành duyệt tăng ca, HR Tuyển dụng]
+- title: TLC Tác nghiệp lương
+  roles: [TLC Payroll]
+  icon: money-coins
+  sequence: 14
+  cards: [TLC Bảng lương chờ ký, TLC Bảng lương chờ chi, TLC Việc được giao quá hạn]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Nhà máy chốt kỳ công, HR Theo dõi hạn công việc]
+- title: TLC Kế toán chi trả
+  roles: [Accounts User]
+  icon: money-coins
+  sequence: 15
+  cards: [TLC Bảng lương chờ chi, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
+  shortcuts: [Điều hành ký bảng lương, Kế toán tạm ứng, Kế toán quyết toán chi phí, HR Theo dõi hạn công việc]

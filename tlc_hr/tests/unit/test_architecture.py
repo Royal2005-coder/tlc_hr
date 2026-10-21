@@ -15,7 +15,7 @@ APP = Path(__file__).resolve().parents[2]
 FORBIDDEN = {
     "domain": ("frappe", "erpnext", "hrms", "tlc_hr.application", "tlc_hr.infrastructure", "tlc_hr.interface", "tlc_hr.setup"),
     "application": ("frappe", "erpnext", "hrms", "tlc_hr.infrastructure", "tlc_hr.interface", "tlc_hr.setup"),
-    "contracts": ("frappe", "erpnext", "hrms", "tlc_hr.infrastructure", "tlc_hr.interface"),
+    "contracts": ("frappe", "erpnext", "hrms", "tlc_hr.application", "tlc_hr.domain", "tlc_hr.infrastructure", "tlc_hr.interface", "tlc_hr.setup"),
 }
 
 
@@ -24,8 +24,15 @@ def imports(path):
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             yield from (alias.name for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
-            yield node.module
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                package = path.parent.relative_to(APP.parent).parts
+                prefix = ".".join(package[:len(package) - node.level + 1])
+                module = ".".join(part for part in (prefix, node.module) if part)
+            else:
+                module = node.module or ""
+            yield module
+            yield from (f"{module}.{alias.name}" for alias in node.names if alias.name != "*")
 
 
 class TestArchitecture(unittest.TestCase):

@@ -1,0 +1,112 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Book Loan",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "employee",
+  "book",
+  "status",
+  "lent_on",
+  "due_date",
+  "returned_on",
+  "reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Người mượn",
+   "reqd": 1,
+   "options": "Employee"
+  },
+  {
+   "fieldname": "book",
+   "fieldtype": "Link",
+   "label": "Sách",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "TLC Library Book"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "default": "Requested",
+   "reqd": 1,
+   "in_list_view": 1,
+   "options": "Requested\nWaitlisted\nLent\nRejected\nReturned\nCancelled"
+  },
+  {
+   "fieldname": "lent_on",
+   "fieldtype": "Date",
+   "label": "Ngày mượn",
+   "read_only": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Hạn trả"
+  },
+  {
+   "fieldname": "returned_on",
+   "fieldtype": "Date",
+   "label": "Ngày HR nhận lại",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Lý do / hướng xử lý"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

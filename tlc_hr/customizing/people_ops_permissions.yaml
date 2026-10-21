@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "kind": "permissions",
+  "permissions": [
+    {
+      "doctype": "Asset",
+      "role": "TLC HR Lead",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Asset",
+      "role": "TLC HR Officer",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Asset Movement",
+      "role": "TLC HR Lead",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Asset Movement",
+      "role": "TLC HR Officer",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Goal",
+      "role": "TLC HR Lead",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Goal",
+      "role": "TLC HR Officer",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Appraisal",
+      "role": "TLC HR Lead",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Appraisal",
+      "role": "TLC HR Officer",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Appraisal Cycle",
+      "role": "TLC HR Lead",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Appraisal Cycle",
+      "role": "TLC HR Officer",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Training Program",
+      "role": "TLC HR Lead",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Training Program",
+      "role": "TLC HR Officer",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Training Event",
+      "role": "TLC HR Lead",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Training Event",
+      "role": "TLC HR Officer",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Training Result",
+      "role": "TLC HR Lead",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Training Result",
+      "role": "TLC HR Officer",
+      "rights": "rwcs"
+    },
+    {
+      "doctype": "Employee Grievance",
+      "role": "TLC HR Lead",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Employee Grievance",
+      "role": "TLC HR Officer",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Asset Movement",
+      "role": "TLC Self Service",
+      "rights": "r"
+    },
+    {
+      "doctype": "Goal",
+      "role": "TLC Self Service",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Appraisal",
+      "role": "TLC Self Service",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Employee Grievance",
+      "role": "TLC Self Service",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Goal",
+      "role": "TLC Line Manager",
+      "rights": "rwc"
+    },
+    {
+      "doctype": "Appraisal",
+      "role": "TLC Line Manager",
+      "rights": "rwc"
+    }
+  ]
+}

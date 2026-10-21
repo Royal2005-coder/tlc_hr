@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "kind": "workflow",
+  "workflow": {
+    "name": "TLC Separation Approval",
+    "doctype": "Employee Separation",
+    "states": [
+      {
+        "state": "Nháp",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Officer"
+      },
+      {
+        "state": "Chờ quản lý duyệt",
+        "doc_status": 0,
+        "allow_edit": "TLC Line Manager"
+      },
+      {
+        "state": "Chờ nhân sự duyệt",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Lead"
+      },
+      {
+        "state": "Chờ giám đốc duyệt",
+        "doc_status": 0,
+        "allow_edit": "TLC Director"
+      },
+      {
+        "state": "Đã duyệt",
+        "doc_status": 1,
+        "allow_edit": "TLC HR Lead"
+      },
+      {
+        "state": "Từ chối",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Officer"
+      }
+    ],
+    "transitions": [
+      {
+        "from": "Nháp",
+        "action": "Gửi duyệt",
+        "to": "Chờ quản lý duyệt",
+        "allowed": [
+          "TLC HR Officer"
+        ]
+      },
+      {
+        "from": "Chờ quản lý duyệt",
+        "action": "Duyệt quản lý",
+        "to": "Chờ nhân sự duyệt",
+        "allowed": [
+          "TLC Line Manager"
+        ]
+      },
+      {
+        "from": "Chờ nhân sự duyệt",
+        "action": "HR kiểm tra",
+        "to": "Chờ giám đốc duyệt",
+        "allowed": [
+          "TLC HR Lead"
+        ]
+      },
+      {
+        "from": "Chờ giám đốc duyệt",
+        "action": "Duyệt",
+        "to": "Đã duyệt",
+        "allowed": [
+          "TLC Director"
+        ]
+      },
+      {
+        "from": "Chờ giám đốc duyệt",
+        "action": "Từ chối",
+        "to": "Từ chối",
+        "allowed": [
+          "TLC Director"
+        ]
+      },
+      {
+        "from": "Từ chối",
+        "action": "Sửa lại",
+        "to": "Nháp",
+        "allowed": [
+          "TLC HR Officer"
+        ]
+      }
+    ]
+  }
+}

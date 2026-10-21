@@ -1,0 +1,105 @@
+version: 1
+kind: dashboards
+description: Native role queues; all counts use Frappe document permissions. Gross payroll is not total employment cost; no invented staffing or deadline fields.
+number_cards:
+- name: TLC ESS Đơn nghỉ đang xử lý
+  doctype: Leave Application
+  color: '#b7791f'
+  filters:
+  - [Leave Application, docstatus, '=', 0]
+- name: TLC ESS Tăng ca chờ đồng ý
+  doctype: TLC Overtime Request
+  color: '#b7791f'
+  filters:
+  - [TLC Overtime Request, workflow_state, '=', Chờ người lao động đồng ý]
+- name: TLC ESS Phiếu lương đã phát hành
+  doctype: Salary Slip
+  color: '#287b47'
+  filters:
+  - [Salary Slip, docstatus, '=', 1]
+- name: TLC Việc được giao còn mở
+  doctype: ToDo
+  color: '#b7791f'
+  filters:
+  - [ToDo, status, '=', Open]
+  dynamic_filters:
+  - [ToDo, allocated_to, '=', frappe.session.user]
+- name: TLC Việc được giao quá hạn
+  doctype: ToDo
+  color: '#b13b2e'
+  filters:
+  - [ToDo, status, '=', Open]
+  dynamic_filters:
+  - [ToDo, allocated_to, '=', frappe.session.user]
+  - [ToDo, date, '<', frappe.datetime.get_today()]
+- name: TLC Nhà máy nhân sự trong phạm vi
+  doctype: Employee
+  color: '#287b47'
+  filters:
+  - [Employee, status, '=', Active]
+  - [Employee, tlc_workforce, '=', factory]
+- name: TLC Nhà máy ngoại lệ đi muộn
+  doctype: Attendance
+  color: '#b13b2e'
+  filters:
+  - [Attendance, docstatus, '=', 1]
+  - [Attendance, late_entry, '=', 1]
+  - [Attendance, attendance_date, Timespan, this month]
+- name: TLC Nhà máy ngoại lệ về sớm
+  doctype: Attendance
+  color: '#b13b2e'
+  filters:
+  - [Attendance, docstatus, '=', 1]
+  - [Attendance, early_exit, '=', 1]
+  - [Attendance, attendance_date, Timespan, this month]
+- name: TLC Nhà máy ca được phân tháng này
+  doctype: Shift Assignment
+  color: '#23649b'
+  filters:
+  - [Shift Assignment, docstatus, '=', 1]
+  - [Shift Assignment, start_date, Timespan, this month]
+- name: TLC HR Việc mở đến hạn tuần này
+  doctype: ToDo
+  color: '#b7791f'
+  filters:
+  - [ToDo, status, '=', Open]
+  - [ToDo, date, Timespan, this week]
+- name: TLC HR Việc mở quá hạn
+  doctype: ToDo
+  color: '#b13b2e'
+  filters:
+  - [ToDo, status, '=', Open]
+  dynamic_filters:
+  - [ToDo, date, '<', frappe.datetime.get_today()]
+- name: TLC Điều hành lương gross tháng này
+  doctype: Salary Slip
+  color: '#23649b'
+  function: Sum
+  field: gross_pay
+  filters:
+  - [Salary Slip, docstatus, '=', 1]
+  - [Salary Slip, start_date, Timespan, this month]
+- name: TLC Điều hành lương net tháng này
+  doctype: Salary Slip
+  color: '#23649b'
+  function: Sum
+  field: net_pay
+  filters:
+  - [Salary Slip, docstatus, '=', 1]
+  - [Salary Slip, start_date, Timespan, this month]
+- name: TLC Vị trí tuyển dụng đang mở
+  doctype: Job Opening
+  color: '#287b47'
+  filters:
+  - [Job Opening, status, '=', Open]
+charts:
+- name: TLC Điều hành gross theo phòng ban
+  chart_type: Group By
+  document_type: Salary Slip
+  group_by_type: Sum
+  aggregate_function_based_on: gross_pay
+  group_by_based_on: department
+  type: Bar
+  filters:
+  - [Salary Slip, docstatus, '=', 1]
+  - [Salary Slip, start_date, Timespan, this month]

@@ -1,0 +1,141 @@
+{
+  "doctype": "DocType",
+  "name": "TLC People Ops Certificate",
+  "module": "TLC HR",
+  "custom": 0,
+  "autoname": "format:POP-CERTIFICATE-{YYYY}-{#####}",
+  "track_changes": 1,
+  "field_order": [
+    "employee",
+    "training_program",
+    "requirement",
+    "status",
+    "due_on",
+    "completed_on",
+    "issued_on",
+    "expires_on",
+    "issuer",
+    "score",
+    "hours",
+    "cost",
+    "trainer",
+    "certificate",
+    "last_reminder"
+  ],
+  "fields": [
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "label": "Employee",
+      "in_list_view": 1,
+      "options": "Employee",
+      "reqd": 1
+    },
+    {
+      "fieldname": "training_program",
+      "fieldtype": "Link",
+      "label": "Training Program",
+      "options": "Training Program",
+      "reqd": 1
+    },
+    {
+      "fieldname": "requirement",
+      "fieldtype": "Link",
+      "label": "Requirement",
+      "options": "TLC People Ops Training Requirement"
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "default": "Pending",
+      "in_list_view": 1,
+      "options": "Pending\nCompleted\nFailed",
+      "reqd": 1
+    },
+    {
+      "fieldname": "due_on",
+      "fieldtype": "Date",
+      "label": "Due On"
+    },
+    {
+      "fieldname": "completed_on",
+      "fieldtype": "Date",
+      "label": "Completed On"
+    },
+    {
+      "fieldname": "issued_on",
+      "fieldtype": "Date",
+      "label": "Issued On"
+    },
+    {
+      "fieldname": "expires_on",
+      "fieldtype": "Date",
+      "label": "Expires On"
+    },
+    {
+      "fieldname": "issuer",
+      "fieldtype": "Data",
+      "label": "Issuer"
+    },
+    {
+      "fieldname": "score",
+      "fieldtype": "Percent",
+      "label": "Score"
+    },
+    {
+      "fieldname": "hours",
+      "fieldtype": "Float",
+      "label": "Hours"
+    },
+    {
+      "fieldname": "cost",
+      "fieldtype": "Currency",
+      "label": "Cost"
+    },
+    {
+      "fieldname": "trainer",
+      "fieldtype": "Data",
+      "label": "Trainer"
+    },
+    {
+      "fieldname": "certificate",
+      "fieldtype": "Attach",
+      "label": "Certificate"
+    },
+    {
+      "fieldname": "last_reminder",
+      "fieldtype": "Data",
+      "label": "Last Reminder",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "TLC HR Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC HR Officer",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "print": 1,
+      "report": 1
+    },
+    {
+      "role": "TLC Self Service",
+      "read": 1,
+      "create": 0,
+      "write": 0
+    }
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "actions": [],
+  "links": []
+}

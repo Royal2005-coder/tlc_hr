@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "kind": "workflow",
+  "workflow": {
+    "name": "TLC Episode Approval",
+    "doctype": "TLC Employment Episode",
+    "states": [
+      {
+        "state": "Nháp",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Officer"
+      },
+      {
+        "state": "Chờ nhân sự duyệt",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Lead"
+      },
+      {
+        "state": "Đã duyệt",
+        "doc_status": 1,
+        "allow_edit": "TLC HR Lead"
+      },
+      {
+        "state": "Từ chối",
+        "doc_status": 0,
+        "allow_edit": "TLC HR Officer"
+      }
+    ],
+    "transitions": [
+      {
+        "from": "Nháp",
+        "action": "Gửi duyệt",
+        "to": "Chờ nhân sự duyệt",
+        "allowed": [
+          "TLC HR Officer",
+          "Employee"
+        ]
+      },
+      {
+        "from": "Chờ nhân sự duyệt",
+        "action": "Duyệt",
+        "to": "Đã duyệt",
+        "allowed": [
+          "TLC HR Lead"
+        ]
+      },
+      {
+        "from": "Chờ nhân sự duyệt",
+        "action": "Từ chối",
+        "to": "Từ chối",
+        "allowed": [
+          "TLC HR Lead"
+        ]
+      },
+      {
+        "from": "Từ chối",
+        "action": "Sửa lại",
+        "to": "Nháp",
+        "allowed": [
+          "TLC HR Officer",
+          "Employee"
+        ]
+      }
+    ]
+  }
+}

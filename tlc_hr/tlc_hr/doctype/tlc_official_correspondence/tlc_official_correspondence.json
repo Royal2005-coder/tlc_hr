@@ -1,0 +1,125 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Official Correspondence",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 1,
+ "field_order": [
+  "employee",
+  "direction",
+  "subject",
+  "counterparty",
+  "address",
+  "courier",
+  "tracking_number",
+  "status",
+  "attachment"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nhân viên gửi / nhận",
+   "reqd": 1,
+   "options": "Employee"
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "label": "Chiều",
+   "reqd": 1,
+   "default": "Outgoing",
+   "options": "Outgoing\nIncoming"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Trích yếu",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "counterparty",
+   "fieldtype": "Data",
+   "label": "Nơi gửi / nơi nhận",
+   "reqd": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Địa chỉ"
+  },
+  {
+   "fieldname": "courier",
+   "fieldtype": "Data",
+   "label": "Đơn vị vận chuyển"
+  },
+  {
+   "fieldname": "tracking_number",
+   "fieldtype": "Data",
+   "label": "Mã vận đơn"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Trạng thái",
+   "reqd": 1,
+   "default": "Need Dispatch",
+   "in_list_view": 1,
+   "options": "Need Dispatch\nWith Courier\nDelivered\nNew Incoming\nHanded Over"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Tệp văn thư"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "TLC HR Lead",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC HR Officer",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Self Service",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Line Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Director",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "TLC Payroll",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

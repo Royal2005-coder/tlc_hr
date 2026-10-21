@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "kind": "custom_fields",
+  "custom_fields": [
+    {
+      "doctype": "Employee Onboarding",
+      "fields": [
+        {
+          "fieldname": "custom_tlc_evidence",
+          "fieldtype": "Table",
+          "label": "Custom Tlc Evidence",
+          "options": "TLC Lifecycle Evidence",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_completed_by",
+          "fieldtype": "Link",
+          "label": "Custom Tlc Completed By",
+          "options": "User",
+          "read_only": true,
+          "allow_on_submit": true
+        }
+      ]
+    },
+    {
+      "doctype": "Employee Separation",
+      "fields": [
+        {
+          "fieldname": "custom_tlc_case_type",
+          "fieldtype": "Select",
+          "label": "Custom Tlc Case Type",
+          "options": "Employee resignation\nEmployer termination\nContract expiry\nProbation failure\nMutual agreement\nOther",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_submitted_on",
+          "fieldtype": "Date",
+          "label": "Custom Tlc Submitted On",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_last_day",
+          "fieldtype": "Date",
+          "label": "Custom Tlc Last Day",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_effective_on",
+          "fieldtype": "Date",
+          "label": "Custom Tlc Effective On",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_reason",
+          "fieldtype": "Small Text",
+          "label": "Custom Tlc Reason",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_contract_category",
+          "fieldtype": "Select",
+          "label": "Custom Tlc Contract Category",
+          "options": "Indefinite\nFixed 12-36 months\nFixed under 12 months",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_notice_exception",
+          "fieldtype": "Select",
+          "label": "Custom Tlc Notice Exception",
+          "options": "\nStatutory employee exception\nSpecial occupation\nMutual agreement\nProbation termination\nContract expiry\nEmployer termination"
+        },
+        {
+          "fieldname": "custom_tlc_legal_evidence",
+          "fieldtype": "Attach",
+          "label": "Custom Tlc Legal Evidence"
+        },
+        {
+          "fieldname": "custom_tlc_legal_reviewer",
+          "fieldtype": "Link",
+          "label": "Custom Tlc Legal Reviewer",
+          "options": "User"
+        },
+        {
+          "fieldname": "custom_tlc_earliest_last_day",
+          "fieldtype": "Date",
+          "label": "Custom Tlc Earliest Last Day",
+          "read_only": true
+        },
+        {
+          "fieldname": "custom_tlc_settlement_extended",
+          "fieldtype": "Check",
+          "label": "Custom Tlc Settlement Extended"
+        },
+        {
+          "fieldname": "custom_tlc_settlement_due",
+          "fieldtype": "Date",
+          "label": "Custom Tlc Settlement Due",
+          "read_only": true
+        },
+        {
+          "fieldname": "custom_tlc_decision",
+          "fieldtype": "Attach",
+          "label": "Custom Tlc Decision",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_handover",
+          "fieldtype": "Attach",
+          "label": "Custom Tlc Handover",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_final_statement",
+          "fieldtype": "Link",
+          "label": "Custom Tlc Final Statement",
+          "options": "Full and Final Statement",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_rehire_decision",
+          "fieldtype": "Select",
+          "label": "Custom Tlc Rehire Decision",
+          "options": "\nEligible\nNot eligible\nLegal review",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_evidence",
+          "fieldtype": "Table",
+          "label": "Custom Tlc Evidence",
+          "options": "TLC Lifecycle Evidence",
+          "allow_on_submit": true
+        },
+        {
+          "fieldname": "custom_tlc_completed_by",
+          "fieldtype": "Link",
+          "label": "Custom Tlc Completed By",
+          "options": "User",
+          "read_only": true,
+          "allow_on_submit": true
+        }
+      ]
+    },
+    {
+      "doctype": "Employee",
+      "fields": [
+        {
+          "fieldname": "custom_tlc_lifecycle_state",
+          "fieldtype": "Select",
+          "label": "Custom Tlc Lifecycle State",
+          "options": "Pre-boarding\nProbation\nOfficial\nMaternity\nLong leave\nSuspended\nLeft\nRehired",
+          "read_only": true
+        },
+        {
+          "fieldname": "custom_tlc_rehire_episode",
+          "fieldtype": "Link",
+          "label": "Custom Tlc Rehire Episode",
+          "options": "TLC Employment Episode",
+          "description": "Approved rehire on this existing employee code; never create a second Employee."
+        }
+      ]
+    },
+    {
+      "doctype": "Employee Promotion",
+      "fields": [
+        {
+          "fieldname": "custom_tlc_reason",
+          "fieldtype": "Small Text",
+          "label": "Custom Tlc Reason",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_decision",
+          "fieldtype": "Attach",
+          "label": "Custom Tlc Decision",
+          "reqd": true
+        }
+      ]
+    },
+    {
+      "doctype": "Employee Transfer",
+      "fields": [
+        {
+          "fieldname": "custom_tlc_reason",
+          "fieldtype": "Small Text",
+          "label": "Custom Tlc Reason",
+          "reqd": true
+        },
+        {
+          "fieldname": "custom_tlc_decision",
+          "fieldtype": "Attach",
+          "label": "Custom Tlc Decision",
+          "reqd": true
+        }
+      ]
+    }
+  ]
+}

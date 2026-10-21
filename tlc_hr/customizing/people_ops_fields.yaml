@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "kind": "custom_fields",
+  "custom_fields": [
+    {
+      "doctype": "Asset Movement",
+      "fields": [
+        {
+          "fieldname": "tlc_ops_staff",
+          "fieldtype": "Link",
+          "label": "Tlc Ops Staff",
+          "read_only": true,
+          "options": "User"
+        },
+        {
+          "fieldname": "tlc_ops_employee",
+          "fieldtype": "Link",
+          "label": "Tlc Ops Employee",
+          "read_only": true,
+          "options": "Employee"
+        },
+        {
+          "fieldname": "tlc_ops_from_employee",
+          "fieldtype": "Link",
+          "label": "Tlc Ops From Employee",
+          "read_only": true,
+          "options": "Employee"
+        },
+        {
+          "fieldname": "tlc_ops_condition",
+          "fieldtype": "Small Text",
+          "label": "Tlc Ops Condition"
+        },
+        {
+          "fieldname": "tlc_ops_evidence",
+          "fieldtype": "Attach",
+          "label": "Tlc Ops Evidence"
+        },
+        {
+          "fieldname": "tlc_ops_staff_ack",
+          "fieldtype": "Datetime",
+          "label": "Tlc Ops Staff Ack",
+          "read_only": true
+        },
+        {
+          "fieldname": "tlc_ops_employee_ack",
+          "fieldtype": "Datetime",
+          "label": "Tlc Ops Employee Ack",
+          "read_only": true
+        },
+        {
+          "fieldname": "tlc_ops_from_ack",
+          "fieldtype": "Datetime",
+          "label": "Tlc Ops From Ack",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "doctype": "Goal",
+      "fields": [
+        {
+          "fieldname": "tlc_ops_weight",
+          "fieldtype": "Percent",
+          "label": "Tlc Ops Weight",
+          "default": "100"
+        },
+        {
+          "fieldname": "tlc_ops_approved_by",
+          "fieldtype": "Link",
+          "label": "Tlc Ops Approved By",
+          "options": "User"
+        }
+      ]
+    },
+    {
+      "doctype": "Appraisal",
+      "fields": [
+        {
+          "fieldname": "tlc_ops_stage",
+          "fieldtype": "Select",
+          "label": "Tlc Ops Stage",
+          "default": "Self Review",
+          "options": "Self Review\nManager Review\nCalibration\nRated"
+        },
+        {
+          "fieldname": "tlc_ops_rating",
+          "fieldtype": "Select",
+          "label": "Tlc Ops Rating",
+          "options": "\nOutstanding\nExceeds Expectations\nMeets Expectations\nNeeds Improvement\nUnsatisfactory"
+        }
+      ]
+    }
+  ]
+}

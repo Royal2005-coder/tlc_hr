@@ -1,0 +1,18 @@
+version: 1
+kind: custom_fields
+description: Fields payroll needs - the wage region of a person (from the department) and the bank proof of a payroll payment.
+custom_fields:
+- doctype: Employee
+  fields:
+  - {fieldname: tlc_wage_region, label: Vùng lương tối thiểu, fieldtype: Data, read_only: true, fetch_from: department.tlc_wage_region,
+     insert_after: tlc_dependents}
+- doctype: Payroll Entry
+  fields:
+  - {fieldname: tlc_section, label: Ký và chi lương, fieldtype: Section Break, insert_after: number_of_employees}
+  - {fieldname: tlc_bank_reference, label: Số chứng từ ngân hàng, fieldtype: Data, allow_on_submit: true, insert_after: tlc_section,
+     description: Kế toán nhập khi xác nhận đã chi (bắt buộc).}
+  - {fieldname: tlc_paid_on, label: Ngày chi, fieldtype: Date, allow_on_submit: true, insert_after: tlc_bank_reference}
+  - {fieldname: tlc_reject_reason, label: Lý do trả lại, fieldtype: Small Text, allow_on_submit: true, no_copy: true,
+     insert_after: tlc_paid_on, depends_on: eval:doc.workflow_state}
+  - {fieldname: tlc_rejected_stage, label: Trả lại từ bước, fieldtype: Data, read_only: true, hidden: true, allow_on_submit: true,
+     no_copy: true, insert_after: tlc_reject_reason}

@@ -1,0 +1,32 @@
+{
+ "doctype": "DocType",
+ "name": "TLC Survey Participation",
+ "module": "TLC HR",
+ "custom": 0,
+ "engine": "InnoDB",
+ "autoname": "hash",
+ "track_changes": 0,
+ "field_order": [
+  "campaign",
+  "employee"
+ ],
+ "fields": [
+  {
+   "fieldname": "campaign",
+   "fieldtype": "Link",
+   "label": "Khảo sát",
+   "reqd": 1,
+   "options": "TLC Survey Campaign"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Nhân viên",
+   "reqd": 1,
+   "options": "Employee"
+  }
+ ],
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC"
+}

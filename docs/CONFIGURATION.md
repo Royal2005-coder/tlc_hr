@@ -1,67 +1,46 @@
-# Cấu hình khai báo (customizing) của TLC HRM
+# Cấu hình khai báo (Customizing Reference)
 
-Mọi cấu hình TLC thêm vào Frappe được khai báo trong `tlc_hr/customizing/**/*.yaml`, gồm vai trò, trường thêm, quyền, workflow duyệt, mẫu email, thẻ số liệu, biểu đồ, workspace, ca làm việc, địa điểm chấm công, loại nghỉ, loại tăng ca, tham số lương Việt Nam và tài khoản.
+Toàn bộ cấu hình nghiệp vụ của TLC HRM được đặc tả dưới dạng declarative YAML đặt tại `tlc_hr/customizing/**/*.yaml`. Hệ thống đọc và đối soát cấu hình bằng schema Pydantic v2 strict trong `tlc_hr/contracts/customizing.py`.
 
-- **Nguồn duy nhất.** YAML là nguồn duy nhất, được git quản lý và đi theo image.
-- **Áp dụng tự động.** `bench migrate` áp YAML lên site qua hook `after_migrate`. Cách áp là idempotent: chỉ ghi phần khác.
-- **Data contract.** Mỗi file được kiểm tra bằng data contract (`tlc_hr/contracts/customizing.py`, Pydantic strict, không nhận khoá lạ).
+## Mô hình ánh xạ SAP ↔ Frappe TLC
 
-## Đối chiếu với SAP
-
-| SAP | TLC trên Frappe |
-|---|---|
-| DDIC (bảng/trường) | DocType JSON trong `tlc_hr/tlc_hr/doctype/` (doctype riêng TLC) + `customizing/custom_fields.yaml` (trường thêm vào doctype chuẩn) |
-| Customizing SPRO/IMG | `tlc_hr/customizing/*.yaml` |
-| SE16 xem cấu hình | Desk Frappe hoặc `bench --site <site> tlc config plan` |
-| Transport STMS | Commit git → build image → `bench migrate` (áp YAML) |
-| BAdI / user exit | `hooks.py`: `doc_events`, `permission_query_conditions`, `has_permission` → `tlc_hr/interface/` |
-| Transaction / report ABAP | Lệnh `bench tlc …`, Script/Query Report của Frappe |
-| RFC / BAPI | REST `/api/resource/<DocType>`, `/api/method/<hàm>` (frappe-client làm SDK) |
-
-## Lệnh
-
-```
-bench --site <site> tlc config validate                 # kiểm YAML theo contract và tham chiếu chéo; không ghi
-bench --site <site> tlc config plan                     # liệt kê khác biệt site ↔ YAML; exit 2 nếu có khác biệt
-bench --site <site> tlc config apply                    # ghi phần khác biệt
-bench --site <site> tlc config export-workflow "<tên>"  # workflow sửa trên desk → YAML để đưa về git
-bench --site <site> tlc doctor                          # kiểm tra vận hành (ca + địa điểm, trưởng nhà máy, người duyệt, tài khoản, kỳ công)
-bench --site <site> tlc seed run|reset-leave|reset-overtime|reset-periods   # dữ liệu demo (reset chỉ trên site allow_tests)
-```
-
-Trên k3s: `kubectl -n tlc-hr exec deploy/backend -- bench --site tlc-hr.local tlc config plan`.
-
-## Các loại khai báo
-
-Mỗi file có dạng `version: 1`, `kind: <loại>`, `description: …`, rồi đến các mục của loại đó.
-
-| kind | Khoá | Ghi vào Frappe |
+| Khái niệm SAP | Triển khai trong TLC HR (Frappe v16) | Ghi chú vận hành |
 |---|---|---|
-| `roles` | `roles: [{name, desk_access, home_page}]` | Role |
-| `custom_fields` | `custom_fields: [{doctype, fields: [{fieldname, fieldtype, label, insert_after, options, permlevel, read_only, …}]}]` | Custom Field |
-| `permissions` | `permissions: [{doctype, role, permlevel, rights}]`, `rights` là chữ cái `r w c d s x a` (đọc, ghi, tạo, xoá, submit, huỷ, sửa đổi) | Custom DocPerm |
-| `workflow` | `workflow: {name, doctype, states: [{state, doc_status, allow_edit, style}], transitions: [{from, action, to, allowed: [vai trò], condition, allow_self_approval}]}` | Workflow, Workflow State, Workflow Action Master |
-| `email_templates` | `email_templates: [{name, subject, html, hr_setting}]` | Email Template (+ trỏ HR Settings) |
-| `dashboards` | `number_cards: [{name, doctype, color, function, field, filters, dynamic_filters}]`, `charts: [{name, chart_type, document_type, type, filters, …}]` | Number Card, Dashboard Chart |
-| `workspaces` | `shortcuts: [{label, type, link_to, url, doc_view, color, stats_filter, format}]`, `workspaces: [{title, roles, icon, sequence, cards, charts, shortcuts, quick_list}]` | Workspace |
-| `records` | `records: [{doctype, name, values, on_create, tables}]`. Bỏ `name` để ghi doctype single | Bản ghi cấu hình bất kỳ: Shift Type, Shift Location, HR Settings, Leave Type, Overtime Type, VN Payroll Settings… |
-| `accounts` | `accounts: {account_types: {số TK: loại}, company_defaults: {trường Company: số TK}}` | Account, Company |
+| **DDIC** (Data Dictionary) | `DocType` JSON trong `tlc_hr/doctype/` + `records.yaml` (DocType) + `custom_fields.yaml` | `DocTypeApplier` xử lý bảng con trước bảng cha; `CustomFieldApplier` cập nhật trường bổ sung. |
+| **SPRO / IMG** (Customizing) | `tlc_hr/customizing/*.yaml` | Nguồn sự thật duy nhất, kiểm soát qua git. |
+| **Transport STMS** | Git commit → image build → `bench migrate` (tự chạy `tlc config apply`) | Tự động, idempotent, chỉ ghi phần lệch. |
+| **SE16** (Đối soát dữ liệu) | `bench --site <site> tlc config plan` | So khớp giữa database và YAML, trả exit code 2 khi có sai lệch. |
+| **BAdI / User Exit** | `hooks.py` (`doc_events`, `override_doctype_class`, `permission_query_conditions`) | Gọi vào adapter mỏng tại `tlc_hr/interface/`. |
+| **CLI / ABAP Report** | Lệnh click `bench tlc ...` (`tlc_hr/commands.py` và `tlc_hr/interface/cli.py`) | Hỗ trợ `validate`, `plan`, `apply`, `export`, `doctor`, `seed`. |
+| **RFC / BAPI** | REST API chuẩn của Frappe (`/api/method/...`, `/api/resource/...`) | Gọi chung use case với giao diện người dùng. |
 
-Một vài lưu ý:
-- `url` của shortcut có thể chứa `{year}` (năm hiện tại).
-- Workspace tham chiếu thẻ, biểu đồ và shortcut theo tên; tên sai bị báo lỗi khi validate.
-- Một workflow chỉ được dùng trạng thái đã khai báo.
+## Danh mục tài nguyên cấu hình (`kind`)
 
-## Quy trình thay đổi cấu hình
+Mỗi file YAML khai báo bắt buộc phải có `version: 1`, `kind: <loại>`, trường `description`, và chỉ chứa payload tương ứng với loại đó:
 
-1. Sửa YAML, hoặc chỉnh trên desk rồi lấy về bằng `tlc config export-workflow`.
-2. Chạy `tlc config validate` và unit test (`tests/unit/test_customizing.py`). CI chạy lại hai bước này khi push.
-3. Chạy `tlc config plan` trên site thử và đọc diff.
-4. Commit, build image, `bench migrate` (lệnh này tự `apply`).
-5. Chạy `tlc doctor`.
+1. `roles`: Danh sách vai trò người dùng (`name`, `desk_access`, `home_page`).
+2. `custom_fields`: Trường mở rộng trên DocType chuẩn (`doctype`, danh sách `fields`).
+3. `permissions`: Ma trận phân quyền vai trò (`doctype`, `role`, `permlevel`, `rights` gồm các ký tự `r w c d s x a`).
+4. `workflow`: Quy trình phê duyệt trạng thái (`name`, `doctype`, `states`, `transitions`).
+5. `email_templates`: Mẫu thông báo email gắn với cấu hình hệ thống (`name`, `subject`, `html`, `hr_setting`).
+6. `dashboards`: Thẻ số liệu (`number_cards`) và biểu đồ (`charts`).
+7. `workspaces`: Không gian làm việc cho từng vai trò (`workspaces`, `shortcuts`).
+8. `records`: Bản ghi cấu hình hệ thống: ca làm việc (`Shift Type`), địa điểm (`Shift Location`), loại nghỉ (`Leave Type`), tham số luật lao động (`VN Payroll Settings`), v.v.
+9. `accounts`: Cấu hình tài khoản lương TT200 (`account_types`, `company_defaults`).
+10. `payroll`: Khai báo thành phần lương (`components`) và cấu trúc tính lương (`structure` bao gồm `earnings`, `deductions`, `employer_contributions`, `effective_from`).
 
-Thay đổi trực tiếp trên desk mà không đưa về YAML sẽ bị `migrate` sau ghi đè. `tlc config plan` hoặc `tlc doctor` sẽ báo trước.
+## Các lệnh quản trị `bench tlc config`
 
-## Tham số luật Việt Nam
+```bash
+# Kiểm tra hợp lệ schema và toàn vẹn tham chiếu nội bộ (không ghi site, chạy được không cần site)
+bench --site <site> tlc config validate
 
-`records.yaml` → `VN Payroll Settings` chứa lương cơ sở, tỷ lệ bảo hiểm, giảm trừ gia cảnh, lương tối thiểu vùng và ngày hiệu lực. Unit test so giá trị này với `tlc_hr/vn/statutory.py`, nơi công thức lương đọc tham số. Khi luật đổi, thêm dòng có ngày hiệu lực; không sửa đè giá trị cũ, để phiếu lương cũ vẫn tính lại đúng.
+# Kiểm tra sai khác giữa site hiện tại và YAML (exit code 2 nếu có khác biệt)
+bench --site <site> tlc config plan
+
+# Áp dụng cấu hình declared lên site (chỉ ghi phần sai khác, an toàn dữ liệu)
+bench --site <site> tlc config apply
+
+# Xuất cấu hình site ra định dạng YAML chuẩn
+bench --site <site> tlc config export <kind> [name]
+```

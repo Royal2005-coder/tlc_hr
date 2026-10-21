@@ -119,6 +119,23 @@ shortcuts:
   type: URL
   color: Green
   url: /hrms
+- label: Bảng lương
+  type: DocType
+  link_to: Payroll Entry
+  color: Blue
+  doc_view: List
+  stats_filter:
+  - - Payroll Entry
+    - workflow_state
+    - in
+    - - Chờ giám đốc ký
+      - Đã ký
+  format: '{}'
+- label: Phiếu lương
+  type: DocType
+  link_to: Salary Slip
+  color: Grey
+  doc_view: List
 workspaces:
 - title: TLC Quản lý
   roles:
@@ -169,6 +186,7 @@ workspaces:
   - TLC Nhân sự khối Hội sở
   - TLC Nhân sự khối Nhà máy
   - TLC Đơn chờ nhân sự duyệt
+  - TLC Bảng lương chờ chi
   - TLC Điều chỉnh công chờ duyệt
   - TLC Kỳ công chờ đối soát
   - TLC Chấm công hôm nay
@@ -185,6 +203,8 @@ workspaces:
   - Điều chỉnh công
   - Tăng ca
   - Chốt công
+  - Bảng lương
+  - Phiếu lương
   - Lịch nghỉ phép
   - Chấm công
   - Bảng công
@@ -213,6 +233,7 @@ workspaces:
   - TLC Nhân sự đang làm việc
   - TLC Nhân sự khối Hội sở
   - TLC Nhân sự khối Nhà máy
+  - TLC Bảng lương chờ ký
   - TLC Đơn chờ tôi duyệt
   - TLC Tăng ca chờ giám đốc duyệt
   - TLC Kỳ công chờ ký
@@ -230,6 +251,7 @@ workspaces:
   - Đơn chờ duyệt
   - Tăng ca
   - Chốt công
+  - Bảng lương
   - Lịch nghỉ phép
   - Nhân viên
   - Sơ đồ tổ chức

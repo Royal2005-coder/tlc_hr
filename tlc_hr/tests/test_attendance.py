@@ -43,6 +43,12 @@ class TestCheckin(IntegrationTestCase):
         with self.assertRaises(frappe.ValidationError):
             self.checkin(next_weekday_at(13, 0), self.lat, self.lon)
 
+    def test_duplicate_punch_is_rejected_by_native_hrms_controller(self):
+        at = next_weekday_at(21, 55)
+        self.checkin(at, self.lat, self.lon)
+        with self.assertRaises(frappe.ValidationError):
+            self.checkin(at, self.lat, self.lon)
+
     def test_every_active_employee_has_a_located_shift(self):
         missing = frappe.db.sql("""select e.name from `tabEmployee` e where e.status = 'Active' and not exists (
             select 1 from `tabShift Assignment` s where s.employee = e.name and s.docstatus = 1 and s.status = 'Active'

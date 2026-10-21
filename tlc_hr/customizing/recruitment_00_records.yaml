@@ -1,0 +1,60 @@
+version: 1
+kind: records
+description: Canonical candidate identity and multi-position requisition rows; install before Custom Fields.
+records:
+  - doctype: DocType
+    name: TLC Recruitment Candidate
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: TLC-CAND-.#####
+      title_field: applicant_name
+      track_changes: 1
+    tables:
+      fields:
+        - {fieldname: applicant_name, fieldtype: Data, label: Candidate Name, reqd: 1, in_list_view: 1}
+        - {fieldname: email, fieldtype: Data, label: Primary Email, options: Email}
+        - {fieldname: phone, fieldtype: Data, label: Primary Phone}
+        - {fieldname: identity, fieldtype: Data, label: Identity Number}
+        - {fieldname: date_of_birth, fieldtype: Date, label: Date of Birth}
+        - {fieldname: gender, fieldtype: Data, label: Gender}
+        - {fieldname: address, fieldtype: Small Text, label: Address}
+        - {fieldname: education, fieldtype: Small Text, label: Education}
+        - {fieldname: experience, fieldtype: Small Text, label: Experience}
+        - {fieldname: portfolio, fieldtype: Data, label: Portfolio}
+        - {fieldname: cv, fieldtype: Attach, label: CV}
+        - {fieldname: merged_into, fieldtype: Link, label: Merged Into, options: TLC Recruitment Candidate, read_only: 1}
+        - {fieldname: talent_pool, fieldtype: Check, label: Talent Pool}
+        - {fieldname: specialty, fieldtype: Select, label: Specialty, options: "\nSales\nTrading\nLogistics\nAccountant\nHR\nIT\nData\nProcurement"}
+        - {fieldname: seniority, fieldtype: Select, label: Seniority, options: "\nIntern\nStaff\nSenior\nSupervisor\nManager\nDirector"}
+        - {fieldname: quality, fieldtype: Select, label: Quality, options: "\nHigh Potential\nReady to Hire\nMonitor\nNot Suitable"}
+      permissions:
+        - {role: TLC HR Officer, read: 1, write: 1, create: 1, report: 1}
+        - {role: TLC HR Lead, read: 1, write: 1, create: 1, report: 1}
+  - doctype: DocType
+    name: TLC Recruitment Identifier
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: prompt
+      track_changes: 1
+    tables:
+      fields:
+        - {fieldname: identifier_type, fieldtype: Select, label: Type, options: "email\nphone\nidentity", reqd: 1}
+        - {fieldname: normalized_value, fieldtype: Data, label: Normalized Value, reqd: 1}
+        - {fieldname: candidate, fieldtype: Link, label: Candidate, options: TLC Recruitment Candidate, reqd: 1, in_list_view: 1}
+      permissions:
+        - {role: TLC HR Lead, read: 1}
+  - doctype: DocType
+    name: TLC Recruitment Position
+    values:
+      module: TLC HR
+      custom: 1
+      istable: 1
+      editable_grid: 1
+    tables:
+      fields:
+        - {fieldname: designation, fieldtype: Link, label: Designation, options: Designation, reqd: 1, in_list_view: 1}
+        - {fieldname: quantity, fieldtype: Int, label: Quantity, reqd: 1, in_list_view: 1}
+        - {fieldname: department, fieldtype: Link, label: Department, options: Department, in_list_view: 1}
+        - {fieldname: location, fieldtype: Link, label: Location, options: Branch}
