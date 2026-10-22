@@ -83,9 +83,14 @@ def summary(entry_name):
                                                                                        "docstatus"])
     names = [s.name for s in slips] or [""]
     by_component = defaultdict(float)
-    for d in frappe.get_all("Salary Detail", filters={"parent": ["in", names], "parenttype": "Salary Slip"}, fields=["abbr", "amount"]):
+    employer = 0.0
+    for d in frappe.get_all("Salary Detail", filters={"parent": ["in", names], "parenttype": "Salary Slip"},
+                            fields=["abbr", "parentfield", "amount"]):
         by_component[d.abbr] += flt(d.amount)
+        # abbr là nhãn do người đặt (hai cấu trúc demo dùng hai bộ khác nhau), bảng con thì không đổi
+        if d.parentfield == "employer_contributions":
+            employer += flt(d.amount)
     return {"slips": len(slips), "draft": sum(1 for s in slips if s.docstatus == 0), "gross": sum(flt(s.gross_pay) for s in slips),
             "deductions": sum(flt(s.total_deduction) for s in slips), "net": sum(flt(s.net_pay) for s in slips),
             "overtime": by_component["OT"] + by_component["OTP"], "pit": by_component["TNCN"],
-            "employer": sum(by_component[k] for k in ("BHXH_DN_TLC", "BHYT_DN_TLC", "BHTN_DN_TLC", "KPCD_DN_TLC"))}
+            "employer": employer}

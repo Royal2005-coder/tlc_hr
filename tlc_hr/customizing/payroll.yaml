@@ -1,7 +1,8 @@
 version: 1
 kind: payroll
 description: |
-  Salary components of TLC with their accounts (TT200 numbers) and the salary structure "TLC Lương 2026".
+  Salary components of TLC with their accounts (TT200 numbers) and the current salary structure. Changing the law means a
+  new structure name here; the old one is left untouched, and `bench tlc seed salary` moves the assignments onto the new one.
   A formula is either an HRMS expression or a reference to the rules of domain/payroll.py:
   @contribution (insurance of the row's abbreviation), @pit, @lunch. A submitted structure is never edited:
   a new law gets a new structure name here.

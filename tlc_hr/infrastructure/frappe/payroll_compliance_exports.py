@@ -475,11 +475,16 @@ def get_role_private_cost_report(company, start_date, end_date, group_by="depart
     details = frappe.get_all(
         "Salary Detail",
         filters={"parent": ["in", names]},
-        fields=["parent", "salary_component", "abbr", "amount"]
+        fields=["parent", "salary_component", "abbr", "parentfield", "amount"]
     )
     by_slip = {}
+    employer_by_slip = {}
     for d in details:
-        by_slip.setdefault(d.parent, {})[d.abbr] = flt(d.amount)
+        by_slip.setdefault(d.parent, {}).setdefault(d.abbr, 0.0)
+        by_slip[d.parent][d.abbr] += flt(d.amount)
+        # bảng con employer_contributions là chỗ Frappe lưu phần doanh nghiệp trả; abbr là nhãn người đặt
+        if d.parentfield == "employer_contributions":
+            employer_by_slip[d.parent] = employer_by_slip.get(d.parent, 0.0) + flt(d.amount)
 
     groups = {}
     for slip in slips:
@@ -501,12 +506,7 @@ def get_role_private_cost_report(company, start_date, end_date, group_by="depart
         s_details = by_slip.get(slip.name, {})
         ot = s_details.get("OT", 0.0) + s_details.get("OTP", 0.0)
         pit = s_details.get("TNCN", 0.0)
-        employer_ins = (
-            s_details.get("BHXH_DN_TLC", 0.0) +
-            s_details.get("BHYT_DN_TLC", 0.0) +
-            s_details.get("BHTN_DN_TLC", 0.0) +
-            s_details.get("KPCD_DN_TLC", 0.0)
-        )
+        employer_ins = employer_by_slip.get(slip.name, 0.0)
         rec["overtime_pay"] += ot
         rec["pit_tax"] += pit
         rec["employer_insurance"] += employer_ins
