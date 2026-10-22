@@ -175,7 +175,7 @@ workspaces:
   icon: money-coins
   sequence: 14
   cards: [TLC Bảng lương chờ ký, TLC Bảng lương chờ chi, TLC Việc được giao quá hạn]
-  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Lương rà soát sai lệch, Tham số lương Việt Nam, Nhà máy chốt kỳ công, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Lương rà soát sai lệch, Tham số lương Việt Nam, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
 - title: TLC Kế toán chi trả
   roles: [Accounts User, Accounts Manager]
   icon: money-coins
