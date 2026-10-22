@@ -69,6 +69,8 @@ def post_payment(entry, month):
     if journal:
         journal.cheque_no, journal.cheque_date = entry.tlc_bank_reference, entry.tlc_paid_on
         journal.user_remark = f"Chi lương {month}, chứng từ {entry.tlc_bank_reference}"
+        if entry.get("tlc_bank_proof"):
+            journal.user_remark += f" (đính kèm {entry.tlc_bank_proof})"
         journal.flags.ignore_permissions = True
         journal.save()
         journal.submit()

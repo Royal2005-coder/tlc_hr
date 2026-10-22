@@ -1,19 +1,25 @@
 version: 1
 kind: roles
-description: TLC roles with desk access; TLC Self Service lands on the Frappe HR app.
+description: TLC business roles use their native Desk workspace; employees retain Frappe HR self service. Role labels never confer technical provisioning or business approval rights on their own.
 roles:
 - name: TLC Director
   desk_access: true
+  home_page: desk/tlc-hr/tlc-điều-hành
 - name: TLC HR Lead
   desk_access: true
+  home_page: desk/tlc-hr/tlc-nhân-sự
 - name: TLC HR Officer
   desk_access: true
+  home_page: desk/tlc-hr/tlc-nhân-sự
 - name: TLC Payroll
   desk_access: true
+  home_page: desk/tlc-hr/tlc-tác-nghiệp-lương
 - name: TLC Line Manager
   desk_access: true
+  home_page: desk/tlc-hr/tlc-quản-lý
 - name: TLC Role Admin
   desk_access: true
+  home_page: desk/tlc-hr/tlc-quản-trị-kỹ-thuật
 - name: TLC Self Service
   desk_access: true
   home_page: hrms

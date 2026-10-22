@@ -1,6 +1,6 @@
 version: 1
 kind: workspaces
-description: Supplemental native Desk resources; employee default remains /hrms. Factory isolation is enforced by server permissions, never by workspace visibility or URL filters.
+description: Role-specific native Desk work queues with an explicit return to personal Frappe HR. Server permissions, not workspace visibility, enforce employee and salary scope; technical administration never means business sign-off.
 shortcuts:
 - label: ESS Trang chủ Frappe HR
   type: URL
@@ -87,25 +87,77 @@ shortcuts:
   type: DocType
   link_to: Expense Claim
   doc_view: List
+- label: Lương phân bổ cấu trúc
+  type: DocType
+  link_to: Salary Structure Assignment
+  doc_view: List
+- label: Lương quyết định điều chỉnh
+  type: DocType
+  link_to: TLC Payroll Adjustment
+  doc_view: List
+- label: Lương quyết định thưởng
+  type: DocType
+  link_to: TLC Payroll Bonus
+  doc_view: List
+- label: Lương đề nghị thay đổi
+  type: DocType
+  link_to: TLC Salary Review
+  doc_view: List
+- label: Lương rà soát sai lệch
+  type: DocType
+  link_to: TLC Payroll Review
+  doc_view: List
+- label: Kế toán chứng từ thanh toán
+  type: DocType
+  link_to: Payment Entry
+  doc_view: List
+- label: Dịch vụ nội bộ
+  type: DocType
+  link_to: TLC Service Request
+  doc_view: List
+- label: Khảo sát ẩn danh
+  type: DocType
+  link_to: TLC Survey Campaign
+  doc_view: List
+- label: IT Tài khoản người dùng
+  type: DocType
+  link_to: User
+  doc_view: List
+- label: IT Vai trò kỹ thuật
+  type: DocType
+  link_to: Role
+  doc_view: List
+- label: IT Phạm vi người dùng
+  type: DocType
+  link_to: User Permission
+  doc_view: List
+- label: IT Nhật ký truy cập
+  type: DocType
+  link_to: Access Log
+  doc_view: List
+- label: IT Nhật ký lỗi
+  type: DocType
+  link_to: Error Log
+  doc_view: List
 workspaces:
 - title: TLC Cá nhân
   roles: [TLC Self Service]
   icon: user
   sequence: 10
-  cards: [TLC ESS Đơn nghỉ đang xử lý, TLC ESS Tăng ca chờ đồng ý, TLC ESS Phiếu lương đã phát hành, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
-  shortcuts: [ESS Trang chủ Frappe HR, ESS Số dư và đơn nghỉ, ESS Chấm công của tôi, ESS Phiếu lương của tôi, ESS Đồng ý tăng ca, ESS Việc được giao]
+  cards: [TLC ESS Đơn nghỉ đang xử lý, TLC ESS Tăng ca chờ đồng ý, TLC ESS Phiếu lương đã xác nhận, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
+  shortcuts: [ESS Trang chủ Frappe HR, ESS Số dư và đơn nghỉ, ESS Chấm công của tôi, ESS Phiếu lương của tôi, ESS Đồng ý tăng ca, ESS Việc được giao, Dịch vụ nội bộ, Khảo sát ẩn danh]
 - title: TLC Nhà máy
   roles: [TLC Line Manager]
   icon: users
   sequence: 11
   cards: [TLC Nhà máy nhân sự trong phạm vi, TLC Nhà máy ngoại lệ đi muộn, TLC Nhà máy ngoại lệ về sớm, TLC Nhà máy ca được phân tháng này, TLC Đơn chờ tôi duyệt, TLC Kỳ công chờ tôi xác nhận, TLC Việc được giao quá hạn]
-  shortcuts: [Nhà máy nhân sự và định biên, Nhà máy ca được phân, Nhà máy bảng công ngoại lệ, Nhà máy giải trình công, Nhà máy duyệt phép, Nhà máy chốt kỳ công, ESS Đồng ý tăng ca]
+  shortcuts: [Nhà máy nhân sự và định biên, Nhà máy ca được phân, Nhà máy bảng công ngoại lệ, Nhà máy giải trình công, Nhà máy duyệt phép, Nhà máy chốt kỳ công, ESS Đồng ý tăng ca, ESS Trang chủ Frappe HR]
 - title: TLC HR Hạn xử lý
   roles: [TLC HR Lead, TLC HR Officer]
   icon: hr
   sequence: 12
   cards: [TLC HR Việc mở đến hạn tuần này, TLC HR Việc mở quá hạn, TLC Đơn chờ nhân sự duyệt, TLC Kỳ công chờ đối soát, TLC Vị trí tuyển dụng đang mở]
-  shortcuts: [HR Theo dõi hạn công việc, HR Hội nhập, HR Nghỉ việc, HR Tuyển dụng, Nhà máy chốt kỳ công]
+  shortcuts: [HR Theo dõi hạn công việc, HR Hội nhập, HR Nghỉ việc, HR Tuyển dụng, Nhà máy chốt kỳ công, Dịch vụ nội bộ, Khảo sát ẩn danh, ESS Trang chủ Frappe HR]
   quick_list:
     doctype: ToDo
     label: Công việc HR còn mở
@@ -117,16 +169,21 @@ workspaces:
   sequence: 13
   cards: [TLC Nhân sự đang làm việc, TLC Điều hành lương gross tháng này, TLC Điều hành lương net tháng này, TLC Vị trí tuyển dụng đang mở, TLC Bảng lương chờ ký, TLC Kỳ công chờ ký, TLC Tăng ca chờ giám đốc duyệt]
   charts: [TLC Điều hành gross theo phòng ban, TLC Giờ tăng ca theo bộ phận]
-  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Điều hành ký kỳ công, Điều hành duyệt tăng ca, HR Tuyển dụng]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Điều hành ký kỳ công, Điều hành duyệt tăng ca, HR Tuyển dụng, ESS Trang chủ Frappe HR]
 - title: TLC Tác nghiệp lương
-  roles: [TLC Payroll]
+  roles: [TLC Payroll, TLC HR Lead]
   icon: money-coins
   sequence: 14
   cards: [TLC Bảng lương chờ ký, TLC Bảng lương chờ chi, TLC Việc được giao quá hạn]
-  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Nhà máy chốt kỳ công, HR Theo dõi hạn công việc]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Lương rà soát sai lệch, Tham số lương Việt Nam, Nhà máy chốt kỳ công, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
 - title: TLC Kế toán chi trả
-  roles: [Accounts User]
+  roles: [Accounts User, Accounts Manager]
   icon: money-coins
   sequence: 15
   cards: [TLC Bảng lương chờ chi, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
-  shortcuts: [Điều hành ký bảng lương, Kế toán tạm ứng, Kế toán quyết toán chi phí, HR Theo dõi hạn công việc]
+  shortcuts: [Điều hành ký bảng lương, Kế toán chứng từ thanh toán, Kế toán tạm ứng, Kế toán quyết toán chi phí, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
+- title: TLC Quản trị kỹ thuật
+  roles: [TLC Role Admin, System Manager]
+  icon: settings
+  sequence: 16
+  shortcuts: [IT Tài khoản người dùng, IT Vai trò kỹ thuật, IT Phạm vi người dùng, IT Nhật ký truy cập, IT Nhật ký lỗi, Dịch vụ nội bộ, ESS Trang chủ Frappe HR]

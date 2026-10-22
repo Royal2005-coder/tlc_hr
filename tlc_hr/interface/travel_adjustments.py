@@ -26,9 +26,11 @@ def validate_generated_correction(doc):
 def _validate_source(doc):
     if not doc.tlc_travel_request or not doc.tlc_travel_effect_key:
         raise DomainError("travel.adjustment_source", "Thiếu nguồn điều chỉnh công tác.")
+    if doc.docstatus == 1:
+        return
     trip = frappe.get_doc("Travel Request", doc.tlc_travel_request)
     day = getdate(doc.from_date)
-    if trip.docstatus != 1 or not trip.tlc_approved_on or trip.employee != doc.employee or getdate(doc.to_date) != day:
+    if (trip.docstatus != 1 and trip.workflow_state != rules.CANCELLED) or not trip.tlc_approved_on or trip.employee != doc.employee or getdate(doc.to_date) != day:
         raise DomainError("travel.adjustment_scope", "Điều chỉnh phải cùng nhân viên và một ngày thuộc công tác được duyệt.")
     if not FrappeAttendanceRepository().locked_period(doc.employee, day, day):
         raise DomainError("travel.adjustment_lock", "Điều chỉnh công tác sau chốt phải thuộc kỳ đã khóa.")
@@ -42,15 +44,26 @@ def _validate_source(doc):
                                ["tlc_travel_request", "tlc_duty_sessions"], as_dict=True)
     old = (mark.tlc_duty_sessions or "").split(",") if mark and mark.tlc_travel_request == trip.name else []
     sessions = actual.get(day, ())
-    delta = Decimal(len(sessions) - len(old)) / 2
-    expected_key = f"{trip.name}:{day}:{','.join(sessions)}"
-    if money(doc.tlc_workday_delta) != delta or doc.tlc_travel_effect_key != expected_key or not delta:
+
+    prior_applied = sum((Decimal(str(r.tlc_workday_delta)) for r in frappe.get_all(
+        "Attendance Request",
+        filters={"employee": doc.employee, "from_date": day, "to_date": day,
+                 "tlc_travel_request": trip.name, "docstatus": 1, "name": ["!=", doc.name]},
+        fields=["tlc_workday_delta"]
+    )), Decimal(0))
+    expected_delta = (Decimal(len(sessions) - len(old)) / Decimal(2) - prior_applied).quantize(Decimal("0.01"))
+    if not prior_applied:
+        expected_key = f"{trip.name}:{day}:{','.join(sessions)}"
+    else:
+        expected_key = f"{trip.name}:{day}:{','.join(sessions)}:recon:{expected_delta}"
+
+    if money(doc.tlc_workday_delta) != expected_delta or doc.tlc_travel_effect_key != expected_key or not expected_delta:
         raise DomainError("travel.adjustment_delta", "Chênh lệch phải được tính từ báo cáo đã duyệt và ảnh chụp công cũ.")
-    if frappe.db.exists("Attendance Request", {"tlc_travel_effect_key": expected_key, "name": ["!=", doc.name]}):
+    if frappe.db.exists("Attendance Request", {"tlc_travel_effect_key": expected_key, "name": ["!=", doc.name], "docstatus": ["<", 2]}):
         raise DomainError("travel.adjustment_duplicate", "Điều chỉnh cho nguồn này đã tồn tại.")
     before = doc.get_doc_before_save()
-    if before and any(before.get(f) != doc.get(f) for f in ("employee", "from_date", "to_date", "tlc_travel_request",
-            "tlc_travel_effect_key", "tlc_workday_delta")):
+    if before and not doc.flags.get("tlc_travel_reconcile") and any(before.get(f) != doc.get(f) for f in (
+            "employee", "from_date", "to_date", "tlc_travel_request", "tlc_travel_effect_key", "tlc_workday_delta")):
         raise DomainError("travel.adjustment_fixed", "Không sửa nguồn hoặc số công điều chỉnh tự sinh.")
 
 

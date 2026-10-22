@@ -6,7 +6,7 @@ import json
 from datetime import timedelta
 
 import frappe
-from frappe.utils import flt, getdate, now_datetime
+from frappe.utils import flt, get_datetime, getdate, now_datetime
 
 from tlc_hr.domain.payroll_compliance import effective_base, fingerprint, service_bonus, variance_percent
 from tlc_hr.infrastructure.frappe import payroll_compliance_exports as exports
@@ -14,6 +14,10 @@ from tlc_hr.infrastructure.frappe import payroll_compliance_exports as exports
 PAYROLL_ROLES = {"TLC Payroll", "TLC HR Lead", "TLC Director", "Accounts User", "System Manager"}
 HR_ROLES = {"TLC Payroll", "TLC HR Lead", "System Manager"}
 APPROVED = {"Đã ký", "Đã chi"}
+DECISION_DOCTYPES = frozenset({
+    "Salary Structure Assignment", "TLC Payroll Adjustment", "TLC Payroll Bonus", "TLC Salary Review",
+})
+DIRECTOR_ROLES = {"TLC Director", "System Manager"}
 
 
 def require_roles(roles=PAYROLL_ROLES):
@@ -24,6 +28,89 @@ def require_roles(roles=PAYROLL_ROLES):
 def private_evidence(url):
     if not url or not frappe.db.exists("File", {"file_url": url, "is_private": 1}):
         frappe.throw("Cần chứng từ riêng tư trong File; không dùng liên kết công khai.")
+
+
+def decision_scope(doc):
+    """Read permission and native Employee scope are prerequisites, never bypassed."""
+    doc.check_permission("read")
+    if doc.doctype == "TLC Salary Review":
+        employees = [row.employee for row in doc.employees]
+    elif doc.doctype == "TLC Payroll Adjustment":
+        original = frappe.get_doc("Salary Slip", doc.original_slip)
+        original.check_permission("read")
+        employees = [original.employee]
+    else:
+        employees = [doc.employee]
+    if not employees:
+        frappe.throw("Quyết định cần nhân viên thuộc phạm vi được phân quyền.")
+    for name in employees:
+        employee = frappe.get_doc("Employee", name)
+        employee.check_permission("read")
+        if doc.get("company") and employee.company != doc.company:
+            frappe.throw("Nhân viên không thuộc công ty của quyết định.")
+        if doc.doctype == "TLC Salary Review" and employee.department != doc.department:
+            frappe.throw("Nhân viên không thuộc bộ phận của đợt xét.")
+    return employees
+
+
+def self_approval(doc):
+    if doc.owner == frappe.session.user or doc.get("hr_reviewed_by") == frappe.session.user:
+        return True
+    employees = [row.employee for row in doc.employees] if doc.doctype == "TLC Salary Review" else [doc.employee]
+    return any(frappe.db.get_value("Employee", employee, "user_id") == frappe.session.user for employee in employees)
+
+
+def decision_blocker(doc):
+    if doc.docstatus != 0:
+        return "Quyết định không còn là bản nháp; không phê duyệt lại."
+    if self_approval(doc):
+        return "Người lập, người HR rà soát hoặc nhân viên hưởng lương không được tự phê duyệt."
+    if doc.doctype == "TLC Salary Review" and (doc.review_stage != "HR Reviewed" or not doc.hr_reviewed_by):
+        return "HR phải tổng hợp và rà soát trước Giám đốc duyệt."
+    return None
+
+
+def record_decision_approval(doc):
+    require_roles(DIRECTOR_ROLES)
+    decision_scope(doc)
+    if self_approval(doc):
+        frappe.throw("Không được tự phê duyệt quyết định lương.", frappe.PermissionError)
+    doc.tlc_decision_approved_by = frappe.session.user
+    doc.tlc_decision_approved_on = now_datetime()
+
+
+@frappe.whitelist()
+def decision_approval_context(doctype, name):
+    require_roles(DIRECTOR_ROLES)
+    if doctype not in DECISION_DOCTYPES:
+        frappe.throw("Loại quyết định không được phép.", frappe.PermissionError)
+    doc = frappe.get_doc(doctype, name)
+    decision_scope(doc)
+    reason = decision_blocker(doc)
+    return {"can_approve": not reason, "reason": reason}
+
+
+@frappe.whitelist(methods=["POST"])
+def approve_decision(doctype, name, modified):
+    """Approve only a persisted, locked draft; accept no editable document payload."""
+    require_roles(DIRECTOR_ROLES)
+    if doctype not in DECISION_DOCTYPES:
+        frappe.throw("Loại quyết định không được phép.", frappe.PermissionError)
+    doc = frappe.get_doc(doctype, name, for_update=True)
+    decision_scope(doc)
+    if get_datetime(modified) != get_datetime(doc.modified):
+        frappe.throw("Quyết định đã thay đổi; tải lại và kiểm tra trước khi phê duyệt.", frappe.TimestampMismatchError)
+    reason = decision_blocker(doc)
+    if reason:
+        frappe.throw(reason, frappe.ValidationError)
+    record_decision_approval(doc)
+    # Native submit requires both write and submit. The Director has read only:
+    # bypass only those DocPerm checks, after explicit role/record/state checks.
+    # All controller validation, evidence, hooks, Version and submit side effects run.
+    doc.flags.ignore_permissions = True
+    doc.submit()
+    return {"doctype": doc.doctype, "name": doc.name, "docstatus": doc.docstatus,
+            "approved_by": doc.tlc_decision_approved_by, "approved_on": doc.tlc_decision_approved_on}
 
 
 def assignments(employee, end):
@@ -82,8 +169,7 @@ def validate_assignment(doc, method=None):
         if not doc.tlc_decision_reason:
             frappe.throw("Quyết định thay đổi lương cần lý do.")
         private_evidence(doc.tlc_decision_evidence)
-        require_roles({"TLC Director", "System Manager"})
-        doc.tlc_decision_approved_by = frappe.session.user
+        record_decision_approval(doc)
     elif not previous:
         doc.tlc_decision_approved_by = frappe.session.user
 
@@ -155,6 +241,8 @@ def new_review(name, employee, issue="Variance"):
     require_roles(HR_ROLES)
     entry = frappe.get_doc("Payroll Entry", name)
     entry.check_permission("read")
+    if not frappe.has_permission("TLC Payroll Review", "create"):
+        frappe.throw("Không có quyền lập phiếu rà soát.", frappe.PermissionError)
     if entry.workflow_state in APPROVED:
         frappe.throw("Bảng lương đã duyệt không mở rà soát lại; dùng phiếu điều chỉnh kỳ sau.")
     item = next((r for r in review_issues(entry) if r["employee"] == employee and r["issue"] == issue), None)
@@ -169,6 +257,7 @@ def validate_review(doc, method=None):
     require_roles(HR_ROLES)
     private_evidence(doc.evidence)
     entry = frappe.get_doc("Payroll Entry", doc.payroll_entry)
+    entry.check_permission("read")
     if entry.workflow_state in APPROVED:
         frappe.throw("Không sửa rà soát của bảng lương đã duyệt.")
     issues = review_issues(entry)
@@ -185,8 +274,10 @@ def entry_guard(doc, method=None):
     if not before:
         return
     if before.workflow_state in APPROVED:
-        allowed = {"modified", "modified_by", "workflow_state", "tlc_bank_reference", "tlc_paid_on", "tlc_reject_reason", "tlc_rejected_stage"}
-        old, new = before.as_dict(), doc.as_dict()
+        if before.workflow_state == "Đã chi":
+            allowed = {"modified", "modified_by"}
+        else:
+            allowed = {"modified", "modified_by", "workflow_state", "tlc_bank_reference", "tlc_paid_on", "tlc_bank_proof", "tlc_reject_reason", "tlc_rejected_stage"}
         for key in set(old) | set(new):
             if key not in allowed and fingerprint(old.get(key)) != fingerprint(new.get(key)):
                 frappe.throw("Bảng lương đã duyệt bất biến; dùng phiếu điều chỉnh kỳ sau.")
@@ -242,7 +333,7 @@ def validate_award(doc, method=None):
         if duplicate:
             frappe.throw(f"Đã có thưởng được duyệt cho kỳ này: {duplicate}")
     if doc.docstatus == 1:
-        require_roles({"TLC Director", "System Manager"})
+        record_decision_approval(doc)
 
 
 def apply_awards(entry, method=None):
@@ -334,6 +425,8 @@ def salary_review_permission(doc, user=None, permission_type=None):
     if user == "Administrator" or set(frappe.get_roles(user)) & PAYROLL_ROLES:
         return True
     department = frappe.db.get_value("Employee", {"user_id": user}, "department")
+    if not doc or not getattr(doc, "department", None):
+        return bool(department and "TLC Line Manager" in frappe.get_roles(user))
     return bool(department and department == doc.department and "TLC Line Manager" in frappe.get_roles(user))
 
 
@@ -367,7 +460,7 @@ def validate_salary_review(doc, method=None):
         if old != new or str(before.effective_on) != str(doc.effective_on) or flt(before.annual_budget_increase) != flt(doc.annual_budget_increase):
             frappe.throw("Đã HR rà soát: chuyển Draft trước khi sửa đề xuất.")
     if doc.docstatus == 1:
-        require_roles({"TLC Director", "System Manager"})
+        record_decision_approval(doc)
         if doc.review_stage != "HR Reviewed" or not doc.hr_reviewed_by:
             frappe.throw("HR phải tổng hợp và rà soát trước Giám đốc duyệt.")
 
@@ -377,9 +470,13 @@ def approve_salary_review(doc, method=None):
     for row in doc.employees:
         old_name = frappe.db.get_value("Salary Structure Assignment", {"employee": row.employee, "docstatus": 1,
                             "from_date": ["<", doc.effective_on]}, "name", order_by="from_date desc")
-        assignment = frappe.copy_doc(frappe.get_doc("Salary Structure Assignment", old_name))
+        previous = frappe.get_doc("Salary Structure Assignment", old_name)
+        previous.check_permission("read")
+        assignment = frappe.copy_doc(previous)
         assignment.update({"from_date": doc.effective_on, "base": row.new_base, "tlc_decision_reason": "Periodic",
                            "tlc_decision_evidence": doc.evidence, "tlc_salary_review": doc.name})
+        decision_scope(doc)
+        assignment.owner = doc.owner
         assignment.flags.ignore_permissions = True
         assignment.insert()
         assignment.submit()

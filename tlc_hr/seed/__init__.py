@@ -228,19 +228,13 @@ def people(data):
             frappe.db.set_value("Department", department_name(dept["code"], data), "tlc_head", head)
 
 
-# Where a person lands after login: the Frappe HR app for employees, the desk workspace of their role otherwise.
-WORKSPACE_OF = [("TLC Director", "TLC Điều hành"), ("TLC HR Lead", "TLC Nhân sự"), ("TLC HR Officer", "TLC Nhân sự"),
-                ("TLC Line Manager", "TLC Quản lý")]
-
-
 def route_users(rows):
+    from tlc_hr.interface.role_navigation import apply_user_route
+
     for row in rows:
         user = email_of(row["key"])
+        workspace = apply_user_route(user)
         roles = set(frappe.get_roles(user))
-        workspace = next((w for role, w in WORKSPACE_OF if role in roles), None)
-        if workspace and not frappe.db.exists("Workspace", workspace):
-            workspace = None
-        frappe.db.set_value("User", user, {"default_workspace": workspace, "default_app": "" if workspace else "hrms"})
         doc = frappe.get_doc("User", user)
         if workspace and SELF_SERVICE in roles:
             doc.remove_roles(SELF_SERVICE)
@@ -510,8 +504,15 @@ def reset_payroll():
                                 ("Payroll Entry", "name", entries)):
         if names:
             frappe.db.delete(table, {field: ["in", names]})
+    # A salary decision the UAT filed (base changed from a date inside a month) is demo data too: leaving it
+    # behind makes the next run's payroll month a mid-period structure switch, which our own rule refuses.
+    decisions = frappe.get_all("Salary Structure Assignment", filters={"company": COMPANY, "tlc_decision_reason": ["is", "set"]}, pluck="name")
+    for table, field, names in (("Workflow Action", "reference_name", decisions), ("Comment", "reference_name", decisions),
+                                ("Salary Structure Assignment", "name", decisions)):
+        if names:
+            frappe.db.delete(table, {field: ["in", names]})
     frappe.db.commit()
-    print(f"reset: {len(entries)} payroll entries, {len(slips)} payslips, {len(journals)} journal entries deleted")
+    print(f"reset: {len(entries)} payroll entries, {len(slips)} payslips, {len(journals)} journal entries, {len(decisions)} salary decisions deleted")
 
 
 def reset_attendance_demo():

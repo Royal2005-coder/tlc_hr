@@ -50,6 +50,8 @@ def before_update_after_submit(doc, method=None):
             rules.check_return(doc.tlc_reject_reason)
             doc.tlc_rejected_stage = before.workflow_state
         if doc.workflow_state == PAID:
+            from tlc_hr.interface.payroll_compliance import private_evidence
+            private_evidence(doc.tlc_bank_proof)
             rules.check_payment(doc.tlc_bank_reference, getdate(doc.tlc_paid_on) if doc.tlc_paid_on else None, actions.draft_slips(doc))
 
 

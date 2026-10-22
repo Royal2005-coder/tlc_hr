@@ -3,6 +3,8 @@ kind: permissions
 description: |
   Who works on the payroll (HRMS gives it to HR Manager only): the payroll officer and the HR lead compute,
   the CEO reads and signs (posts the payslips), the accountant reads and confirms the payment.
+  Salary decision drafts are prepared by HR; the Director reads and explicitly approves through
+  the audited approval action, without native create/write/submit rights on the decision.
 permissions:
 - {doctype: Payroll Entry, role: TLC Payroll, rights: rwcsx}
 - {doctype: Payroll Entry, role: TLC HR Lead, rights: rwcsx}
@@ -14,5 +16,6 @@ permissions:
 - {doctype: Salary Slip, role: Accounts User, rights: r}
 - {doctype: Additional Salary, role: TLC Payroll, rights: rwcsx}
 - {doctype: Additional Salary, role: TLC HR Lead, rights: rwcsx}
-- {doctype: Salary Structure Assignment, role: TLC Payroll, rights: rwcs}
-- {doctype: Salary Structure Assignment, role: TLC HR Lead, rights: rwcs}
+- {doctype: Salary Structure Assignment, role: TLC Payroll, rights: rwc}
+- {doctype: Salary Structure Assignment, role: TLC HR Lead, rights: rwc}
+- {doctype: Salary Structure Assignment, role: TLC Director, rights: r}

@@ -80,6 +80,12 @@ class FrappeAttendanceRepository(IAttendanceRepository):
                                                                  "workflow_state": ["in", PENDING_OVERTIME], "ot_date": ["between", [start, end]]},
                                 fields=["name", "employee", "workflow_state"]):
             items.append(f"{d.name} · {names.get(d.employee, '')} · Tăng ca chưa duyệt xong ({d.workflow_state})")
+        for d in frappe.get_all("Travel Request", filters={
+            "employee": ["in", employees or [""]], "docstatus": ["<", 2],
+            "tlc_from_date": ["<=", end], "tlc_to_date": [">=", start],
+            "workflow_state": ["in", ["Chờ quản lý duyệt", "Chờ giám đốc duyệt", "Đã duyệt", "Chờ quản lý duyệt báo cáo", "Chờ giám đốc duyệt báo cáo", "Bổ sung báo cáo"]],
+        }, fields=["name", "employee", "workflow_state"]):
+            items.append(f"{d.name} · {names.get(d.employee, '')} · Công tác chưa hoàn tất báo cáo ({d.workflow_state})")
         unprocessed = defaultdict(int)
         for c in frappe.get_all("Employee Checkin", filters={"employee": ["in", employees or [""]], "skip_auto_attendance": 0,
                                                              "attendance": ["is", "not set"],

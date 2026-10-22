@@ -186,7 +186,6 @@ workspaces:
   - TLC Nhân sự khối Hội sở
   - TLC Nhân sự khối Nhà máy
   - TLC Đơn chờ nhân sự duyệt
-  - TLC Bảng lương chờ chi
   - TLC Điều chỉnh công chờ duyệt
   - TLC Kỳ công chờ đối soát
   - TLC Chấm công hôm nay
@@ -203,8 +202,6 @@ workspaces:
   - Điều chỉnh công
   - Tăng ca
   - Chốt công
-  - Bảng lương
-  - Phiếu lương
   - Lịch nghỉ phép
   - Chấm công
   - Bảng công
@@ -212,10 +209,10 @@ workspaces:
   - Nhân viên
   - Cấp phép năm
   - Lịch nghỉ lễ
-  - Tham số lương Việt Nam
   - Số dư phép
   - Sơ đồ tổ chức
   - Yêu cầu cần xử lý
+  - ESS Trang chủ Frappe HR
   quick_list:
     doctype: Leave Application
     label: Đơn chờ nhân sự duyệt

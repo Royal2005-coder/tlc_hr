@@ -12,7 +12,7 @@ number_cards:
   color: '#b7791f'
   filters:
   - [TLC Overtime Request, workflow_state, '=', Chờ người lao động đồng ý]
-- name: TLC ESS Phiếu lương đã phát hành
+- name: TLC ESS Phiếu lương đã xác nhận
   doctype: Salary Slip
   color: '#287b47'
   filters:

@@ -1,0 +1,22 @@
+version: 1
+kind: records
+description: Native monetary Employee fields use the same explicit payroll-only field permission level as tlc_monthly_wage. Non-monetary HR identity and payment-method fields retain their native permissions.
+records:
+- doctype: Property Setter
+  name: Employee-ctc-permlevel
+  values:
+    doctype_or_field: DocField
+    doc_type: Employee
+    field_name: ctc
+    property: permlevel
+    property_type: Int
+    value: '1'
+- doctype: Property Setter
+  name: Employee-vn_insurance_salary-permlevel
+  values:
+    doctype_or_field: DocField
+    doc_type: Employee
+    field_name: vn_insurance_salary
+    property: permlevel
+    property_type: Int
+    value: '1'

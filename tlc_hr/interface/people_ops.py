@@ -187,11 +187,14 @@ def movement_validate(doc, method=None):
 
 
 def movement_before_submit(doc, method=None):
-    require(bool(doc.tlc_ops_condition and doc.tlc_ops_evidence))
+    if not (doc.tlc_ops_condition and doc.tlc_ops_evidence):
+        frappe.throw("Biên bản bàn giao bắt buộc có tình trạng tài sản và chứng từ đính kèm.")
     if doc.tlc_ops_employee:
-        require(bool(doc.tlc_ops_staff_ack and doc.tlc_ops_employee_ack))
+        if not (doc.tlc_ops_staff_ack and doc.tlc_ops_employee_ack):
+            frappe.throw("Biên bản bàn giao bắt buộc có đủ xác nhận của cả nhân viên và cán bộ phụ trách.")
     if doc.tlc_ops_from_employee and doc.tlc_ops_from_employee != doc.tlc_ops_employee:
-        require(bool(doc.tlc_ops_from_ack))
+        if not doc.tlc_ops_from_ack:
+            frappe.throw("Biên bản bàn giao bắt buộc có xác nhận của bên bàn giao.")
 
 
 @frappe.whitelist(methods=["POST"])

@@ -194,7 +194,9 @@
             "label": "Additional Salary",
             "read_only": 1,
             "options": "Additional Salary"
-          }
+          },
+          {"fieldname": "tlc_decision_approved_by", "fieldtype": "Link", "label": "Decision Approved By", "options": "User", "read_only": 1},
+          {"fieldname": "tlc_decision_approved_on", "fieldtype": "Datetime", "label": "Decision Approved On", "read_only": 1}
         ],
         "permissions": [
           {
@@ -202,7 +204,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -212,7 +214,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -336,7 +338,9 @@
             "label": "Additional Salary",
             "read_only": 1,
             "options": "Additional Salary"
-          }
+          },
+          {"fieldname": "tlc_decision_approved_by", "fieldtype": "Link", "label": "Decision Approved By", "options": "User", "read_only": 1},
+          {"fieldname": "tlc_decision_approved_on", "fieldtype": "Datetime", "label": "Decision Approved On", "read_only": 1}
         ],
         "permissions": [
           {
@@ -344,7 +348,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -354,7 +358,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -767,7 +771,9 @@
             "fieldtype": "Attach",
             "label": "Evidence",
             "reqd": 1
-          }
+          },
+          {"fieldname": "tlc_decision_approved_by", "fieldtype": "Link", "label": "Decision Approved By", "options": "User", "read_only": 1},
+          {"fieldname": "tlc_decision_approved_on", "fieldtype": "Datetime", "label": "Decision Approved On", "read_only": 1}
         ],
         "permissions": [
           {
@@ -775,7 +781,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -785,7 +791,7 @@
             "read": 1,
             "write": 1,
             "create": 1,
-            "submit": 1,
+            "submit": 0,
             "report": 1,
             "export": 1,
             "print": 1
@@ -819,6 +825,15 @@
             "create": 1
           }
         ]
+      }
+    },
+    {
+      "doctype": "Custom Field",
+      "name": "Salary Structure Assignment-tlc_decision_approved_on",
+      "values": {
+        "dt": "Salary Structure Assignment", "fieldname": "tlc_decision_approved_on",
+        "fieldtype": "Datetime", "label": "Decision Approved On", "read_only": 1,
+        "insert_after": "tlc_decision_approved_by"
       }
     }
   ]

@@ -136,7 +136,10 @@ class FrappeTravelFinanceRepository(ITravelFinanceRepository):
         """Preserve locked snapshots; report differences become HR-controlled post-close requests."""
         planned = dict(window_of(trip).days())
         target = {} if cancel else dict(window_of(trip, actual=actual).days())
-        days = sorted(set(planned) | set(target))
+        existing_adj_dates = {getdate(d) for d in frappe.get_all("Attendance Request",
+            filters={"employee": trip.employee, "tlc_travel_request": trip.name, "docstatus": ["<", 2]},
+            pluck="from_date")}
+        days = sorted(set(planned) | set(target) | existing_adj_dates)
         calendar = FrappeAttendanceRepository()
         from erpnext.setup.doctype.employee.employee import is_holiday
 
@@ -144,30 +147,17 @@ class FrappeTravelFinanceRepository(ITravelFinanceRepository):
             if is_holiday(trip.employee, day):
                 continue  # Never fabricate overtime/compensatory leave on a trip.
             sessions = target.get(day, ())
+            locked = calendar.locked_period(trip.employee, day, day)
+            if locked:
+                self._reconcile_locked_day(trip, day, sessions, locked)
+                continue
+
             attendance_name = frappe.db.get_value("Attendance", {"employee": trip.employee, "attendance_date": day, "docstatus": 1}, "name")
             old = frappe.get_doc("Attendance", attendance_name) if attendance_name else None
             previous = tuple((old.get("tlc_duty_sessions") or "").split(",")) if old and old.get("tlc_travel_request") == trip.name else ()
             if previous == sessions:
                 continue
-            locked = calendar.locked_period(trip.employee, day, day)
-            if locked:
-                delta = Decimal(len(sessions) - len(previous)) / 2
-                if not delta:
-                    continue
-                key = f"{trip.name}:{day}:{','.join(sessions)}"
-                if frappe.db.exists("Attendance Request", {"tlc_travel_effect_key": key}):
-                    continue
-                # A draft correction is intentionally not submitted: HR must approve the next-payroll effect.
-                correction = frappe.get_doc({"doctype": "Attendance Request", "employee": trip.employee, "company": trip.company,
-                    "from_date": day, "to_date": day, "reason": "On Duty", "tlc_correction_type": "Điều chỉnh sau chốt",
-                    "explanation": f"{trip.name}: công tác thực tế {','.join(sessions) or 'không đi'}; chênh lệch {delta} ngày, kỳ {locked[0]}.",
-                    "tlc_travel_request": trip.name, "tlc_travel_effect_key": key, "tlc_workday_delta": float(delta),
-                    "workflow_state": "Nháp"})
-                # Standard correction validation requires HR; creation is delegated to an HR assignee, never their approval.
-                correction.flags.tlc_travel_adjustment = True
-                correction.insert(ignore_permissions=True)
-                frappe.get_doc("TLC Attendance Period", locked[0]).add_comment("Info", f"{trip.name}: cần duyệt điều chỉnh {correction.name}; không sửa ảnh chụp kỳ công.")
-                continue
+
             if not sessions:
                 if old and old.get("tlc_travel_request") == trip.name:
                     old.db_set({"status": old.tlc_before_travel_status or "Absent", "tlc_travel_request": None,
@@ -191,6 +181,121 @@ class FrappeTravelFinanceRepository(ITravelFinanceRepository):
                     "shift": calendar.shift_of(trip.employee, day), "tlc_before_travel_status": "Absent", **values})
                 mark.insert(ignore_permissions=True)
                 mark.submit()
+
+    def _reconcile_locked_day(self, trip, day, sessions, locked):
+        attendance_name = frappe.db.get_value("Attendance", {"employee": trip.employee, "attendance_date": day, "docstatus": 1}, "name")
+        old = frappe.get_doc("Attendance", attendance_name) if attendance_name else None
+        mark_sessions = tuple((old.get("tlc_duty_sessions") or "").split(",")) if old and old.get("tlc_travel_request") == trip.name else ()
+
+        existing_reqs = frappe.get_all(
+            "Attendance Request",
+            filters={
+                "employee": trip.employee,
+                "from_date": day,
+                "to_date": day,
+                "tlc_travel_request": trip.name,
+                "docstatus": ["<", 2],
+            },
+            fields=["name", "docstatus", "workflow_state", "tlc_workday_delta", "tlc_travel_effect_key",
+                    "tlc_adjustment_payroll", "tlc_adjustment_salary", "explanation"],
+            order_by="creation asc"
+        )
+
+        immutable_reqs = [
+            r for r in existing_reqs
+            if r.docstatus == 1 or r.workflow_state == "Đã duyệt" or r.tlc_adjustment_payroll
+        ]
+        pending_reqs = [
+            r for r in existing_reqs
+            if r.name not in {im.name for im in immutable_reqs} and r.workflow_state != "Đã hủy"
+        ]
+
+        applied_delta = sum((Decimal(str(r.tlc_workday_delta)) for r in immutable_reqs), Decimal(0))
+        has_pending = bool(pending_reqs)
+        pending_delta = Decimal(str(pending_reqs[0].tlc_workday_delta)) if has_pending else Decimal(0)
+        pending_key = pending_reqs[0].tlc_travel_effect_key or "" if has_pending else ""
+
+        recon = rules.reconcile_adjustment(
+            trip_name=trip.name,
+            day=day,
+            target_sessions=sessions,
+            mark_sessions=mark_sessions,
+            applied_delta=applied_delta,
+            has_pending=has_pending,
+            pending_delta=pending_delta,
+            pending_key=pending_key,
+        )
+
+        if recon.action == "none":
+            return
+
+        if recon.action == "cancel":
+            for p in pending_reqs:
+                p_doc = frappe.get_doc("Attendance Request", p.name)
+                p_doc.flags.tlc_travel_reconcile = True
+                p_doc.db_set({
+                    "workflow_state": "Đã hủy",
+                    "docstatus": 2,
+                    "tlc_workday_delta": 0.0,
+                    "explanation": f"{p_doc.explanation or ''} (Đã hủy do công tác thực tế không phát sinh chênh lệch)."
+                })
+                p_doc.add_comment("Info", f"{trip.name}: hủy yêu cầu điều chỉnh sau chốt do công tác thực tế không phát sinh chênh lệch.")
+                frappe.get_doc("TLC Attendance Period", locked[0]).add_comment(
+                    "Info", f"{trip.name}: hủy điều chỉnh {p_doc.name} (chênh lệch = 0); không sửa ảnh chụp kỳ công."
+                )
+            return
+
+        if recon.action == "update":
+            p = pending_reqs[0]
+            p_doc = frappe.get_doc("Attendance Request", p.name)
+            p_doc.flags.tlc_travel_reconcile = True
+            p_doc.flags.tlc_travel_adjustment = True
+            old_delta = p_doc.tlc_workday_delta
+            new_explanation = f"{trip.name}: công tác thực tế {','.join(sessions) or 'không đi'}; chênh lệch {float(recon.needed_delta)} ngày, kỳ {locked[0]}."
+            p_doc.db_set({
+                "tlc_workday_delta": float(recon.needed_delta),
+                "tlc_travel_effect_key": recon.target_key,
+                "explanation": new_explanation
+            })
+            p_doc.add_comment("Info", f"{trip.name}: điều chỉnh theo báo cáo thực tế từ {old_delta} ngày thành {float(recon.needed_delta)} ngày.")
+            frappe.get_doc("TLC Attendance Period", locked[0]).add_comment(
+                "Info", f"{trip.name}: cập nhật điều chỉnh {p_doc.name} thành {float(recon.needed_delta)} ngày; không sửa ảnh chụp kỳ công."
+            )
+            for extra in pending_reqs[1:]:
+                extra_doc = frappe.get_doc("Attendance Request", extra.name)
+                extra_doc.flags.tlc_travel_reconcile = True
+                extra_doc.db_set({
+                    "workflow_state": "Đã hủy",
+                    "docstatus": 2,
+                    "tlc_workday_delta": 0.0,
+                    "explanation": f"{extra_doc.explanation or ''} (Đã hủy do gộp điều chỉnh)."
+                })
+                extra_doc.add_comment("Info", f"{trip.name}: hủy yêu cầu trùng lặp sau điều chỉnh.")
+            return
+
+        if recon.action in ("create", "inverse"):
+            if frappe.db.exists("Attendance Request", {"tlc_travel_effect_key": recon.target_key, "docstatus": ["<", 2]}):
+                return
+            explanation = f"{trip.name}: công tác thực tế {','.join(sessions) or 'không đi'}; chênh lệch {float(recon.needed_delta)} ngày, kỳ {locked[0]}."
+            correction = frappe.get_doc({
+                "doctype": "Attendance Request",
+                "employee": trip.employee,
+                "company": trip.company,
+                "from_date": day,
+                "to_date": day,
+                "reason": "On Duty",
+                "tlc_correction_type": "Điều chỉnh sau chốt",
+                "explanation": explanation,
+                "tlc_travel_request": trip.name,
+                "tlc_travel_effect_key": recon.target_key,
+                "tlc_workday_delta": float(recon.needed_delta),
+                "workflow_state": "Nháp"
+            })
+            correction.flags.tlc_travel_adjustment = True
+            correction.insert(ignore_permissions=True)
+            frappe.get_doc("TLC Attendance Period", locked[0]).add_comment(
+                "Info", f"{trip.name}: cần duyệt điều chỉnh {correction.name}; không sửa ảnh chụp kỳ công."
+            )
 
     def notify(self, doc, before):
         route = self.route(doc.employee)

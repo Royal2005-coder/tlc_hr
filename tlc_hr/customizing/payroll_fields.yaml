@@ -12,7 +12,9 @@ custom_fields:
   - {fieldname: tlc_bank_reference, label: Số chứng từ ngân hàng, fieldtype: Data, allow_on_submit: true, insert_after: tlc_section,
      description: Kế toán nhập khi xác nhận đã chi (bắt buộc).}
   - {fieldname: tlc_paid_on, label: Ngày chi, fieldtype: Date, allow_on_submit: true, insert_after: tlc_bank_reference}
+  - {fieldname: tlc_bank_proof, label: Chứng từ chuyển khoản (riêng tư), fieldtype: Attach, allow_on_submit: true,
+     no_copy: true, insert_after: tlc_paid_on, description: Tải chứng từ chuyển khoản thực ở chế độ riêng tư trước khi xác nhận đã chi.}
   - {fieldname: tlc_reject_reason, label: Lý do trả lại, fieldtype: Small Text, allow_on_submit: true, no_copy: true,
-     insert_after: tlc_paid_on, depends_on: eval:doc.workflow_state}
+     insert_after: tlc_bank_proof, depends_on: eval:doc.workflow_state}
   - {fieldname: tlc_rejected_stage, label: Trả lại từ bước, fieldtype: Data, read_only: true, hidden: true, allow_on_submit: true,
      no_copy: true, insert_after: tlc_reject_reason}

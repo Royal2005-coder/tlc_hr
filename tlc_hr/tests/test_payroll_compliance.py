@@ -203,6 +203,67 @@ class TestPayrollCompliance(IntegrationTestCase):
         res = exports.get_role_private_cost_report(self.company, "2026-01-01", "2026-12-31")
         self.assertIn("groups", res)
         self.assertIn("summary", res)
+    def test_export_scope_excludes_cross_company(self):
+        frappe.set_user("Administrator")
+        other_company = frappe.db.get_value("Company", {"name": ["!=", self.company]}, "name")
+        if not other_company:
+            other_company = frappe.get_doc({
+                "doctype": "Company", "company_name": "TLC Foreign Unit",
+                "default_currency": "VND", "country": "Viet Nam"
+            }).insert(ignore_permissions=True).name
+
+        # Other employee in foreign company
+        other_emp = frappe.get_doc({
+            "doctype": "Employee", "first_name": "Foreign", "last_name": "Worker",
+            "company": other_company, "status": "Active", "gender": "Female",
+            "date_of_birth": "1995-01-01", "date_of_joining": "2026-01-01"
+        }).insert(ignore_permissions=True)
+
+        # Other company insurance change
+        chg = frappe.get_doc({
+            "doctype": "TLC Insurance Change", "employee": other_emp.name,
+            "insurance_number": "9999999999", "change_type": "Join",
+            "effective_on": "2026-08-01", "contribution_base": 15000000,
+            "status": "Prepared", "reason": "Test foreign", "evidence": self.evidence
+        }).insert(ignore_permissions=True)
+        chg.submit()
+
+        # Export for self.company must not include other_emp
+        frappe.set_user(PAYROLL_USER)
+        d02 = exports.export_bhxh_d02lt(self.company, "2026-08")
+        emp_ids = [r["employee"] for r in d02["records"]]
+        self.assertNotIn(other_emp.name, emp_ids)
+
+    def test_decision_approval_lifecycle_and_rejection(self):
+        frappe.set_user(PAYROLL_USER)
+        base = frappe.db.get_value("Salary Structure Assignment", {"employee": self.employee, "docstatus": 1}, "base") or 10000000.0
+        structure = frappe.db.get_value("Salary Structure Assignment", {"employee": self.employee, "docstatus": 1}, "salary_structure")
+        ssa = frappe.get_doc({
+            "doctype": "Salary Structure Assignment", "employee": self.employee,
+            "salary_structure": structure, "from_date": "2026-11-01", "base": base + 1000000,
+            "tlc_decision_reason": "Promotion", "tlc_decision_evidence": self.evidence
+        }).insert()
+
+        # Preparer cannot self-approve or call approve_decision
+        with self.assertRaises(frappe.PermissionError):
+            comp.approve_decision("Salary Structure Assignment", ssa.name, ssa.modified)
+
+        # Director can approve valid draft
+        frappe.set_user(CEO_USER)
+        ctx = comp.decision_approval_context("Salary Structure Assignment", ssa.name)
+        self.assertTrue(ctx["can_approve"])
+
+        # Stale modified timestamp is rejected
+        with self.assertRaises(frappe.TimestampMismatchError):
+            comp.approve_decision("Salary Structure Assignment", ssa.name, "2020-01-01 00:00:00")
+
+        res = comp.approve_decision("Salary Structure Assignment", ssa.name, ssa.modified)
+        self.assertEqual(res["docstatus"], 1)
+        self.assertEqual(res["approved_by"], CEO_USER)
+
+        # Re-approval rejected
+        with self.assertRaises(frappe.ValidationError):
+            comp.approve_decision("Salary Structure Assignment", ssa.name, ssa.modified)
 
     def test_bank_batch_export_disclaimer(self):
         frappe.set_user("Administrator")

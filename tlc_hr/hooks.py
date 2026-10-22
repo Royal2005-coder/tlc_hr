@@ -55,7 +55,7 @@ doc_events = {
                       "on_cancel": ["tlc_hr.interface.payroll.on_cancel", f"{PCOM}.release_awards"],
                       "before_cancel": f"{PCOM}.prohibit_approved_change",
                       "on_trash": f"{PCOM}.prohibit_approved_change",
-                      "before_update_after_submit": "tlc_hr.interface.payroll.before_update_after_submit",
+                      "before_update_after_submit": ["tlc_hr.interface.payroll.before_update_after_submit", f"{PCOM}.entry_guard"],
                       "on_update_after_submit": "tlc_hr.interface.payroll.on_update_after_submit"},
     "Salary Slip": {"before_validate": f"{PCOM}.prepare_slip",
                     "before_cancel": f"{PCOM}.prohibit_approved_change",
@@ -70,11 +70,14 @@ doc_events = {
 
     # W3 travel, advances and expense settlement.
     "Travel Request": {"validate": f"{TRAVEL}.validate_travel",
-                       "on_update": [f"{TRAVEL}.travel_updated", f"{FINANCE}.snapshot"]},
+                       "on_update": [f"{TRAVEL}.travel_updated", f"{FINANCE}.snapshot"],
+                       "on_update_after_submit": [f"{TRAVEL}.travel_updated", f"{FINANCE}.snapshot"]},
     "Employee Advance": {"validate": f"{TRAVEL}.validate_advance",
-                         "on_update": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"]},
+                         "on_update": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"],
+                         "on_update_after_submit": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"]},
     "Expense Claim": {"validate": f"{TRAVEL}.validate_claim",
-                      "on_update": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"]},
+                      "on_update": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"],
+                      "on_update_after_submit": [f"{TRAVEL}.finance_updated", f"{FINANCE}.snapshot"]},
     "Payment Entry": {"validate": f"{TRAVEL}.validate_payment", "before_cancel": f"{TRAVEL}.payment_before_cancel"},
     "Additional Salary": {"validate": ["tlc_hr.interface.travel_adjustments.validate_adjustment_salary", f"{TRAVEL}.validate_additional_salary"]},
     "File": {"validate": f"{FINANCE}.guard_snapshot", "on_trash": f"{FINANCE}.guard_snapshot"},
@@ -209,6 +212,10 @@ app_include_js = ["/assets/tlc_hr/js/tlc_workflow.js"]
 doctype_js = {
     "Leave Application": "public/js/leave_application.js",
     "Payroll Entry": "public/js/payroll_entry.js",
+    "Salary Structure Assignment": "public/js/payroll_decision.js",
+    "TLC Payroll Adjustment": "public/js/payroll_decision.js",
+    "TLC Payroll Bonus": "public/js/payroll_decision.js",
+    "TLC Salary Review": "public/js/payroll_decision.js",
     "Employee Onboarding": "public/js/lifecycle_boarding.js",
     "Employee Separation": "public/js/lifecycle_boarding.js",
     "Asset Movement": "public/js/people_ops.js",
@@ -216,3 +223,7 @@ doctype_js = {
 }
 
 before_job = ["tlc_hr.interface.assistant.guard_job"]
+app_home = "/desk/tlc-hr"
+
+
+on_session_creation = ["tlc_hr.interface.role_navigation.on_session_creation"]

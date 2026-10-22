@@ -140,3 +140,49 @@ def require_payroll_consent(*, allowed, consent, evidence, consent_by, subject, 
         raise DomainError("finance.payroll_consent", "Khấu trừ tạm ứng cần chính sách được phép và nhân viên tự xác nhận đồng ý kèm chứng từ.")
     if not due or due >= today:
         raise DomainError("finance.not_overdue", "Chỉ tạm ứng quá hạn mới được chuyển sang khấu trừ lương.")
+
+
+@dataclass(frozen=True)
+class AdjustmentReconciliation:
+    intended_delta: Decimal
+    applied_delta: Decimal
+    needed_delta: Decimal
+    action: str  # "none", "create", "update", "cancel", "inverse"
+    target_key: str
+
+
+def reconcile_adjustment(
+    trip_name: str,
+    day: date,
+    target_sessions: tuple[str, ...],
+    mark_sessions: tuple[str, ...],
+    applied_delta: Decimal,
+    has_pending: bool = False,
+    pending_delta: Decimal = Decimal("0"),
+    pending_key: str = "",
+) -> AdjustmentReconciliation:
+    intended = (Decimal(len(target_sessions) - len(mark_sessions)) / Decimal(2)).quantize(Decimal("0.01"))
+    applied = applied_delta.quantize(Decimal("0.01"))
+    needed = (intended - applied).quantize(Decimal("0.01"))
+
+    if not applied:
+        key = f"{trip_name}:{day}:{','.join(target_sessions)}"
+    else:
+        key = f"{trip_name}:{day}:{','.join(target_sessions)}:recon:{needed}"
+
+    if needed == 0:
+        action = "cancel" if has_pending else "none"
+    elif has_pending:
+        action = "none" if (pending_delta.quantize(Decimal("0.01")) == needed and pending_key == key) else "update"
+    elif applied != 0:
+        action = "inverse"
+    else:
+        action = "create"
+
+    return AdjustmentReconciliation(
+        intended_delta=intended,
+        applied_delta=applied,
+        needed_delta=needed,
+        action=action,
+        target_key=key,
+    )

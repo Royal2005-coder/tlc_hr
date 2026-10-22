@@ -1,7 +1,6 @@
 """Transactional native services. Resource-row locks serialize booking, lending and meals."""
-from datetime import timedelta
 import frappe
-from frappe.utils import getdate, get_datetime, nowdate, now_datetime
+from frappe.utils import getdate, get_datetime, nowdate
 from tlc_hr.domain.services import (require, transition, working_due, working_elapsed, meal_cutoff,
                                      SERVICE_EDGES, LOAN_EDGES, MAIL_EDGES)
 from tlc_hr.domain.shared import HR_ROLES

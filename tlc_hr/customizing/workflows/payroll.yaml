@@ -21,4 +21,4 @@ workflow:
   - {from: Chờ giám đốc ký, action: Ký duyệt, to: Đã ký, allowed: [TLC Director], allow_self_approval: true}
   - {from: Chờ giám đốc ký, action: Trả lại, to: Đã tính lương, allowed: [TLC Director], allow_self_approval: true}
   - {from: Đã ký, action: Xác nhận đã chi, to: Đã chi, allowed: [Accounts User], allow_self_approval: true,
-     condition: doc.tlc_bank_reference and doc.tlc_paid_on}
+     condition: doc.tlc_bank_reference and doc.tlc_paid_on and doc.tlc_bank_proof}

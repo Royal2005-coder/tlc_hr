@@ -1,6 +1,6 @@
 version: 1
 kind: permissions
-description: 'Who reads and writes the reason to reject (permlevel 1): the employee reads it, deciders write it.'
+description: Rejection reasons remain readable by employees and writable by deciders; Employee salary amounts require an explicit payroll role at permlevel 1.
 permissions:
 - doctype: Leave Application
   role: Employee
@@ -58,3 +58,9 @@ permissions:
   role: HR User
   permlevel: 1
   rights: rw
+# Monetary Employee fields are moved to this level by employee_salary_visibility.yaml.
+# HR User, HR Manager and Line Manager alone do not receive salary-field access.
+- {doctype: Employee, role: TLC Payroll, permlevel: 1, rights: rw}
+- {doctype: Employee, role: TLC HR Lead, permlevel: 1, rights: rw}
+- {doctype: Employee, role: TLC Director, permlevel: 1, rights: r}
+- {doctype: Employee, role: System Manager, permlevel: 1, rights: rw}

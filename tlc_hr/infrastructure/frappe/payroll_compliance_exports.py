@@ -13,7 +13,6 @@ Supports:
 """
 import csv
 import io
-import json
 from datetime import date
 from decimal import Decimal
 
@@ -28,6 +27,37 @@ PAYROLL_ROLES = {"TLC Payroll", "TLC HR Lead", "TLC Director", "Accounts User", 
 def check_payroll_permission():
     if frappe.session.user != "Administrator" and not set(frappe.get_roles()) & PAYROLL_ROLES:
         frappe.throw("Không có quyền truy cập báo cáo/chi phí lương.", frappe.PermissionError)
+
+
+def company_employee_scope(company):
+    """Keep payroll role authorization AND native Company/Employee user scope.
+
+    Accounts User has native select-only on Employee to protect HR PII, while holding
+    explicit read/export authority on Salary Slip / Payroll Entry. When Accounts User
+    executes an authorized export, project Employee IDs belonging to the authorized Company
+    (and explicit user permission restrictions, if configured), without bypassing Company read.
+    """
+    check_payroll_permission()
+    frappe.get_doc("Company", company).check_permission("read")
+    if frappe.has_permission("Employee", "read"):
+        return frappe.get_list("Employee", filters={"company": company}, pluck="name", limit_page_length=0)
+    if "Accounts User" in frappe.get_roles() or frappe.session.user == "Administrator":
+        filters = {"company": company}
+        user_perms = frappe.permissions.get_user_permissions(frappe.session.user)
+        if user_perms.get("Employee"):
+            allowed_emp = [p.get("doc") for p in user_perms["Employee"] if p.get("doc")]
+            if allowed_emp:
+                filters["name"] = ["in", allowed_emp]
+        return frappe.get_all("Employee", filters=filters, pluck="name")
+    frappe.throw("Không có quyền truy cập phạm vi nhân viên của công ty.", frappe.PermissionError)
+
+
+def check_batch_scope(entry, slips):
+    allowed = set(company_employee_scope(entry.company))
+    for slip in slips:
+        if slip.employee not in allowed:
+            frappe.throw("Kỳ lương chứa nhân viên ngoài công ty/phạm vi được phân quyền.", frappe.PermissionError)
+        frappe.get_doc("Salary Slip", slip.name).check_permission("read")
 
 
 def export_bank_payment_batch(payroll_entry_name, bank_code="VCB"):
@@ -46,6 +76,7 @@ def export_bank_payment_batch(payroll_entry_name, bank_code="VCB"):
         fields=["name", "employee", "employee_name", "net_pay", "bank_name", "bank_account_no"],
         order_by="employee_name asc"
     )
+    check_batch_scope(entry, slips)
     if not slips:
         frappe.throw("Chưa có phiếu lương đã ghi sổ để xuất file ngân hàng.")
 
@@ -104,8 +135,9 @@ def export_accounting_reconciliation(payroll_entry_name):
     slips = frappe.get_all(
         "Salary Slip",
         filters={"payroll_entry": payroll_entry_name, "docstatus": 1},
-        fields=["name", "gross_pay", "total_deduction", "net_pay"]
+        fields=["name", "employee", "gross_pay", "total_deduction", "net_pay"]
     )
+    check_batch_scope(entry, slips)
     names = [s.name for s in slips] or [""]
 
     component_totals = {}
@@ -147,11 +179,12 @@ def export_accounting_reconciliation(payroll_entry_name):
 
 def export_pit_report(company, from_date, to_date):
     """Statutory PIT summary per employee across the date range."""
-    check_payroll_permission()
+    employees = company_employee_scope(company)
     slips = frappe.get_all(
         "Salary Slip",
         filters={
             "company": company,
+            "employee": ["in", employees],
             "docstatus": 1,
             "start_date": [">=", from_date],
             "end_date": ["<=", to_date]
@@ -227,7 +260,7 @@ def export_bhxh_d02lt(company, month_str):
 
     Includes tracked additions, separations, and base adjustments from TLC Insurance Change.
     """
-    check_payroll_permission()
+    employees = company_employee_scope(company)
     first_day = f"{month_str}-01"
     last_day = frappe.utils.get_last_day(first_day)
 
@@ -235,6 +268,7 @@ def export_bhxh_d02lt(company, month_str):
         "TLC Insurance Change",
         filters={
             "docstatus": 1,
+            "employee": ["in", employees],
             "effective_on": ["between", [first_day, last_day]]
         },
         fields=[
@@ -293,12 +327,12 @@ def export_bhxh_d02lt(company, month_str):
 
 def export_labor_register(company, as_of_date=None):
     """Labor Management Register (Sổ quản lý lao động - Decree 145/2020/ND-CP)."""
-    check_payroll_permission()
+    scope = company_employee_scope(company)
     as_of = getdate(as_of_date) if as_of_date else date.today()
 
     employees = frappe.get_all(
         "Employee",
-        filters={"company": company},
+        filters={"company": company, "name": ["in", scope]},
         fields=[
             "name", "employee_name", "gender", "date_of_birth", "department",
             "designation", "date_of_joining", "relieving_date", "status",
@@ -362,12 +396,16 @@ def export_labor_register(company, as_of_date=None):
 
 def simulate_salary_budget(company, percent_increase, base_date=None, department=None):
     """Simulate payroll budget impact of a percentage salary adjustment (HR-LG-14)."""
-    check_payroll_permission()
+    scope = company_employee_scope(company)
     as_of = getdate(base_date) if base_date else date.today()
     pct = Decimal(str(percent_increase))
 
-    filters = {"company": company, "status": "Active"}
+    filters = {"company": company, "status": "Active", "name": ["in", scope]}
     if department:
+        department_doc = frappe.get_doc("Department", department)
+        department_doc.check_permission("read")
+        if department_doc.company != company:
+            frappe.throw("Bộ phận không thuộc công ty được chọn.", frappe.PermissionError)
         filters["department"] = department
 
     active_employees = frappe.get_all("Employee", filters=filters, fields=["name", "employee_name", "department"])
@@ -417,12 +455,15 @@ def simulate_salary_budget(company, percent_increase, base_date=None, department
 
 def get_role_private_cost_report(company, start_date, end_date, group_by="department"):
     """Comprehensive role-private labor cost report (HR-LG-24)."""
-    check_payroll_permission()
+    employees = company_employee_scope(company)
+    if group_by not in {"department", "employee", "employee_name"}:
+        frappe.throw("Nhóm báo cáo không được hỗ trợ.")
 
     slips = frappe.get_all(
         "Salary Slip",
         filters={
             "company": company,
+            "employee": ["in", employees],
             "docstatus": 1,
             "start_date": [">=", start_date],
             "end_date": ["<=", end_date]
@@ -491,7 +532,7 @@ def get_role_private_cost_report(company, start_date, end_date, group_by="depart
 
 def get_headcount_movement_report(company, from_date, to_date):
     """Headcount breakdown and movement report (HR-LG-23)."""
-    check_payroll_permission()
+    employees = company_employee_scope(company)
     from_d = getdate(from_date)
     to_d = getdate(to_date)
 
@@ -500,6 +541,7 @@ def get_headcount_movement_report(company, from_date, to_date):
         "Employee",
         filters={
             "company": company,
+            "name": ["in", employees],
             "date_of_joining": ["<=", to_d],
             "status": ["!=", "Left"]
         },
@@ -516,6 +558,7 @@ def get_headcount_movement_report(company, from_date, to_date):
         "Employee",
         filters={
             "company": company,
+            "name": ["in", employees],
             "date_of_joining": ["between", [from_d, to_d]]
         },
         fields=["name", "employee_name", "department", "date_of_joining"]
@@ -526,6 +569,7 @@ def get_headcount_movement_report(company, from_date, to_date):
         "Employee",
         filters={
             "company": company,
+            "name": ["in", employees],
             "relieving_date": ["between", [from_d, to_d]]
         },
         fields=["name", "employee_name", "department", "relieving_date"]
@@ -536,6 +580,7 @@ def get_headcount_movement_report(company, from_date, to_date):
         "Salary Structure Assignment",
         filters={
             "company": company,
+            "employee": ["in", employees],
             "docstatus": 1,
             "from_date": ["between", [from_d, to_d]],
             "tlc_decision_reason": ["in", ["Promotion", "Special", "Periodic"]]
@@ -559,11 +604,13 @@ def check_payroll_anomalies(payroll_entry_name):
     """AI / Automated review for payroll irregularities (HR-LG-26)."""
     check_payroll_permission()
     entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
+    entry.check_permission("read")
     slips = frappe.get_all(
         "Salary Slip",
         filters={"payroll_entry": payroll_entry_name, "docstatus": ["!=", 2]},
         fields=["name", "employee", "employee_name", "gross_pay", "net_pay", "start_date", "end_date"]
     )
+    check_batch_scope(entry, slips)
 
     anomalies = []
     for slip in slips:

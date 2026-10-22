@@ -163,6 +163,106 @@ class TestTravelFinanceDomain(unittest.TestCase):
                 requested_advance=Decimal("0"), active=True
             ))
 
+    def test_reconcile_adjustment_planned_initial_creation(self):
+        # 1 day planned (AM, PM) in locked period with no prior mark or adjustments
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=("AM", "PM"),
+            mark_sessions=(),
+            applied_delta=Decimal("0"),
+            has_pending=False,
+        )
+        self.assertEqual(recon.intended_delta, Decimal("1.00"))
+        self.assertEqual(recon.applied_delta, Decimal("0.00"))
+        self.assertEqual(recon.needed_delta, Decimal("1.00"))
+        self.assertEqual(recon.action, "create")
+        self.assertEqual(recon.target_key, "TRV-2026-001:2026-09-15:AM,PM")
+
+    def test_reconcile_adjustment_shortened_report_updates_pending(self):
+        # Report shortened to AM only while initial +1.0 draft is still pending
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=("AM",),
+            mark_sessions=(),
+            applied_delta=Decimal("0"),
+            has_pending=True,
+            pending_delta=Decimal("1.00"),
+            pending_key="TRV-2026-001:2026-09-15:AM,PM",
+        )
+        self.assertEqual(recon.intended_delta, Decimal("0.50"))
+        self.assertEqual(recon.applied_delta, Decimal("0.00"))
+        self.assertEqual(recon.needed_delta, Decimal("0.50"))
+        self.assertEqual(recon.action, "update")
+        self.assertEqual(recon.target_key, "TRV-2026-001:2026-09-15:AM")
+
+    def test_reconcile_adjustment_idempotent_replay(self):
+        # Re-evaluating with identical target sessions and pending adjustment is a no-op
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=("AM",),
+            mark_sessions=(),
+            applied_delta=Decimal("0"),
+            has_pending=True,
+            pending_delta=Decimal("0.50"),
+            pending_key="TRV-2026-001:2026-09-15:AM",
+        )
+        self.assertEqual(recon.intended_delta, Decimal("0.50"))
+        self.assertEqual(recon.needed_delta, Decimal("0.50"))
+        self.assertEqual(recon.action, "none")
+
+    def test_reconcile_adjustment_cancellation_cancels_pending(self):
+        # Trip cancelled before departure cancels pending draft adjustment (net delta 0)
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=(),
+            mark_sessions=(),
+            applied_delta=Decimal("0"),
+            has_pending=True,
+            pending_delta=Decimal("1.00"),
+            pending_key="TRV-2026-001:2026-09-15:AM,PM",
+        )
+        self.assertEqual(recon.intended_delta, Decimal("0.00"))
+        self.assertEqual(recon.needed_delta, Decimal("0.00"))
+        self.assertEqual(recon.action, "cancel")
+
+    def test_reconcile_adjustment_immutable_applied_with_shortened_report(self):
+        # +1.0 day was already approved/applied to payroll; report shortened to AM only
+        # Must produce an inverse adjustment of -0.5 day
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=("AM",),
+            mark_sessions=(),
+            applied_delta=Decimal("1.00"),
+            has_pending=False,
+        )
+        self.assertEqual(recon.intended_delta, Decimal("0.50"))
+        self.assertEqual(recon.applied_delta, Decimal("1.00"))
+        self.assertEqual(recon.needed_delta, Decimal("-0.50"))
+        self.assertEqual(recon.action, "inverse")
+        self.assertEqual(recon.target_key, "TRV-2026-001:2026-09-15:AM:recon:-0.50")
+
+    def test_reconcile_adjustment_immutable_applied_with_cancellation(self):
+        # +1.0 day was already approved/applied to payroll; trip cancelled after close
+        # Must produce an inverse adjustment of -1.0 day
+        recon = rules.reconcile_adjustment(
+            trip_name="TRV-2026-001",
+            day=date(2026, 9, 15),
+            target_sessions=(),
+            mark_sessions=(),
+            applied_delta=Decimal("1.00"),
+            has_pending=False,
+        )
+        self.assertEqual(recon.intended_delta, Decimal("0.00"))
+        self.assertEqual(recon.applied_delta, Decimal("1.00"))
+        self.assertEqual(recon.needed_delta, Decimal("-1.00"))
+        self.assertEqual(recon.action, "inverse")
+        self.assertEqual(recon.target_key, "TRV-2026-001:2026-09-15::recon:-1.00")
+
 
 if __name__ == "__main__":
     unittest.main()

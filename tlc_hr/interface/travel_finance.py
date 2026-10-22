@@ -131,6 +131,8 @@ def validate_travel(doc, method=None):
                     raise DomainError("travel.unsettled", "Quyết toán chi phí chưa hoàn tất.")
             if previous == rules.REPORT_CEO and state == rules.DONE:
                 doc.tlc_report_approved_on = now_datetime()
+                if not doc.is_new() and doc.docstatus == 1:
+                    doc.db_set("tlc_report_approved_on", doc.tlc_report_approved_on)
         if state == rules.CANCELLED and previous != state:
             if getdate() >= getdate(doc.tlc_from_date):
                 raise DomainError("travel.cancel_date", "Chỉ hủy trước ngày đi; về sớm phải nộp báo cáo thực tế.")
@@ -157,6 +159,7 @@ def travel_updated(doc, method=None):
                 draft.add_comment("Info", f"Kế thừa phê duyệt quản lý/Giám đốc từ {doc.name}; kế toán kiểm tra trước khi chi.")
             _cancel_meals(doc, actual=False)
         if previous == rules.REPORT_CEO and doc.workflow_state == rules.DONE:
+            doc.db_set("tlc_report_approved_on", now_datetime())
             repository().post_travel_days(doc, actual=True)
             _cancel_meals(doc, actual=True)
         if doc.workflow_state == rules.CANCELLED and before and before.get("tlc_approved_on"):
@@ -283,14 +286,19 @@ def validate_claim(doc, method=None):
             doc.tlc_settled_on = now_datetime()
             if previous == rules.RECEIPT:
                 doc.tlc_received_by, doc.tlc_received_on = frappe.session.user, now_datetime()
+                if not doc.is_new() and doc.docstatus == 1:
+                    doc.db_set({"tlc_settled_on": doc.tlc_settled_on, "tlc_received_by": doc.tlc_received_by, "tlc_received_on": doc.tlc_received_on})
 
 
 def finance_updated(doc, method=None):
     before = doc.get_doc_before_save()
     previous = before.get("workflow_state") if before else rules.DRAFT
+    if doc.doctype == "Expense Claim" and previous == rules.RECEIPT and doc.workflow_state == rules.DONE:
+        doc.db_set("tlc_settled_on", now_datetime())
+        doc.db_set("tlc_received_by", frappe.session.user)
+        doc.db_set("tlc_received_on", now_datetime())
     if previous != doc.workflow_state:
         repository().notify(doc, previous)
-
 
 def validate_payment(doc, method=None):
     if not any(r.reference_doctype in ("Employee Advance", "Expense Claim") for r in doc.references or []):
