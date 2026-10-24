@@ -378,6 +378,7 @@ def checkins(data, days=DEMO_DAYS):
         day -= dt.timedelta(days=1)
     work_days.reverse()
     employees = frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, fields=["name", "department", "default_shift"])
+    uncovered = []
     for employee in employees:
         shift = employee.default_shift or "TLC Hành chính"
         (in_h, in_m), (out_h, out_m) = SHIFT_TIMES[shift]
@@ -395,9 +396,15 @@ def checkins(data, days=DEMO_DAYS):
                 continue
             end_day = work_day + dt.timedelta(days=1) if out_h < in_h else work_day
             end = dt.datetime.combine(end_day, dt.time(out_h, out_m)) + dt.timedelta(minutes=rng.randint(0, 20))
-            for log_type, when in (("IN", start), ("OUT", end)):
-                frappe.get_doc({"doctype": "Employee Checkin", "employee": employee.name, "log_type": log_type, "time": when,
-                                "latitude": lat + rng.uniform(-0.0004, 0.0004), "longitude": lon + rng.uniform(-0.0004, 0.0004)}).insert()
+            try:
+                for log_type, when in (("IN", start), ("OUT", end)):
+                    frappe.get_doc({"doctype": "Employee Checkin", "employee": employee.name, "log_type": log_type, "time": when,
+                                    "latitude": lat + rng.uniform(-0.0004, 0.0004), "longitude": lon + rng.uniform(-0.0004, 0.0004)}).insert()
+            except Exception as exc:  # a person hired (or re-shifted) mid-window has no covering shift assignment
+                uncovered.append(f"{employee.name} {work_day}: {str(exc)[:70]}")
+                break
+    if uncovered:
+        print(f"checkins: bỏ qua {len(uncovered)} nhân viên chưa có ca phủ ngày (ví dụ {uncovered[0]})")
     first = work_days[0]
     for shift in SHIFT_TIMES:
         doc = frappe.get_doc("Shift Type", shift)
@@ -480,6 +487,7 @@ def reset_attendance_periods():
     frappe.db.delete("TLC Attendance Period Row", {"parent": ["in", periods or [""]]})
     if requests:
         frappe.db.delete("Attendance", {"attendance_request": ["in", requests]})
+    frappe.db.commit()  # the closing check reads the period through the cache: the month must be gone first
     checkins(load())
     frappe.db.commit()
     print(f"reset: {len(periods)} attendance periods and {len(requests)} corrections deleted, attendance re-marked")
