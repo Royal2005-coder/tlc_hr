@@ -46,6 +46,12 @@ def guard_message(doc, method=None):
     channel = frappe.get_doc("Raven Channel", doc.channel_id)
     if not _assistant_channel(channel):
         return
+    # The AI worker updates the user's message and writes the AI thread after guard_job has
+    # already checked the persisted user message; internal messages of that job are trusted.
+    job_message = frappe.flags.get("tlc_ai_job_message")
+    if job_message and (doc.name == job_message
+                        or (channel.get("is_ai_thread") and channel.get("channel_name") == job_message)):
+        return
     channel.check_permission("read")
     if doc.get("is_bot_message"):
         return
@@ -74,6 +80,7 @@ def guard_job(method, kwargs, transaction_type=None):
     if message:
         persisted = frappe.get_doc("Raven Message", message.name)
         guard_message(persisted)
+        frappe.flags.tlc_ai_job_message = persisted.name
 
 
 def validate_bot(doc, method=None):
