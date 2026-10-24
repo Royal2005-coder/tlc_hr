@@ -18,6 +18,33 @@ def _service():
     return AssistantService(FrappeAssistantRepository())
 
 
+def _mistral_openai_compat():
+    """Mistral's OpenAI-compatible API rejects OpenAI-only None fields on assistant messages."""
+    try:
+        from openai.resources.chat.completions import AsyncCompletions
+    except Exception:
+        return
+    original = AsyncCompletions.create
+    if getattr(original, "_tlc_mistral_compat", False):
+        return
+
+    async def create(self, *args, **kwargs):
+        messages = kwargs.get("messages")
+        if messages:
+            for message in messages:
+                if isinstance(message, dict):
+                    for key in ("refusal", "annotations", "audio", "function_call"):
+                        if message.get(key) is None:
+                            message.pop(key, None)
+        return await original(self, *args, **kwargs)
+
+    create._tlc_mistral_compat = True
+    AsyncCompletions.create = create
+
+
+_mistral_openai_compat()
+
+
 @frappe.whitelist(methods=["POST"])
 def query(topic, employee=None):
     with domain_errors():
