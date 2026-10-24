@@ -1,6 +1,6 @@
 """Authenticated document hooks and native Desk actions for W5."""
 import frappe
-from frappe.utils import getdate, now_datetime, today
+from frappe.utils import get_datetime, getdate, now_datetime, today
 from tlc_hr.contracts.people_ops import BenefitCommand, LicenseCommand, ReceiptCommand, TransitionCommand
 from tlc_hr.domain.people_ops import PeopleOpsError, benefit_amount, require_receipt, require_seat, require_transition
 from tlc_hr.infrastructure.frappe.people_ops import PREFIX, HR, employee_user, is_hr, is_manager, is_self, lock, private_evidence, publish_policy, require
@@ -20,9 +20,23 @@ def transition(doc, old, kind, evidence=""):
         require_transition(kind, TransitionCommand(previous=old.status, target=doc.status, actor_kind=required, evidence=evidence or ""))
 
 
+def _stored(doc, field):
+    """Compare stored values: a Desk payload carries datetimes as strings, the DB copy as objects."""
+    value = doc.get(field)
+    if value in (None, ""):
+        return ""
+    meta = doc.meta.get_field(field)
+    fieldtype = meta.fieldtype if meta else None
+    if fieldtype == "Datetime":
+        return str(get_datetime(value))
+    if fieldtype == "Date":
+        return str(getdate(value))
+    return str(value)
+
+
 def unchanged(doc, old, fields):
     if old:
-        require(all(doc.get(field) == old.get(field) for field in fields))
+        require(all(_stored(doc, field) == _stored(old, field) for field in fields))
 
 
 def validate_gap(doc, method=None):

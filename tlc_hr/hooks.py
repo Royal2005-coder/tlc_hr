@@ -206,20 +206,20 @@ scheduler_events = {
 }
 
 # The reason dialog of "Từ chối" for every TLC approval workflow on the desk.
-app_include_js = ["/assets/tlc_hr/js/tlc_workflow.js"]
+# Frappe skips doctype_js for custom doctypes, so the scripts that also extend custom
+# TLC doctypes (payroll decisions, people ops) are loaded desk-wide instead.
+app_include_js = [
+    "/assets/tlc_hr/js/tlc_workflow.js",
+    "/assets/tlc_hr/js/payroll_decision.js",
+    "/assets/tlc_hr/js/people_ops.js",
+]
 
 # TLC additions to standard forms (decision support, approval evidence, native completion actions).
 doctype_js = {
     "Leave Application": "public/js/leave_application.js",
     "Payroll Entry": "public/js/payroll_entry.js",
-    "Salary Structure Assignment": "public/js/payroll_decision.js",
-    "TLC Payroll Adjustment": "public/js/payroll_decision.js",
-    "TLC Payroll Bonus": "public/js/payroll_decision.js",
-    "TLC Salary Review": "public/js/payroll_decision.js",
     "Employee Onboarding": "public/js/lifecycle_boarding.js",
     "Employee Separation": "public/js/lifecycle_boarding.js",
-    "Asset Movement": "public/js/people_ops.js",
-    "TLC People Ops Acknowledgment": "public/js/people_ops.js",
 }
 
 before_job = ["tlc_hr.interface.assistant.guard_job"]

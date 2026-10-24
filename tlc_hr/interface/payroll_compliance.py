@@ -278,8 +278,20 @@ def entry_guard(doc, method=None):
             allowed = {"modified", "modified_by"}
         else:
             allowed = {"modified", "modified_by", "workflow_state", "tlc_bank_reference", "tlc_paid_on", "tlc_bank_proof", "tlc_reject_reason", "tlc_rejected_stage"}
-        for key in set(old) | set(new):
-            if key not in allowed and fingerprint(old.get(key)) != fingerprint(new.get(key)):
+        before_values, after_values = before.as_dict(), doc.as_dict()
+        child_meta = {"name", "owner", "creation", "modified", "modified_by", "docstatus", "idx",
+                      "parent", "parentfield", "parenttype", "doctype", "__islocal", "__unsaved"}
+        for field in doc.meta.fields:
+            key = field.fieldname
+            if key in allowed:
+                continue
+            if field.fieldtype in ("Table", "Table MultiSelect"):
+                rows = lambda values: [{k: v for k, v in row.items() if k not in child_meta}
+                                       for row in values.get(key) or []]
+                changed = fingerprint(rows(before_values)) != fingerprint(rows(after_values))
+            else:
+                changed = fingerprint(before_values.get(key)) != fingerprint(after_values.get(key))
+            if changed:
                 frappe.throw("Bảng lương đã duyệt bất biến; dùng phiếu điều chỉnh kỳ sau.")
         if doc.workflow_state not in APPROVED:
             frappe.throw("Không mở lại bảng lương đã duyệt.")
