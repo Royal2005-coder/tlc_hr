@@ -160,7 +160,7 @@ frappe.ui.form.on("Job Applicant", {
 		}
 		if (inStep(STEPS[5])) {
 			frm.add_custom_button(__("Hoàn tất và bàn giao onboarding"), () => dialog(__("Kết quả và lưu vết (bước 6)"), [
-				{ fieldname: "confirm", label: __("Tạo việc bàn giao Employee Onboarding cho HR"), fieldtype: "Check", default: 1, reqd: 1 },
+				{ fieldname: "confirm", label: __("Tạo Employee Onboarding từ Job Offer và việc bàn giao cho HR"), fieldtype: "Check", default: 1, reqd: 1 },
 			], "complete"), AI);
 		}
 		if (!inStep("Từ chối", "Talent Pool", STEPS[5])) {

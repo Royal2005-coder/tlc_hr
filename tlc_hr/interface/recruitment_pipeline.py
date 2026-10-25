@@ -258,14 +258,19 @@ def advance(name, action, payload=None):
             frappe.throw(f"Hoàn tất từ bước 6 (đang ở {step}).")
         if not doc.tlc_job_offer:
             frappe.throw("Chưa có Job Offer để bàn giao onboarding.")
+        offer = frappe.get_doc("Job Offer", doc.tlc_job_offer)
+        onboarding = frappe.get_doc({
+            "doctype": "Employee Onboarding", "job_offer": offer.name,
+            "date_of_joining": offer.tlc_joining_date or offer.offer_date,
+        }).insert(ignore_permissions=True)
         todo = frappe.get_doc({"doctype": "ToDo", "allocated_to": "hoa@demo.example", "status": "Open",
                                "date": nowdate(), "priority": "High",
-                               "description": f"Vào việc {doc.applicant_name} ({doc.name}) — tạo Employee và "
-                                              f"Employee Onboarding từ offer {doc.tlc_job_offer}."}).insert(ignore_permissions=True)
+                               "description": f"Vào việc {doc.applicant_name} ({doc.name}) — hoàn tất Employee Onboarding "
+                                              f"{onboarding.name} từ offer {offer.name}."}).insert(ignore_permissions=True)
         _save(doc, tlc_decision_by=frappe.session.user, tlc_decision_on=now_datetime(),
               tlc_step_owner=frappe.session.user, tlc_pipeline="Joined", status="Accepted")
-        _trace(doc, "pipeline.completed", f"Bàn giao onboarding, ToDo {todo.name}, offer {doc.tlc_job_offer}",
-               actor=frappe.session.user)
+        _trace(doc, "pipeline.completed", f"Bàn giao Employee Onboarding {onboarding.name} và ToDo {todo.name} từ offer "
+                                          f"{offer.name}", actor=frappe.session.user)
     elif action in ("reject", "talent"):
         target = REJECTED if action == "reject" else TALENT
         if not reason:
