@@ -1,6 +1,38 @@
 version: 1
 kind: dashboards
 number_cards:
+  - name: TLC Tuyển dụng bước 1 hồ sơ
+    doctype: Job Applicant
+    color: '#2563eb'
+    filters: [[tlc_step, '=', '1. Tiếp nhận hồ sơ']]
+  - name: TLC Tuyển dụng bước 2 đối chiếu
+    doctype: Job Applicant
+    color: '#0891b2'
+    filters: [[tlc_step, '=', '2. Đối chiếu tiêu chí']]
+  - name: TLC Tuyển dụng bước 3 mời phỏng vấn
+    doctype: Job Applicant
+    color: '#7c3aed'
+    filters: [[tlc_step, '=', '3. Quyết định mời phỏng vấn']]
+  - name: TLC Tuyển dụng bước 4 thư mời
+    doctype: Job Applicant
+    color: '#b45309'
+    filters: [[tlc_step, '=', '4. Thư mời và lịch hẹn']]
+  - name: TLC Tuyển dụng bước 5 phỏng vấn
+    doctype: Job Applicant
+    color: '#c2410c'
+    filters: [[tlc_step, '=', '5. Phỏng vấn và quyết định offer']]
+  - name: TLC Tuyển dụng bước 6 kết quả
+    doctype: Job Applicant
+    color: '#15803d'
+    filters: [[tlc_step, '=', '6. Kết quả và lưu vết']]
+  - name: TLC Tuyển dụng AI cần người duyệt
+    doctype: Job Applicant
+    color: '#d9480f'
+    filters: [[tlc_step, '=', '2. Đối chiếu tiêu chí'], [tlc_ai_status, '=', 'Đã chấm']]
+  - name: TLC Tuyển dụng offer cần giám đốc
+    doctype: Job Applicant
+    color: '#b91c1c'
+    filters: [[tlc_step, '=', '5. Phỏng vấn và quyết định offer']]
   - name: TLC Recruitment Open Vacancies
     doctype: Job Opening
     color: '#2563eb'

@@ -6,6 +6,38 @@ shortcuts:
   type: URL
   url: /hrms/home
   color: Green
+- label: Tuyển dụng Kanban 6 bước
+  type: URL
+  url: /desk/job-applicant/view/kanban/TLC%20Tuy%E1%BB%83n%20d%E1%BB%A5ng%206%20b%C6%B0%E1%BB%9Bc
+  color: Blue
+- label: Tuyển dụng Ứng viên
+  type: DocType
+  link_to: Job Applicant
+  doc_view: List
+- label: Tuyển dụng Vị trí
+  type: DocType
+  link_to: Job Opening
+  doc_view: List
+- label: Tuyển dụng Yêu cầu
+  type: DocType
+  link_to: Job Requisition
+  doc_view: List
+- label: Tuyển dụng Job Offer
+  type: DocType
+  link_to: Job Offer
+  doc_view: List
+- label: Tuyển dụng AI log
+  type: DocType
+  link_to: TLC Recruitment AI Log
+  doc_view: List
+- label: Tuyển dụng Onboarding
+  type: DocType
+  link_to: Employee Onboarding
+  doc_view: List
+- label: Trợ lý AI (Chat)
+  type: Page
+  link_to: tro-ly-ai
+  color: Purple
 - label: ESS Số dư và đơn nghỉ
   type: URL
   url: /hrms/dashboard/leaves
@@ -145,45 +177,52 @@ workspaces:
   icon: user
   sequence: 10
   cards: [TLC ESS Đơn nghỉ đang xử lý, TLC ESS Tăng ca chờ đồng ý, TLC ESS Phiếu lương đã xác nhận, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
-  shortcuts: [ESS Trang chủ Frappe HR, ESS Số dư và đơn nghỉ, ESS Chấm công của tôi, ESS Phiếu lương của tôi, ESS Đồng ý tăng ca, ESS Việc được giao, Dịch vụ nội bộ, Khảo sát ẩn danh]
+  shortcuts: [ESS Trang chủ Frappe HR, ESS Số dư và đơn nghỉ, ESS Chấm công của tôi, ESS Phiếu lương của tôi, ESS Đồng ý tăng ca, ESS Việc được giao, Dịch vụ nội bộ, Khảo sát ẩn danh, Trợ lý AI (Chat)]
 - title: TLC Nhà máy
   roles: [TLC Line Manager]
   icon: users
   sequence: 11
   cards: [TLC Nhà máy nhân sự trong phạm vi, TLC Nhà máy ngoại lệ đi muộn, TLC Nhà máy ngoại lệ về sớm, TLC Nhà máy ca được phân tháng này, TLC Đơn chờ tôi duyệt, TLC Kỳ công chờ tôi xác nhận, TLC Việc được giao quá hạn]
-  shortcuts: [Nhà máy nhân sự và định biên, Nhà máy ca được phân, Nhà máy bảng công ngoại lệ, Nhà máy giải trình công, Nhà máy duyệt phép, Nhà máy chốt kỳ công, ESS Đồng ý tăng ca, ESS Trang chủ Frappe HR]
+  shortcuts: [Nhà máy nhân sự và định biên, Nhà máy ca được phân, Nhà máy bảng công ngoại lệ, Nhà máy giải trình công, Nhà máy duyệt phép, Nhà máy chốt kỳ công, ESS Đồng ý tăng ca, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]
 - title: TLC HR Hạn xử lý
   roles: [TLC HR Lead, TLC HR Officer]
   icon: hr
   sequence: 12
   cards: [TLC HR Việc mở đến hạn tuần này, TLC HR Việc mở quá hạn, TLC Đơn chờ nhân sự duyệt, TLC Kỳ công chờ đối soát, TLC Vị trí tuyển dụng đang mở]
-  shortcuts: [HR Theo dõi hạn công việc, HR Hội nhập, HR Nghỉ việc, HR Tuyển dụng, Nhà máy chốt kỳ công, Dịch vụ nội bộ, Khảo sát ẩn danh, ESS Trang chủ Frappe HR]
+  shortcuts: [HR Theo dõi hạn công việc, HR Hội nhập, HR Nghỉ việc, HR Tuyển dụng, Nhà máy chốt kỳ công, Dịch vụ nội bộ, Khảo sát ẩn danh, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]
   quick_list:
     doctype: ToDo
     label: Công việc HR còn mở
     filters:
     - [ToDo, status, '=', Open]
+- title: TLC Tuyển dụng
+  roles: [TLC HR Lead, TLC HR Officer, TLC Director]
+  icon: hr
+  sequence: 4
+  cards: [TLC Tuyển dụng bước 1 hồ sơ, TLC Tuyển dụng bước 2 đối chiếu, TLC Tuyển dụng bước 3 mời phỏng vấn, TLC Tuyển dụng bước 4 thư mời, TLC Tuyển dụng bước 5 phỏng vấn, TLC Tuyển dụng bước 6 kết quả, TLC Tuyển dụng AI cần người duyệt, TLC Tuyển dụng offer cần giám đốc]
+  charts: [TLC Recruitment Application Pipeline]
+  shortcuts: [Tuyển dụng Kanban 6 bước, Tuyển dụng Ứng viên, Tuyển dụng Vị trí, Tuyển dụng Yêu cầu, Tuyển dụng Job Offer, Tuyển dụng AI log, Tuyển dụng Onboarding, Trợ lý AI (Chat)]
 - title: TLC CEO Chi phí
   roles: [TLC Director]
   icon: dashboard
   sequence: 13
   cards: [TLC Nhân sự đang làm việc, TLC Điều hành lương gross tháng này, TLC Điều hành lương net tháng này, TLC Vị trí tuyển dụng đang mở, TLC Bảng lương chờ ký, TLC Kỳ công chờ ký, TLC Tăng ca chờ giám đốc duyệt]
   charts: [TLC Điều hành gross theo phòng ban, TLC Giờ tăng ca theo bộ phận]
-  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Điều hành ký kỳ công, Điều hành duyệt tăng ca, HR Tuyển dụng, ESS Trang chủ Frappe HR]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Điều hành ký kỳ công, Điều hành duyệt tăng ca, HR Tuyển dụng, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]
 - title: TLC Tác nghiệp lương
   roles: [TLC Payroll, TLC HR Lead]
   icon: money-coins
   sequence: 14
   cards: [TLC Bảng lương chờ ký, TLC Bảng lương chờ chi, TLC Việc được giao quá hạn]
-  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Lương rà soát sai lệch, Tham số lương Việt Nam, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
+  shortcuts: [Điều hành chi phí lương, Điều hành ký bảng lương, Lương phân bổ cấu trúc, Lương quyết định điều chỉnh, Lương quyết định thưởng, Lương đề nghị thay đổi, Lương rà soát sai lệch, Tham số lương Việt Nam, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]
 - title: TLC Kế toán chi trả
   roles: [Accounts User, Accounts Manager]
   icon: money-coins
   sequence: 15
   cards: [TLC Bảng lương chờ chi, TLC Việc được giao còn mở, TLC Việc được giao quá hạn]
-  shortcuts: [Điều hành ký bảng lương, Kế toán chứng từ thanh toán, Kế toán tạm ứng, Kế toán quyết toán chi phí, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR]
+  shortcuts: [Điều hành ký bảng lương, Kế toán chứng từ thanh toán, Kế toán tạm ứng, Kế toán quyết toán chi phí, HR Theo dõi hạn công việc, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]
 - title: TLC Quản trị kỹ thuật
   roles: [TLC Role Admin, System Manager]
   icon: settings
   sequence: 16
-  shortcuts: [IT Tài khoản người dùng, IT Vai trò kỹ thuật, IT Phạm vi người dùng, IT Nhật ký truy cập, IT Nhật ký lỗi, Dịch vụ nội bộ, ESS Trang chủ Frappe HR]
+  shortcuts: [IT Tài khoản người dùng, IT Vai trò kỹ thuật, IT Phạm vi người dùng, IT Nhật ký truy cập, IT Nhật ký lỗi, Dịch vụ nội bộ, ESS Trang chủ Frappe HR, Trợ lý AI (Chat)]

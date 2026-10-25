@@ -115,7 +115,8 @@ doc_events = {
                         "on_update": "tlc_hr.interface.recruitment.requisition_updated"},
     "Job Opening": {"validate": "tlc_hr.interface.recruitment.validate_opening",
                     "on_update": "tlc_hr.interface.recruitment.opening_updated"},
-    "Job Applicant": {"validate": "tlc_hr.interface.recruitment.validate_applicant"},
+    "Job Applicant": {"validate": ["tlc_hr.interface.recruitment.validate_applicant",
+                                    "tlc_hr.interface.recruitment_pipeline.validate_applicant"]},
     "Job Offer": {"validate": "tlc_hr.interface.recruitment.validate_offer",
                   "before_update_after_submit": "tlc_hr.interface.recruitment.validate_offer",
                   "on_update": "tlc_hr.interface.recruitment.offer_updated",
@@ -178,7 +179,8 @@ has_permission = {
     "Salary Slip": "tlc_hr.interface.payroll_permissions.has_permission",
     "Travel Request": f"{TRAVEL}.has_permission", "Employee Advance": f"{TRAVEL}.has_permission",
     "Expense Claim": f"{TRAVEL}.has_permission",
-    "Asset Movement": f"{OPS}.scoped_permission", "Employee Grievance": f"{OPS}.scoped_permission",
+    "Asset Movement": f"{OPS}.scoped_permission",
+    "Job Applicant": "tlc_hr.interface.recruitment_pipeline.guard_step_field", "Employee Grievance": f"{OPS}.scoped_permission",
     "Goal": f"{OPS}.scoped_permission", "Appraisal": f"{OPS}.scoped_permission",
     "TLC People Ops Account": f"{OPS}.scoped_permission", "TLC People Ops Acknowledgment": f"{OPS}.scoped_permission",
     "TLC People Ops Certificate": f"{OPS}.scoped_permission", "TLC People Ops Benefit Claim": f"{OPS}.scoped_permission",
@@ -198,6 +200,7 @@ has_permission = {
 override_doctype_class = {"Attendance Request": "tlc_hr.interface.travel_adjustments.TravelAttendanceRequest"}
 
 scheduler_events = {
+    "all": ["tlc_hr.interface.recruitment_pipeline.poll_mailpit"],
     "daily": [
         "tlc_hr.interface.organization.apply_due_changes",
         "tlc_hr.infrastructure.frappe.lifecycle.remind_expiries",
@@ -218,6 +221,7 @@ app_include_js = [
 doctype_js = {
     "Leave Application": "public/js/leave_application.js",
     "Payroll Entry": "public/js/payroll_entry.js",
+    "Job Applicant": "public/js/recruitment_pipeline.js",
     "Employee Onboarding": "public/js/lifecycle_boarding.js",
     "Employee Separation": "public/js/lifecycle_boarding.js",
 }

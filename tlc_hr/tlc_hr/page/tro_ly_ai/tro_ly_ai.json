@@ -1,0 +1,19 @@
+{
+ "doctype": "Page",
+ "name": "tro-ly-ai",
+ "page_name": "tro-ly-ai",
+ "title": "Trợ lý HR (AI)",
+ "module": "TLC HR",
+ "standard": "Yes",
+ "system_page": 0,
+ "roles": [
+  {"role": "TLC Self Service"},
+  {"role": "TLC Line Manager"},
+  {"role": "TLC HR Lead"},
+  {"role": "TLC HR Officer"},
+  {"role": "TLC Payroll"},
+  {"role": "TLC Director"},
+  {"role": "Accounts User"},
+  {"role": "TLC Role Admin"}
+ ]
+}

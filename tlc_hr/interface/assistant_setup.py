@@ -4,6 +4,7 @@ import json
 import os
 
 import frappe
+from frappe.utils import now_datetime
 
 from tlc_hr.contracts.assistant import AssistantQuery, LeaveDraft
 from tlc_hr.infrastructure.frappe.assistant import DEMO_USERS
@@ -22,6 +23,13 @@ Chỉ khẳng định đã tạo nháp khi công cụ trả document_id và docs
 trả mã đơn và đường dẫn cho người dùng tự mở kiểm tra. Với query luôn trả mã nhân viên và mã bản ghi
 để đối chiếu; không bịa số liệu khi bị từ chối hoặc không có bản ghi.
 """
+
+
+WORKSPACE = "TLC HR"
+CHANNEL = "nhan-su-tlc"
+GREETING = ("Xin chào {name}! Tôi là trợ lý HR của dữ liệu mẫu TLC. Hỏi tôi: hồ sơ của tôi, số dư phép, "
+            "đơn phép đang chờ ai duyệt, phiếu lương đã ghi sổ - hoặc bảo 'soạn nháp đơn nghỉ phép'. "
+            "Tôi chỉ tạo bản nháp và chỉ trả lời dữ liệu của chính bạn; gửi duyệt và phê duyệt vẫn là việc của người.")
 
 
 def _operator():
@@ -77,21 +85,55 @@ def configure():
                 "top_p": 1, "instruction": INSTRUCTION, "openai_assistant_id": None,
                 "file_sources": [], "bot_functions": [{"function": name} for name in FUNCTIONS]})
     bot.save()
-    channels = {}
-    for user_id in sorted(DEMO_USERS):
-        if not frappe.db.exists("User", user_id):
-            frappe.throw(f"Prerequisite missing: demo user {user_id}.")
-        user = frappe.get_doc("User", user_id)
-        user.add_roles("Raven User")
-        if not frappe.db.exists("Raven User", user_id):
-            frappe.get_doc({"doctype": "Raven User", "type": "User", "user": user_id, "full_name": user.full_name}).insert()
-        channels[user_id] = "/raven/dm-channel/" + bot.create_direct_message_channel(user_id)
+    channels = provision_channels()
     from frappe.installer import update_site_config
     update_site_config("tlc_ai_demo_enabled", True)
     frappe.conf.tlc_ai_demo_enabled = True
     frappe.db.commit()
     return {"configured": True, "provider": "Mistral / OpenAI-compatible Chat Completions", "bot": BOT_NAME,
             "tools": list(FUNCTIONS), "channels": channels, "provider_smoke_executed": False}
+
+
+def provision_channels():
+    """Put every demo person where the Raven UI actually lists them: a workspace member, a shared channel,
+    and a DM that already holds a message (an empty DM is invisible in the channel rail)."""
+    if frappe.session.user != "Administrator":
+        frappe.throw("Assistant configuration is restricted to the demo site operator.", frappe.PermissionError)
+    if not frappe.db.exists("Raven Bot", BOT_NAME):
+        frappe.throw("Configure the assistant bot before provisioning channels.")
+    bot = frappe.get_doc("Raven Bot", BOT_NAME)
+    if not frappe.db.exists("Raven User", {"bot": bot.name}):
+        frappe.get_doc({"doctype": "Raven User", "type": "Bot", "bot": bot.name, "full_name": bot.bot_name}).insert()
+    if not frappe.db.exists("Raven Workspace", WORKSPACE):
+        frappe.get_doc({"doctype": "Raven Workspace", "workspace_name": WORKSPACE, "type": "Public",
+                        "description": "Không gian chat của dữ liệu mẫu TLC."}).insert()
+    channels = {}
+    for user_id in sorted(DEMO_USERS):
+        if not frappe.db.exists("User", user_id):
+            frappe.throw(f"Prerequisite missing: demo user {user_id}.")
+        user = frappe.get_doc("User", user_id)
+        user.add_roles("Raven User")
+        if not frappe.db.exists("Raven User", {"user": user_id}):
+            frappe.get_doc({"doctype": "Raven User", "type": "User", "user": user_id, "full_name": user.full_name}).insert()
+        if not frappe.db.exists("Raven Workspace Member", {"workspace": WORKSPACE, "user": user_id}):
+            frappe.get_doc({"doctype": "Raven Workspace Member", "workspace": WORKSPACE, "user": user_id}).insert()
+        dm = frappe.db.get_value("Raven Channel", {"is_direct_message": 1, "dm_user_1": user_id}, "name")
+        if not dm:
+            dm = bot.create_direct_message_channel(user_id)
+        if not frappe.db.exists("Raven Message", {"channel_id": dm}):
+            frappe.get_doc({"doctype": "Raven Message", "channel_id": dm, "message_type": "Text", "is_bot_message": 1,
+                            "bot": bot.name, "text": GREETING.format(name=user.first_name)}).insert(ignore_permissions=True)
+        channels[user_id] = "/raven/dm-channel/" + dm
+    channel = frappe.db.get_value("Raven Channel", {"channel_name": CHANNEL}, "name")
+    if not channel:
+        channel = frappe.get_doc({"doctype": "Raven Channel", "channel_name": CHANNEL, "type": "Public", "workspace": WORKSPACE,
+                                  "channel_description": "Kênh chung của dữ liệu mẫu; trợ lý trả lời riêng theo từng người trong DM."}).insert().name
+    for member in sorted(DEMO_USERS) + [bot.name]:
+        if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": member}):
+            frappe.get_doc({"doctype": "Raven Channel Member", "channel_id": channel, "user_id": member,
+                            "last_visit": now_datetime()}).insert()
+    frappe.db.commit()
+    return channels
 
 
 def provider_smoke():

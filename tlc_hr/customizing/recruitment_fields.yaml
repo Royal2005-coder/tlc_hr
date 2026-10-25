@@ -34,6 +34,30 @@ custom_fields:
       - {fieldname: tlc_received_on, fieldtype: Date, label: Received On, read_only: true, no_copy: true}
       - {fieldname: tlc_pipeline, fieldtype: Select, label: Recruitment Pipeline, default: New, options: "New\nCV Screening\nHR Interview\nTechnical Interview\nFinal Interview\nOffer\nOffer Accepted\nJoined\nRejected\nTalent Pool\nWithdrawn"}
       - {fieldname: tlc_disposition_reason, fieldtype: Select, label: Disposition Reason, options: "\nTechnical fit\nCulture fit\nSalary\nInterview result\nAnother offer\nUnavailable\nPersonal\nOther"}
+      - {fieldname: tlc_step, fieldtype: Select, label: AI Hiring Step, default: "1. Tiếp nhận hồ sơ", options: "1. Tiếp nhận hồ sơ\n2. Đối chiếu tiêu chí\n3. Quyết định mời phỏng vấn\n4. Thư mời và lịch hẹn\n5. Phỏng vấn và quyết định offer\n6. Kết quả và lưu vết\nTừ chối\nTalent Pool"}
+      - {fieldname: tlc_step_due, fieldtype: Date, label: Step Due}
+      - {fieldname: tlc_step_owner, fieldtype: Link, label: Step Owner, options: User, read_only: 1}
+      - {fieldname: tlc_ai_section, fieldtype: Section Break, label: AI Screening, collapsible: 1}
+      - {fieldname: tlc_ai_status, fieldtype: Select, label: AI Status, read_only: 1, default: "Chưa chấm", options: "Chưa chấm\nĐang chấm\nĐã chấm\nLỗi"}
+      - {fieldname: tlc_ai_score, fieldtype: Float, label: AI Fit Score, read_only: 1}
+      - {fieldname: tlc_ai_verdict, fieldtype: Select, label: AI Verdict, read_only: 1, options: "\nĐạt\nCân nhắc\nKhông đạt"}
+      - {fieldname: tlc_ai_summary, fieldtype: Small Text, label: AI Summary, read_only: 1}
+      - {fieldname: tlc_ai_risks, fieldtype: Small Text, label: AI Risks, read_only: 1}
+      - {fieldname: tlc_ai_questions, fieldtype: Small Text, label: AI Interview Questions, read_only: 1}
+      - {fieldname: tlc_ai_model, fieldtype: Data, label: AI Model, read_only: 1}
+      - {fieldname: tlc_ai_checked_on, fieldtype: Datetime, label: AI Checked On, read_only: 1}
+      - {fieldname: tlc_cv_text, fieldtype: Long Text, label: CV Text (AI), read_only: 1, hidden: 1}
+      - {fieldname: tlc_intake_source, fieldtype: Select, label: Intake Source, default: Manual, read_only: 1, options: "\nManual\nEmail\nPortal"}
+      - {fieldname: tlc_intake_message, fieldtype: Data, label: Intake Message ID, read_only: 1, unique: 1, no_copy: 1}
+      - {fieldname: tlc_interview_section, fieldtype: Section Break, label: Interview and Offer}
+      - {fieldname: tlc_interview_at, fieldtype: Datetime, label: Interview At}
+      - {fieldname: tlc_interviewer, fieldtype: Link, label: Interviewer, options: Employee}
+      - {fieldname: tlc_interview_notes, fieldtype: Small Text, label: Interview Notes}
+      - {fieldname: tlc_interview_result, fieldtype: Select, label: Interview Result, options: "\nPass\nFail\nHold"}
+      - {fieldname: tlc_decision_by, fieldtype: Link, label: Decision By, options: User, read_only: 1}
+      - {fieldname: tlc_decision_on, fieldtype: Datetime, label: Decision On, read_only: 1}
+      - {fieldname: tlc_decision_reason, fieldtype: Small Text, label: Decision Reason}
+      - {fieldname: tlc_job_offer, fieldtype: Link, label: Job Offer, options: Job Offer, read_only: 1, no_copy: 1}
   - doctype: Interview Type
     fields:
       - {fieldname: tlc_final_round, fieldtype: Check, label: TLC Final Round}

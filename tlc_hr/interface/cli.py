@@ -6,9 +6,11 @@
     bench --site <site> tlc config export <kind> [name]   a workflow edited on the desk, as YAML for tlc_hr/customizing
     bench --site <site> tlc doctor               operational checks: shifts, sites, approvers, accounts, closing
     bench --site <site> tlc seed run|reset-leave|reset-overtime|reset-periods|reset-payroll   demo data (test sites only)
+    bench --site <site> tlc ai channels      make the Raven assistant and its channels visible to every demo person
 """
 
 import click
+import json
 import frappe
 from frappe.commands import get_site, pass_context
 
@@ -117,6 +119,24 @@ def doctor(context):
         click.echo(f"{'OK ' if ok else 'LỖI'} {title}" + (f": {detail}" if detail else ""))
     if not all(ok for ok, _t, _d in results):
         raise SystemExit(1)
+
+
+@tlc.group("ai")
+def ai():
+    """Raven assistant and chat provisioning (demo site operator only)."""
+
+
+@ai.command("channels")
+@pass_context
+def ai_channels(context):
+    """Give every demo person a Raven workspace membership, the shared channel and a bot DM."""
+    from tlc_hr.interface.assistant_setup import provision_channels
+
+    connect(context)
+    try:
+        click.echo(json.dumps(provision_channels(), ensure_ascii=False, indent=1))
+    finally:
+        frappe.destroy()
 
 
 @tlc.command("seed")

@@ -167,6 +167,7 @@ workspaces:
   - Sơ đồ tổ chức
   - Số dư phép
   - Ứng dụng Frappe HR
+  - Trợ lý AI (Chat)
   quick_list:
     doctype: Leave Application
     label: Đơn chờ quản lý duyệt
@@ -213,6 +214,7 @@ workspaces:
   - Sơ đồ tổ chức
   - Yêu cầu cần xử lý
   - ESS Trang chủ Frappe HR
+  - Trợ lý AI (Chat)
   quick_list:
     doctype: Leave Application
     label: Đơn chờ nhân sự duyệt
@@ -253,6 +255,7 @@ workspaces:
   - Nhân viên
   - Sơ đồ tổ chức
   - Số dư phép
+  - Trợ lý AI (Chat)
   quick_list:
     doctype: Leave Application
     label: Đơn chờ tôi duyệt
