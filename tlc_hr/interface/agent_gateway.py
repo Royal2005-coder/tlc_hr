@@ -204,7 +204,9 @@ def act(message, tool=None, args=None, case=None):
     existing = frappe.db.get_value("TLC AI Case", {"case_key": key})
     if existing:
         doc = frappe.get_doc("TLC AI Case", existing)
-        return {"state": doc.state, "case": doc.name, "reply": f"Yêu cầu trước đó đang ở trạng thái {doc.state} (case {doc.name})."}
+        # the same request already ran: hand back the record it produced, so a follow-up tool call can continue from it
+        return {"state": doc.state, "case": doc.name, "reply": f"Yêu cầu trước đó đang ở trạng thái {doc.state} (case {doc.name}).",
+                "document_type": doc.document_type or "", "document_id": doc.document_id or ""}
     record = frappe.get_doc({"doctype": "TLC AI Case", "case_key": key, "tool": tool, "tool_title": spec["title"],
                              "risk_class": spec["risk"], "requester": requester, "arguments": json.dumps(arguments, default=str),
                              "message": (message or "")[:2000], "fingerprint": _fingerprint(tool, arguments),
@@ -349,6 +351,12 @@ def _submit_leave(record):
 
     args = json.loads(record.arguments or "{}")
     name = args.get("name") or record.document_id
+    if not name:  # the person said "send the draft I just made" without naming it
+        drafts = frappe.get_all("Leave Application", filters={"employee": employee_of(record.requester), "docstatus": 0},
+                                pluck="name", order_by="creation desc", limit=1)
+        name = drafts[0] if drafts else None
+    if not name:
+        raise frappe.ValidationError("Chưa có đơn nháp nào của bạn để gửi duyệt.")
     doc = frappe.get_doc("Leave Application", name)
     if doc.docstatus != 0 or doc.employee != employee_of(record.requester):
         raise frappe.PermissionError("Chỉ gửi đơn phép nháp của chính mình.")
