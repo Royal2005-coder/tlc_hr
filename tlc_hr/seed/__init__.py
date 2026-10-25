@@ -368,11 +368,12 @@ def checkins(data, days=DEMO_DAYS):
 
     today = getdate(nowdate())
     first = (today.replace(day=1) - dt.timedelta(days=1)).replace(day=1)  # last month is a full month to close
+    window_start = (first - dt.timedelta(days=1)).replace(day=1)  # and the month before it: a second payable month
     work_days = []
     day = today - dt.timedelta(days=1)
     holidays = set(frappe.get_all("Holiday", filters={"parent": frappe.db.get_value("Company", COMPANY, "default_holiday_list")},
                                   pluck="holiday_date"))
-    while len(work_days) < days or day >= first:
+    while len(work_days) < days or day >= window_start:
         if day.weekday() < 5 and day not in holidays:
             work_days.append(day)
         day -= dt.timedelta(days=1)
