@@ -58,7 +58,8 @@ CRITERIA_SYSTEM = (
     'Trả về JSON đúng cấu hình {"criteria": [...], "summary": "...", "risks": [...], "questions": [...]}.'
 )
 NOTE_SYSTEM = (
-    "Bạn viết thư tuyển dụng cho bộ phận nhân sự. Giản dị, lịch sự, đúng tiếng Việt, không bịa thông tin. "
+    "Bạn viết thư tuyển dụng cho bộ phận nhân sự. Giản dị, lịch sự, đúng tiếng Việt. Chỉ dùng đúng thông tin được cho: "
+    "không tự thêm số điện thoại, email, địa chỉ hay tên người nào không có trong dữ kiện. "
     'Trả về JSON đúng {"lines": [...]} với 2-4 câu, mỗi câu một phần tử.'
 )
 INTERVIEW_SYSTEM = (
@@ -767,6 +768,9 @@ def communication_created(doc, method=None):
     trace(doc.reference_name, "email.sent", detail, actor=doc.sender or frappe.session.user, step=applicant.tlc_step,
           message_id=doc.name)
     frappe.db.commit()
+    # the pipeline sends a letter itself only when nobody opened the composer; that call closes the step on its own
+    if frappe.flags.get("tlc_no_advance"):
+        return
     if applicant.tlc_step == "3. Quyết định mời phỏng vấn" and applicant.email_id in recipients:
         from tlc_hr.interface.recruitment_pipeline import advance
 
