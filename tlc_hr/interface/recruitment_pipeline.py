@@ -259,9 +259,10 @@ def advance(name, action, payload=None):
         if not doc.tlc_job_offer:
             frappe.throw("Chưa có Job Offer để bàn giao onboarding.")
         offer = frappe.get_doc("Job Offer", doc.tlc_job_offer)
+        joining = offer.tlc_joining_date or offer.offer_date
         onboarding = frappe.get_doc({
-            "doctype": "Employee Onboarding", "job_offer": offer.name,
-            "date_of_joining": offer.tlc_joining_date or offer.offer_date,
+            "doctype": "Employee Onboarding", "job_offer": offer.name, "company": offer.company,
+            "date_of_joining": joining, "boarding_begins_on": joining,
         }).insert(ignore_permissions=True)
         todo = frappe.get_doc({"doctype": "ToDo", "allocated_to": "hoa@demo.example", "status": "Open",
                                "date": nowdate(), "priority": "High",
