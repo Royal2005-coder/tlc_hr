@@ -16,7 +16,8 @@ permissions:
   - {doctype: Email Account, role: TLC Director, rights: r}
   - {doctype: Email Template, role: TLC HR Lead, rights: rw}
   - {doctype: Email Template, role: TLC HR Officer, rights: r}
-  - {doctype: Interview, role: TLC Director, rights: r}
+  - {doctype: Interview, role: TLC Director, rights: rw}
+  - {doctype: Interview, role: TLC Line Manager, rights: r}
   - {doctype: Interview, role: TLC HR Officer, rights: rwcsxa}
   - {doctype: Interview, role: TLC HR Lead, rights: rwcsxa}
   - {doctype: Job Offer, role: TLC HR Officer, rights: rwc}
