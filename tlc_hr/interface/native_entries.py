@@ -31,6 +31,56 @@ def _values(parent, label, kind, target, color):
             "doc_view": "List" if kind == "DocType" else None}
 
 
+LINKS = (
+    ("Recruitment", "TLC Kanban 6 bước", "DocType", "Job Applicant", "Kanban", "TLC Tuyển dụng 6 bước"),
+    ("Recruitment", "TLC Ứng viên & chấm CV", "DocType", "Job Applicant", "List", None),
+    ("Recruitment", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log", "List", None),
+    ("Recruitment", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai", None, None),
+    ("Recruitment", "TLC Mẫu thư tuyển dụng", "DocType", "Email Template", "List", None),
+    ("HR Setup", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai", None, None),
+    ("HR Setup", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log", "List", None),
+    ("HR Setup", "TLC Kanban 6 bước", "DocType", "Job Applicant", "Kanban", "TLC Tuyển dụng 6 bước"),
+)
+
+
+def _link_values(parent, label, link_type, target, view, board):
+    return {"parenttype": "Workspace", "parentfield": "links", "parent": parent, "type": "Link", "label": label,
+            "link_type": link_type, "link_to": target, "doc_view": view, "kanban_board": board,
+            "is_query_report": 0, "hidden": 0, "onboard": 0}
+
+
+def ensure_links():
+    """The card in the sidebar of the native workspace: the links table is what the desk renders as the left menu."""
+    touched = 0
+    for parent in ("Recruitment", "HR Setup"):
+        if not frappe.db.exists("Workspace", parent):
+            continue
+        card = frappe.get_all("Workspace Link", filters={"parent": parent, "type": "Card Break", "label": "TLC AI"},
+                              pluck="name")
+        if not card:
+            frappe.get_doc({"doctype": "Workspace Link", "parenttype": "Workspace", "parentfield": "links",
+                            "parent": parent, "type": "Card Break", "label": "TLC AI", "link_count": 5,
+                            "hidden": 0}).insert(ignore_permissions=True)
+            touched += 1
+        for label, link_type, target, view, board in ((l[1], l[2], l[3], l[4], l[5]) for l in LINKS if l[0] == parent):
+            values = _link_values(parent, label, link_type, target, view, board)
+            names = frappe.get_all("Workspace Link", filters={"parent": parent, "type": "Link", "label": label},
+                                   pluck="name", order_by="idx asc")
+            if names:
+                frappe.db.set_value("Workspace Link", names[0], values, update_modified=False)
+                for extra in names[1:]:
+                    frappe.delete_doc("Workspace Link", extra, force=1, ignore_permissions=True)
+            else:
+                frappe.get_doc({"doctype": "Workspace Link", **values}).insert(ignore_permissions=True)
+            touched += 1
+        count = frappe.db.count("Workspace Link", {"parent": parent, "type": "Link"})
+        for name in frappe.get_all("Workspace Link", filters={"parent": parent, "type": "Card Break", "label": "TLC AI"},
+                                   pluck="name"):
+            frappe.db.set_value("Workspace Link", name, "link_count", max(1, len(LINKS) - (3 if parent == "HR Setup" else 0)))
+    frappe.db.commit()
+    return touched
+
+
 def ensure():
     """Create or repair the shortcut rows of the native workspaces; safe to run on every migrate."""
     touched, created, repaired = set(), 0, 0
@@ -49,7 +99,7 @@ def ensure():
             frappe.get_doc({"doctype": "Workspace Shortcut", **values}).insert(ignore_permissions=True)
             created += 1
         touched.add(parent)
+    links = ensure_links()
     frappe.db.commit()
-    for parent in touched:
-        frappe.clear_cache(doctype="Workspace")
-    return {"created": created, "duplicates_removed": repaired, "workspaces": sorted(touched)}
+    frappe.clear_cache(doctype="Workspace")
+    return {"created": created, "duplicates_removed": repaired, "links": links, "workspaces": sorted(touched)}
