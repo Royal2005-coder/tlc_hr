@@ -69,6 +69,12 @@ def same(current, wanted) -> bool:
     current, wanted = normal(current), normal(wanted)
     if isinstance(current, (int, float)) and isinstance(wanted, (int, float)):
         return abs(float(current) - float(wanted)) < 1e-9
+    # The DDIC stores a flag or a default as text, so "1" and 1 are the same declared value.
+    if isinstance(current, str) and isinstance(wanted, (int, float)):
+        try:
+            return abs(float(current) - float(wanted)) < 1e-9
+        except ValueError:
+            return False
     return current == wanted
 
 

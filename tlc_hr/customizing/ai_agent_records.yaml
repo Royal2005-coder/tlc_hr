@@ -1,0 +1,125 @@
+version: 1
+kind: records
+description: |
+  The agentic HRM plane: one front agent (@Leo) whose skills hold a closed tool surface, every action leaves a case
+  with its frozen arguments, and a policy record states what the assistant may never do. Written by the app, read by
+  the gateway in tlc_hr/interface/agent_gateway.py.
+records:
+  - doctype: DocType
+    name: TLC AI Agent
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: field:agent_code
+      track_changes: 1
+      naming_rule: By fieldname
+    tables:
+      fields:
+        - {fieldname: agent_code, fieldtype: Data, label: Agent Code, reqd: 1, unique: 1}
+        - {fieldname: agent_name, fieldtype: Data, label: Agent Name, reqd: 1}
+        - {fieldname: is_front, fieldtype: Check, label: Front Agent}
+        - {fieldname: model, fieldtype: Data, label: Model}
+        - {fieldname: enabled, fieldtype: Check, label: Enabled, default: 1}
+        - {fieldname: persona, fieldtype: Long Text, label: Persona}
+      permissions:
+        - {role: TLC Role Admin, read: 1, write: 1, create: 1}
+        - {role: TLC HR Lead, read: 1}
+        - {role: System Manager, read: 1, write: 1, create: 1, delete: 1}
+  - doctype: DocType
+    name: TLC AI Tool
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: field:tool_code
+      track_changes: 1
+      naming_rule: By fieldname
+    tables:
+      fields:
+        - {fieldname: tool_code, fieldtype: Data, label: Tool Code, reqd: 1, unique: 1}
+        - {fieldname: title, fieldtype: Data, label: Title, reqd: 1, in_list_view: 1}
+        - {fieldname: agent, fieldtype: Link, label: Agent, options: TLC AI Agent, in_list_view: 1}
+        - {fieldname: risk_class, fieldtype: Select, label: Risk, options: "read\ndraft\napproval\nforbidden", reqd: 1, in_list_view: 1, default: read}
+        - {fieldname: contract, fieldtype: Long Text, label: Argument Contract (JSON Schema)}
+        - {fieldname: description, fieldtype: Small Text, label: Description}
+        - {fieldname: enabled, fieldtype: Check, label: Enabled, default: 1}
+      permissions:
+        - {role: TLC Role Admin, read: 1, write: 1, create: 1}
+        - {role: TLC HR Lead, read: 1}
+        - {role: TLC Director, read: 1}
+        - {role: System Manager, read: 1, write: 1, create: 1, delete: 1}
+  - doctype: DocType
+    name: TLC AI Case Event
+    values:
+      module: TLC HR
+      custom: 1
+      istable: 1
+      editable_grid: 1
+    tables:
+      fields:
+        - {fieldname: actor, fieldtype: Link, label: Actor, options: User, in_list_view: 1}
+        - {fieldname: detail, fieldtype: Small Text, label: Detail, in_list_view: 1, reqd: 1}
+        - {fieldname: created, fieldtype: Datetime, label: Created, default: Now, read_only: 1}
+  - doctype: DocType
+    name: TLC AI Case
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: format:TLC-AI-{#####}
+      track_changes: 1
+      title_field: tool_title
+    tables:
+      fields:
+        - {fieldname: case_key, fieldtype: Data, label: Case Key, reqd: 1, unique: 1, read_only: 1}
+        - {fieldname: tool, fieldtype: Link, label: Tool, options: TLC AI Tool, reqd: 1, in_list_view: 1}
+        - {fieldname: tool_title, fieldtype: Data, label: Tool Title, in_list_view: 1}
+        - {fieldname: risk_class, fieldtype: Data, label: Risk, read_only: 1}
+        - {fieldname: state, fieldtype: Select, label: State, options: "Đề xuất\nChờ duyệt\nĐã thực hiện\nTừ chối\nLỗi", default: "Đề xuất", in_list_view: 1, in_standard_filter: 1}
+        - {fieldname: requester, fieldtype: Link, label: Requester, options: User, reqd: 1, in_list_view: 1}
+        - {fieldname: approver_roles, fieldtype: Small Text, label: Approver Roles, default: "TLC HR Lead,TLC Director,System Manager"}
+        - {fieldname: column_break_case, fieldtype: Column Break}
+        - {fieldname: message, fieldtype: Text, label: Chat Message}
+        - {fieldname: arguments, fieldtype: Long Text, label: Arguments (frozen)}
+        - {fieldname: fingerprint, fieldtype: Data, label: Fingerprint, read_only: 1}
+        - {fieldname: result, fieldtype: Long Text, label: Result, read_only: 1}
+        - {fieldname: document_type, fieldtype: Data, label: Document Type, read_only: 1}
+        - {fieldname: document_id, fieldtype: Data, label: Document, read_only: 1}
+        - {fieldname: decision_section, fieldtype: Section Break, label: Decision}
+        - {fieldname: decision_by, fieldtype: Link, label: Decision By, options: User, read_only: 1}
+        - {fieldname: decision_on, fieldtype: Datetime, label: Decision On, read_only: 1}
+        - {fieldname: decision_reason, fieldtype: Small Text, label: Decision Reason}
+        - {fieldname: column_break_decision, fieldtype: Column Break}
+        - {fieldname: executed_by, fieldtype: Link, label: Executed By, options: User, read_only: 1}
+        - {fieldname: executed_on, fieldtype: Datetime, label: Executed On, read_only: 1}
+        - {fieldname: events_section, fieldtype: Section Break, label: Ledger}
+        - {fieldname: events, fieldtype: Table, label: Events, options: TLC AI Case Event}
+      permissions:
+        - {role: TLC HR Lead, read: 1, write: 1, create: 1, report: 1, export: 1}
+        - {role: TLC HR Officer, read: 1, write: 1, create: 1, report: 1}
+        - {role: TLC Director, read: 1, write: 1, report: 1}
+        - {role: System Manager, read: 1, write: 1, create: 1, delete: 1}
+  - doctype: DocType
+    name: TLC AI Policy
+    values:
+      module: TLC HR
+      custom: 1
+      autoname: field:policy_code
+      track_changes: 1
+      naming_rule: By fieldname
+    tables:
+      fields:
+        - {fieldname: policy_code, fieldtype: Data, label: Policy Code, reqd: 1, unique: 1}
+        - {fieldname: title, fieldtype: Data, label: Title, reqd: 1, in_list_view: 1}
+        - {fieldname: version, fieldtype: Int, label: Version, default: 1}
+        - {fieldname: state, fieldtype: Select, label: State, options: "Nháp\nChờ duyệt\nĐã duyệt\nHết hiệu lực", default: "Nháp", in_list_view: 1}
+        - {fieldname: effective_from, fieldtype: Date, label: Effective From}
+        - {fieldname: column_break_pol, fieldtype: Column Break}
+        - {fieldname: submitted_by, fieldtype: Link, label: Submitted By, options: User, read_only: 1}
+        - {fieldname: approved_by, fieldtype: Link, label: Approved By, options: User, read_only: 1}
+        - {fieldname: approved_on, fieldtype: Datetime, label: Approved On, read_only: 1}
+        - {fieldname: content_section, fieldtype: Section Break}
+        - {fieldname: content, fieldtype: Long Text, label: Content, reqd: 1}
+      permissions:
+        - {role: TLC HR Lead, read: 1, write: 1, create: 1, report: 1}
+        - {role: TLC HR Officer, read: 1, write: 1, create: 1}
+        - {role: TLC Director, read: 1, write: 1}
+        - {role: System Manager, read: 1, write: 1, create: 1, delete: 1}

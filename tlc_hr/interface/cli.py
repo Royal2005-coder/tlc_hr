@@ -126,6 +126,19 @@ def ai():
     """Raven assistant and chat provisioning (demo site operator only)."""
 
 
+@ai.command("agents")
+@pass_context
+def ai_agents(context):
+    """Register @Leo, its closed tool surface and the assistant policy."""
+    from tlc_hr.interface.agent_gateway import provision
+
+    connect(context)
+    try:
+        click.echo(json.dumps(provision(), ensure_ascii=False))
+    finally:
+        frappe.destroy()
+
+
 @ai.command("channels")
 @pass_context
 def ai_channels(context):

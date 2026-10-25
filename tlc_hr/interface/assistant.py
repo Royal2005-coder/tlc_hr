@@ -11,7 +11,8 @@ from tlc_hr.interface.errors import domain_errors
 
 BOT_NAME = "TLC Demo HR Assistant"
 FUNCTIONS = {"tlc_hr_query": "tlc_hr.interface.assistant.query",
-             "tlc_hr_draft_leave": "tlc_hr.interface.assistant.draft_leave"}
+             "tlc_hr_draft_leave": "tlc_hr.interface.assistant.draft_leave",
+             "tlc_hr_agent": "tlc_hr.interface.agent_gateway.act"}
 
 
 def _service():
