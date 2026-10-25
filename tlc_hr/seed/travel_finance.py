@@ -60,6 +60,7 @@ def reset():
     if not frappe.conf.get("allow_tests") and not frappe.flags.in_test:
         frappe.throw("reset_travel_finance runs only on a test site (site config allow_tests)")
     company = "TLC Demo"
+    frappe.flags.tlc_demo_reset = True  # the reset may delete the snapshots the demo itself created
     refund_entries = [row.tlc_refund_entry for row in frappe.get_all(
         "Expense Claim", filters={"company": company, "tlc_refund_entry": ["is", "set"]}, fields=["tlc_refund_entry"])]
     refund_entries += [row[0] for row in frappe.db.sql(
@@ -80,12 +81,13 @@ def reset():
                                                     fields=["name"])]
     _drop("Payment Entry", payments)
     _drop("Employee Advance", frappe.get_all("Employee Advance", filters={"company": company}, pluck="name"))
-    _drop("Attendance Request", frappe.get_all("Attendance Request", filters={"company": company,
-                                                                             "tlc_travel_request": ["is", "set"]}, pluck="name"))
-    _drop("Attendance", frappe.get_all("Attendance", filters={"company": company,
-                                                               "tlc_travel_request": ["is", "set"]}, pluck="name"))
+    # The On Duty attendance a trip produced may carry no company, so the link is the filter that always holds.
+    _drop("Attendance Request", frappe.get_all("Attendance Request", filters={"tlc_travel_request": ["is", "set"]},
+                                 pluck="name"))
+    _drop("Attendance", frappe.get_all("Attendance", filters={"tlc_travel_request": ["is", "set"]}, pluck="name"))
     _drop("Travel Request", frappe.get_all("Travel Request", filters={"company": company}, pluck="name"))
     _drop("Leave Application", frappe.get_all("Leave Application", filters={"company": company, "docstatus": 0,
         "description": ["like", "%trùng công tác (UAT)%"]}, pluck="name"))
+    frappe.flags.tlc_demo_reset = False
     print("reset: travel and finance records deleted")
 

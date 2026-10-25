@@ -35,6 +35,8 @@ def snapshot(doc, method=None):
 
 
 def guard_snapshot(doc, method=None):
+    if frappe.flags.get("tlc_demo_reset"):
+        return  # the demo reset removes whole vouchers; the test-site check is the guard that matters there
     old = doc.get_doc_before_save()
     protected = bool(doc.get("tlc_finance_snapshot") or (old and old.get("tlc_finance_snapshot")))
     if protected and not doc.flags.get("tlc_creating_finance_snapshot"):
