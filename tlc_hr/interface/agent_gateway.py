@@ -146,6 +146,24 @@ def plan(message, channel=None):
 
 # -------------------------------------------------------------------------------------------------- the gateway
 
+LABELS = {"leave_type": "loại nghỉ", "from_date": "ngày bắt đầu", "to_date": "ngày kết thúc",
+          "reason": "lý do", "description": "lý do", "travel_type": "loại công tác", "purpose": "mục đích",
+          "destination": "nơi đến", "ot_date": "ngày tăng ca", "attendance_date": "ngày cần điều chỉnh",
+          "from_time": "từ giờ", "to_time": "đến giờ", "budget": "dự toán", "requested_advance": "tạm ứng"}
+
+
+def _what_is_missing(exc):
+    """A chat reply a person can act on: name the missing fields instead of showing the validator's own text."""
+    errors = getattr(exc, "errors", lambda: [])() or []
+    missing = [str(err.get("loc", ("?",))[0]) for err in errors if err.get("type") == "missing"]
+    wrong = [str(err.get("loc", ("?",))[0]) for err in errors if err.get("type") not in ("missing", None)]
+    if missing:
+        return "Cần thêm " + ", ".join(LABELS.get(field, field) for field in missing) + ". Bạn nói rõ giúp tôi nhé."
+    if wrong:
+        return "Chưa đọc được " + ", ".join(LABELS.get(field, field) for field in wrong) + ". Bạn nói lại giúp tôi nhé."
+    return f"Tham số chưa hợp lệ: {str(exc)[:160]}"
+
+
 def _guard(tool_code, args, requester):
     """Closed contract, scope narrowing and role checks, before anything touches a document."""
     tool = TOOLS.get(tool_code)
@@ -155,7 +173,7 @@ def _guard(tool_code, args, requester):
         try:
             args = tool["contract"].model_validate(args).model_dump()
         except Exception as exc:
-            return f"Thiếu hoặc sai tham số: {str(exc)[:200]}"
+            return _what_is_missing(exc)
     if tool_code in ("hrm.draft_leave", "hrm.draft_travel", "hrm.draft_attendance_correction",
                      "hrm.draft_overtime", "hrm.submit_leave", "hrm.my_records", "hrm.my_to_decide"):
         if not employee_of(requester):
@@ -205,8 +223,10 @@ def act(message, tool=None, args=None, case=None):
 
 def _assign_approvers(record):
     """The case appears as work in the approver's Desk queue, with the requester's arguments frozen in it."""
-    users = sorted({row.parent for row in frappe.get_all("Has Role", filters={"role": ["in", list(_approver_roles())]},
-                                                          fields=["parent"], limit=50) if row.parent != record.requester})
+    users = sorted({row.parent for row in frappe.get_all(
+        "Has Role", filters={"role": ["in", list(_approver_roles())], "parenttype": "User"},
+        fields=["parent"], limit=200)
+        if row.parent != record.requester and frappe.db.get_value("User", row.parent, "enabled")})
     for user in users[:10]:
         frappe.get_doc({"doctype": "ToDo", "allocated_to": user, "status": "Open", "priority": "Medium",
                         "date": getdate().isoformat(), "reference_type": "TLC AI Case", "reference_name": record.name,
@@ -225,8 +245,12 @@ def _run(record, spec):
         record.db_set({"state": STATE_FAILED, "result": str(exc)[:2000]})
         frappe.db.commit()
         return {"state": STATE_FAILED, "case": record.name, "reply": f"Không thực hiện được: {str(exc)[:300]}"}
+    document = result.get("document_id") if isinstance(result, dict) else None
+    if isinstance(document, dict):  # a service may hand back the desk payload of the record it created
+        document = document.get("document_id") or document.get("name")
+        result = {**result, "document_id": document, "document_type": result.get("document_type") or result.get("doctype")}
     record.db_set({"state": STATE_DONE, "result": json.dumps(result, ensure_ascii=False, default=str)[:4000],
-                   "document_type": result.get("document_type") or "", "document_id": result.get("document_id") or "",
+                   "document_type": (result.get("document_type") or result.get("doctype") or ""), "document_id": document or "",
                    "executed_on": now_datetime(), "executed_by": frappe.session.user})
     frappe.get_doc({"doctype": "TLC AI Case Event", "parent": record.name, "parentfield": "events",
                     "parenttype": "TLC AI Case", "actor": frappe.session.user,
@@ -267,7 +291,9 @@ def _policy_search(record):
 
 def _draft_leave(record):
     args = json.loads(record.arguments or "{}")
-    name = frappe.call("tlc_hr.interface.assistant.draft_leave", **args)
+    created = frappe.call("tlc_hr.interface.assistant.draft_leave", **args)
+    # the assistant service answers with the desk payload of the new draft; the case stores only its name
+    name = created.get("document_id") if isinstance(created, dict) else created
     return {"document_type": "Leave Application", "document_id": name,
             "reply": f"Đã tạo NHÁP đơn nghỉ phép {name}. Chưa gửi duyệt — bạn kiểm tra rồi bấm Gửi trên form."}
 
@@ -318,12 +344,27 @@ def _screen_cv(record):
 
 
 def _submit_leave(record):
+    """Send the requester's own draft through the same workflow a person uses, with the approver's case as the consent."""
+    from frappe.model.workflow import apply_workflow, get_transitions
+
     args = json.loads(record.arguments or "{}")
     name = args.get("name") or record.document_id
     doc = frappe.get_doc("Leave Application", name)
     if doc.docstatus != 0 or doc.employee != employee_of(record.requester):
         raise frappe.PermissionError("Chỉ gửi đơn phép nháp của chính mình.")
-    return {"document_type": "Leave Application", "document_id": name, "reply": f"Đã gửi duyệt đơn {name}."}
+    actor = frappe.session.user
+    try:
+        frappe.set_user(record.requester)
+        actions = [row.action for row in get_transitions(doc)]
+        action = next((item for item in actions if item == "Gửi duyệt"), actions[0] if actions else None)
+        if not action:
+            raise frappe.ValidationError(f"Đơn {name} không còn bước gửi duyệt ({', '.join(actions) or 'không có hành động'}).")
+        apply_workflow(frappe.get_doc("Leave Application", name), action)
+    finally:
+        frappe.set_user(actor)
+    doc.reload()
+    return {"document_type": "Leave Application", "document_id": name,
+            "reply": f"Đã gửi duyệt đơn {name} (trạng thái {doc.get('workflow_state') or 'đã gửi'})."}
 
 
 SERVICES = {"hrm.my_records": _my_records, "hrm.my_to_decide": _my_to_decide, "hrm.policy_search": _policy_search,

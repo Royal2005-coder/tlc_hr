@@ -214,6 +214,7 @@ scheduler_events = {
 # TLC doctypes (payroll decisions, people ops) are loaded desk-wide instead.
 app_include_js = [
     "/assets/tlc_hr/js/tlc_menu.js",
+    "/assets/tlc_hr/js/ai_case.js",
     "/assets/tlc_hr/js/tlc_workflow.js",
     "/assets/tlc_hr/js/payroll_decision.js",
     "/assets/tlc_hr/js/people_ops.js",

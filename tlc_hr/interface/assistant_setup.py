@@ -94,11 +94,27 @@ def configure():
             "tools": list(FUNCTIONS), "channels": channels, "provider_smoke_executed": False}
 
 
+def ensure_raven_role():
+    """Every person who logs into the desk can open the assistant: Raven gates its UI on the Raven User role, and
+    the demo accounts (including the site operator) are created before the assistant exists."""
+    for name in frappe.get_all("User", filters={"enabled": 1, "user_type": "System User"}, pluck="name"):
+        roles = [row.role for row in frappe.get_all("Has Role", filters={"parent": name, "parenttype": "User"},
+                                                    fields=["role"], limit=100)]
+        if "Raven User" in roles:
+            continue
+        user = frappe.get_doc("User", name)
+        user.append("roles", {"role": "Raven User"})
+        user.flags.ignore_permissions = True
+        user.save()
+    frappe.db.commit()
+
+
 def provision_channels():
     """Put every demo person where the Raven UI actually lists them: a workspace member, a shared channel,
     and a DM that already holds a message (an empty DM is invisible in the channel rail)."""
     if frappe.session.user != "Administrator":
         frappe.throw("Assistant configuration is restricted to the demo site operator.", frappe.PermissionError)
+    ensure_raven_role()
     if not frappe.db.exists("Raven Bot", BOT_NAME):
         frappe.throw("Configure the assistant bot before provisioning channels.")
     bot = frappe.get_doc("Raven Bot", BOT_NAME)
