@@ -123,7 +123,8 @@ doc_events = {
                   "on_update_after_submit": "tlc_hr.interface.recruitment.offer_updated",
                   "before_cancel": "tlc_hr.interface.recruitment.before_cancel_offer",
                   "before_print": "tlc_hr.interface.recruitment.before_print_offer"},
-    "Communication": {"before_insert": "tlc_hr.interface.recruitment.validate_offer_communication"},
+    "Communication": {"before_insert": "tlc_hr.interface.recruitment.validate_offer_communication",
+                      "after_insert": "tlc_hr.interface.recruitment_ai.communication_created"},
 
     # W8 organization structure.
     "Department": {"validate": f"{ORG}.validate"},

@@ -26,9 +26,9 @@ shortcuts:
   type: DocType
   link_to: Job Offer
   doc_view: List
-- label: Tuyển dụng AI log
+- label: Tuyển dụng Nhật ký AI
   type: DocType
-  link_to: TLC Recruitment AI Log
+  link_to: TLC AI Trace Log
   doc_view: List
 - label: Tuyển dụng Onboarding
   type: DocType
@@ -201,7 +201,7 @@ workspaces:
   sequence: 4
   cards: [TLC Tuyển dụng bước 1 hồ sơ, TLC Tuyển dụng bước 2 đối chiếu, TLC Tuyển dụng bước 3 mời phỏng vấn, TLC Tuyển dụng bước 4 thư mời, TLC Tuyển dụng bước 5 phỏng vấn, TLC Tuyển dụng bước 6 kết quả, TLC Tuyển dụng AI cần người duyệt, TLC Tuyển dụng offer cần giám đốc]
   charts: [TLC Recruitment Application Pipeline]
-  shortcuts: [Tuyển dụng Kanban 6 bước, Tuyển dụng Ứng viên, Tuyển dụng Vị trí, Tuyển dụng Yêu cầu, Tuyển dụng Job Offer, Tuyển dụng AI log, Tuyển dụng Onboarding, Trợ lý AI (Chat)]
+  shortcuts: [Tuyển dụng Kanban 6 bước, Tuyển dụng Ứng viên, Tuyển dụng Vị trí, Tuyển dụng Yêu cầu, Tuyển dụng Job Offer, Tuyển dụng Nhật ký AI, Tuyển dụng Onboarding, Trợ lý AI (Chat)]
 - title: TLC CEO Chi phí
   roles: [TLC Director]
   icon: dashboard

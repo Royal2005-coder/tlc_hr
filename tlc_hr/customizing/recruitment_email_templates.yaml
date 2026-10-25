@@ -1,0 +1,102 @@
+version: 1
+kind: email_templates
+description: |
+  Letters the hiring loop sends to candidates. Every one is the approved HTML shell; the assistant only fills the
+  personal paragraph (ai_lines) and the facts already decided on the form, so HR verifies and presses Gửi.
+email_templates:
+- name: TLC Thư mời phỏng vấn
+  subject: Thư mời phỏng vấn vị trí {{ position }} tại {{ company }}
+  html: '<h4>Chào {{ applicant_name }},</h4>
+
+    <p>Cảm ơn bạn đã ứng tuyển vị trí <strong>{{ position }}</strong> tại {{ company }}.</p>
+
+    {% for line in ai_lines %}<p>{{ line }}</p>{% endfor %}
+
+    <p>Bộ phận Nhân sự mời bạn tham gia vòng phỏng vấn với thông tin đã chốt như sau:</p>
+
+    <ul>
+    <li>Vị trí ứng tuyển: <strong>{{ position }}</strong>{% if designation %} — {{ designation }}{% endif %}</li>
+    <li>Thời gian: <strong>{{ when }}</strong></li>
+    <li>Người phỏng vấn: {{ interviewer }}</li>
+    <li>Hình thức: phỏng vấn tại {{ site }} (đường dẫn cụ thể sẽ gửi trước giờ hẹn 30 phút)</li>
+    </ul>
+
+    <p>Bạn vui lòng trả lời email này để xác nhận sự tham gia. Nếu cần đổi lịch, liên hệ {{ hr_name }} qua {{ hr_email }}.</p>
+
+    <hr>
+
+    <p>Trân trọng,<br>{{ hr_name }}<br>{{ company }} · Bộ phận Nhân sự<br>{{ hr_email }}{% if hr_phone %} · {{ hr_phone }}{% endif %}</p>'
+- name: TLC Xác nhận lịch phỏng vấn
+  subject: Xác nhận lịch phỏng vấn {{ when }} — {{ position }}
+  html: '<h4>Chào {{ applicant_name }},</h4>
+
+    {% for line in ai_lines %}<p>{{ line }}</p>{% endfor %}
+
+    <p>Nhân sự xác nhận lịch phỏng vấn của bạn cho vị trí <strong>{{ position }}</strong>:</p>
+
+    <ul>
+    <li>Thời gian: <strong>{{ when }}</strong></li>
+    <li>Người phỏng vấn: {{ interviewer }}</li>
+    <li>Địa điểm/đường dẫn: {{ site }}</li>
+    </ul>
+
+    <p>Bạn nên đến trước 10 phút và mang theo bản mô tả quá trình làm việc gần nhất. Nếu có thay đổi, báo cho {{ hr_email }} trước giờ hẹn 2 tiếng.</p>
+
+    <hr>
+
+    <p>{{ hr_name }} · {{ company }}</p>'
+- name: TLC Thông báo kết quả phỏng vấn
+  subject: Kết quả vòng phỏng vấn vị trí {{ position }}
+  html: '<h4>Chào {{ applicant_name }},</h4>
+
+    {% for line in ai_lines %}<p>{{ line }}</p>{% endfor %}
+
+    <p>Hội đồng phỏng vấn đã làm việc với bạn ngày {{ when }} cho vị trí <strong>{{ position }}</strong>. Kết quả vòng này:
+    <strong>{{ interview_result }}</strong>.</p>
+
+    {% if decision_reason %}<p>Phản hồi của hội đồng: {{ decision_reason }}</p>{% endif %}
+
+    <p>Nếu hồ sơ của bạn được chuyển sang bước tiếp theo, Nhân sự sẽ gửi thư mời nhận việc kèm thông tin chi tiết. Nếu
+    chưa phù hợp ở thời điểm này, chúng tôi lưu hồ sơ trong danh sách ứng viên tiềm năng và liên hệ khi có vị trí thích hợp.</p>
+
+    <hr>
+
+    <p>Trân trọng,<br>{{ hr_name }}<br>{{ company }} · Bộ phận Nhân sự<br>{{ hr_email }}</p>'
+- name: TLC Thư mời nhận việc
+  subject: Mời nhận việc vị trí {{ position }} tại {{ company }}
+  html: '<h4>Chào {{ applicant_name }},</h4>
+
+    {% for line in ai_lines %}<p>{{ line }}</p>{% endfor %}
+
+    <p>Chúng tôi vui mừng thông báo bạn được lựa chọn cho vị trí <strong>{{ position }}</strong> tại {{ company }}:</p>
+
+    <ul>
+    <li>Chức danh: {{ designation }}</li>
+    <li>Mức lương mời nhận việc: <strong>{{ salary }} VND/tháng</strong></li>
+    <li>Ngày vào làm dự kiến: <strong>{{ joining_date }}</strong></li>
+    <li>Người tiếp nhận: {{ interviewer }}</li>
+    </ul>
+
+    <p>Bản chào mời chính thức kèm phụ lục phúc lợi sẽ gửi trong ngày làm việc đầu tiên. Bạn xác nhận bằng cách trả lời
+    email này trước {{ joining_date }}. Mọi thắc mắc vui lòng liên hệ {{ hr_email }}.</p>
+
+    <hr>
+
+    <p>Trân trọng,<br>{{ hr_name }}<br>{{ company }} · Bộ phận Nhân sự<br>{{ hr_email }}{% if hr_phone %} · {{ hr_phone }}{% endif %}</p>'
+- name: TLC Thư cảm ơn và giữ liên lạc
+  subject: Cảm ơn bạn đã quan tâm vị trí {{ position }}
+  html: '<h4>Chào {{ applicant_name }},</h4>
+
+    {% for line in ai_lines %}<p>{{ line }}</p>{% endfor %}
+
+    <p>Sau khi cân nhắc kỹ cho vị trí <strong>{{ position }}</strong>, bộ phận Nhân sự chưa thể mời bạn đi tiếp ở đợt tuyển
+    dụng này.</p>
+
+    {% if decision_reason %}<p>Lý do hội đồng ghi nhận: {{ decision_reason }}</p>{% endif %}
+
+    <p>Chúng tôi lưu hồ sơ của bạn trong danh sách ứng viên tiềm năng và sẽ liên hệ khi có vị trí phù hợp hơn với kinh
+    nghiệm của bạn.</p>
+
+    <hr>
+
+    <p>Cảm ơn bạn đã dành thời gian,<br>{{ hr_name }}<br>{{ company }} · Bộ phận Nhân sự<br>{{ hr_email }}</p>'

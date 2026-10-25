@@ -59,28 +59,31 @@ records:
         - {fieldname: department, fieldtype: Link, label: Department, options: Department, in_list_view: 1}
         - {fieldname: location, fieldtype: Link, label: Location, options: Branch}
   - doctype: DocType
-    name: TLC Recruitment AI Log
+    name: TLC AI Trace Log
     values:
       module: TLC HR
       custom: 1
       autoname: hash
       track_changes: 0
+      title_field: event
     tables:
       fields:
-        - {fieldname: applicant, fieldtype: Link, label: Applicant, options: Job Applicant, reqd: 1, in_list_view: 1}
-        - {fieldname: action, fieldtype: Select, label: Action, options: "Screen\nInvite\nInvitation\nInterview\nOffer\nComplete\nReject\nIntake", reqd: 1, in_list_view: 1}
-        - {fieldname: actor, fieldtype: Link, label: Actor, options: User}
+        - {fieldname: candidate, fieldtype: Link, label: Candidate, options: Job Applicant, reqd: 1, in_list_view: 1}
+        - {fieldname: event, fieldtype: Data, label: Event, reqd: 1, in_list_view: 1, search_index: 1}
+        - {fieldname: step, fieldtype: Data, label: Hiring Step, in_list_view: 1}
+        - {fieldname: status, fieldtype: Select, label: Status, default: done, options: "queued\nrunning\ndone\nerror", in_list_view: 1}
+        - {fieldname: actor, fieldtype: Data, label: Actor, in_list_view: 1}
         - {fieldname: model, fieldtype: Data, label: Model}
-        - {fieldname: score, fieldtype: Float, label: Score}
-        - {fieldname: verdict, fieldtype: Data, label: Verdict}
-        - {fieldname: summary, fieldtype: Long Text, label: Summary}
-        - {fieldname: detail, fieldtype: Long Text, label: Detail}
-        - {fieldname: message_id, fieldtype: Data, label: Intake Message ID}
-        - {fieldname: created_on, fieldtype: Datetime, label: Created On, default: Now, read_only: 1, in_list_view: 1}
+        - {fieldname: duration_ms, fieldtype: Int, label: Duration (ms)}
+        - {fieldname: message_id, fieldtype: Data, label: Source Message ID}
+        - {fieldname: column_break_trace, fieldtype: Column Break}
+        - {fieldname: created_on, fieldtype: Datetime, label: Created On, default: Now, read_only: 1, in_list_view: 1, search_index: 1}
+        - {fieldname: detail, fieldtype: Long Text, label: Detail, print_hide: 0}
       permissions:
-        - {role: TLC HR Lead, read: 1, report: 1}
-        - {role: TLC HR Officer, read: 1, report: 1}
+        - {role: TLC HR Lead, read: 1, write: 1, create: 1, report: 1, export: 1}
+        - {role: TLC HR Officer, read: 1, write: 1, create: 1, report: 1}
         - {role: TLC Director, read: 1, report: 1}
+        - {role: System Manager, read: 1, write: 1, create: 1, delete: 1, report: 1, export: 1}
   - doctype: Kanban Board
     name: TLC Tuyển dụng 6 bước
     values:

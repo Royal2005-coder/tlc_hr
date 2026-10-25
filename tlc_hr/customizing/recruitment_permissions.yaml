@@ -10,6 +10,8 @@ permissions:
   - {doctype: Job Opening, role: TLC Director, rights: rw}
   - {doctype: Job Applicant, role: TLC HR Officer, rights: rwc}
   - {doctype: Job Applicant, role: TLC HR Lead, rights: rwc}
+  - {doctype: Job Applicant, role: TLC Director, rights: rw}
+  - {doctype: Interview, role: TLC Director, rights: r}
   - {doctype: Interview, role: TLC HR Officer, rights: rwcsxa}
   - {doctype: Interview, role: TLC HR Lead, rights: rwcsxa}
   - {doctype: Job Offer, role: TLC HR Officer, rights: rwc}

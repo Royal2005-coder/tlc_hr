@@ -58,6 +58,17 @@ custom_fields:
       - {fieldname: tlc_decision_on, fieldtype: Datetime, label: Decision On, read_only: 1}
       - {fieldname: tlc_decision_reason, fieldtype: Small Text, label: Decision Reason}
       - {fieldname: tlc_job_offer, fieldtype: Link, label: Job Offer, options: Job Offer, read_only: 1, no_copy: 1}
+      - {fieldname: tlc_visual_section, fieldtype: Section Break, label: "Kết quả sàng lọc trực quan", collapsible: 0}
+      - {fieldname: tlc_screening_html, fieldtype: HTML, label: "Bảng điểm AI"}
+      - {fieldname: tlc_ai_match, fieldtype: Percent, label: "Mức khớp JD", read_only: 1}
+      - {fieldname: tlc_ai_missing, fieldtype: Small Text, label: "Tiêu chí bắt buộc còn thiếu", read_only: 1}
+      - {fieldname: tlc_cv_profile, fieldtype: Long Text, label: "CV Profile (AI)", read_only: 1, hidden: 1}
+      - {fieldname: tlc_jd_criteria, fieldtype: Long Text, label: "JD Criteria (AI)", read_only: 1, hidden: 1}
+      - {fieldname: tlc_letters_section, fieldtype: Section Break, label: "Thư từ và nhật ký AI", collapsible: 0}
+      - {fieldname: tlc_email_communication, fieldtype: Link, label: "Thư mới nhất", options: Communication, read_only: 1, no_copy: 1}
+      - {fieldname: tlc_interview_summary, fieldtype: Text, label: "Tổng hợp phỏng vấn (AI)", read_only: 1}
+      - {fieldname: tlc_offer_recommendation, fieldtype: Small Text, label: "Khuyến nghị offer (AI)", read_only: 1}
+      - {fieldname: tlc_trace_html, fieldtype: HTML, label: "Nhật ký AI"}
   - doctype: Interview Type
     fields:
       - {fieldname: tlc_final_round, fieldtype: Check, label: TLC Final Round}
