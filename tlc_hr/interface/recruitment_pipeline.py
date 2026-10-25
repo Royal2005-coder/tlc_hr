@@ -237,7 +237,9 @@ def advance(name, action, payload=None):
             frappe.throw("Cần mức lương và ngày vào làm trong quyết định offer.")
         offer = frappe.get_doc("Job Offer", doc.tlc_job_offer) if doc.tlc_job_offer else None
         if not offer:
-            department = values.get("department") or frappe.db.get_value("Employee", {"user_id": doc.email_id}, "department")
+            department = (values.get("department")
+                          or frappe.db.get_value("Employee", {"user_id": doc.email_id}, "department")
+                          or frappe.db.get_value("Job Opening", doc.job_title, "department"))
             offer = frappe.get_doc({
                 "doctype": "Job Offer", "job_applicant": doc.name, "applicant_name": doc.applicant_name,
                 "applicant_email": doc.email_id, "offer_date": nowdate(),
