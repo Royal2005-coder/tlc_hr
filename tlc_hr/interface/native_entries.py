@@ -31,22 +31,21 @@ def _values(parent, label, kind, target, color):
             "doc_view": "List" if kind == "DocType" else None}
 
 
+# The sidebar link cannot carry a view or a board, so the six-step board stays a shortcut of the workspace (and of
+# the TLC AI menu on the top bar); the sidebar carries the screens a person opens by name.
 LINKS = (
-    ("Recruitment", "TLC Kanban 6 bước", "DocType", "Job Applicant", "Kanban", "TLC Tuyển dụng 6 bước"),
-    ("Recruitment", "TLC Ứng viên & chấm CV", "DocType", "Job Applicant", "List", None),
-    ("Recruitment", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log", "List", None),
-    ("Recruitment", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai", None, None),
-    ("Recruitment", "TLC Mẫu thư tuyển dụng", "DocType", "Email Template", "List", None),
-    ("HR Setup", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai", None, None),
-    ("HR Setup", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log", "List", None),
-    ("HR Setup", "TLC Kanban 6 bước", "DocType", "Job Applicant", "Kanban", "TLC Tuyển dụng 6 bước"),
+    ("Recruitment", "TLC Ứng viên & chấm CV", "DocType", "Job Applicant"),
+    ("Recruitment", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log"),
+    ("Recruitment", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai"),
+    ("Recruitment", "TLC Mẫu thư tuyển dụng", "DocType", "Email Template"),
+    ("HR Setup", "TLC Trợ lý AI (Chat)", "Page", "tro-ly-ai"),
+    ("HR Setup", "TLC Nhật ký AI", "DocType", "TLC AI Trace Log"),
 )
 
 
-def _link_values(parent, label, link_type, target, view, board):
+def _link_values(parent, label, link_type, target):
     return {"parenttype": "Workspace", "parentfield": "links", "parent": parent, "type": "Link", "label": label,
-            "link_type": link_type, "link_to": target, "doc_view": view, "kanban_board": board,
-            "is_query_report": 0, "hidden": 0, "onboard": 0}
+            "link_type": link_type, "link_to": target, "is_query_report": 0, "hidden": 0, "onboard": 0}
 
 
 def ensure_links():
@@ -62,8 +61,8 @@ def ensure_links():
                             "parent": parent, "type": "Card Break", "label": "TLC AI", "link_count": 5,
                             "hidden": 0}).insert(ignore_permissions=True)
             touched += 1
-        for label, link_type, target, view, board in ((l[1], l[2], l[3], l[4], l[5]) for l in LINKS if l[0] == parent):
-            values = _link_values(parent, label, link_type, target, view, board)
+        for label, link_type, target in ((row[1], row[2], row[3]) for row in LINKS if row[0] == parent):
+            values = _link_values(parent, label, link_type, target)
             names = frappe.get_all("Workspace Link", filters={"parent": parent, "type": "Link", "label": label},
                                    pluck="name", order_by="idx asc")
             if names:
@@ -76,7 +75,7 @@ def ensure_links():
         count = frappe.db.count("Workspace Link", {"parent": parent, "type": "Link"})
         for name in frappe.get_all("Workspace Link", filters={"parent": parent, "type": "Card Break", "label": "TLC AI"},
                                    pluck="name"):
-            frappe.db.set_value("Workspace Link", name, "link_count", max(1, len(LINKS) - (3 if parent == "HR Setup" else 0)))
+            frappe.db.set_value("Workspace Link", name, "link_count", len([row for row in LINKS if row[0] == parent]))
     frappe.db.commit()
     return touched
 

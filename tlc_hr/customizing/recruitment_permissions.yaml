@@ -11,6 +11,11 @@ permissions:
   - {doctype: Job Applicant, role: TLC HR Officer, rights: rwc}
   - {doctype: Job Applicant, role: TLC HR Lead, rights: rwc}
   - {doctype: Job Applicant, role: TLC Director, rights: rw}
+  - {doctype: Email Account, role: TLC HR Lead, rights: r}
+  - {doctype: Email Account, role: TLC HR Officer, rights: r}
+  - {doctype: Email Account, role: TLC Director, rights: r}
+  - {doctype: Email Template, role: TLC HR Lead, rights: rw}
+  - {doctype: Email Template, role: TLC HR Officer, rights: r}
   - {doctype: Interview, role: TLC Director, rights: r}
   - {doctype: Interview, role: TLC HR Officer, rights: rwcsxa}
   - {doctype: Interview, role: TLC HR Lead, rights: rwcsxa}

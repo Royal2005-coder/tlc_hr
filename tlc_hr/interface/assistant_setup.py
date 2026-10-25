@@ -124,7 +124,10 @@ def provision_channels():
         frappe.get_doc({"doctype": "Raven Workspace", "workspace_name": WORKSPACE, "type": "Public",
                         "description": "Không gian chat của dữ liệu mẫu TLC."}).insert()
     channels = {}
-    for user_id in sorted(DEMO_USERS):
+    people = sorted(set(DEMO_USERS) | {row.name for row in frappe.get_all(
+        "User", filters={"enabled": 1, "user_type": "System User", "name": ["not in", ["Administrator", "Guest"]]},
+        fields=["name"], limit=500)})
+    for user_id in people:
         if not frappe.db.exists("User", user_id):
             frappe.throw(f"Prerequisite missing: demo user {user_id}.")
         user = frappe.get_doc("User", user_id)
@@ -144,7 +147,7 @@ def provision_channels():
     if not channel:
         channel = frappe.get_doc({"doctype": "Raven Channel", "channel_name": CHANNEL, "type": "Public", "workspace": WORKSPACE,
                                   "channel_description": "Kênh chung của dữ liệu mẫu; trợ lý trả lời riêng theo từng người trong DM."}).insert().name
-    for member in sorted(DEMO_USERS) + [bot.name]:
+    for member in people + [bot.name]:
         if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": member}):
             frappe.get_doc({"doctype": "Raven Channel Member", "channel_id": channel, "user_id": member,
                             "last_visit": now_datetime()}).insert()
