@@ -10,6 +10,8 @@ DRAFT, TO_MANAGER, TO_HR, APPROVED, REJECTED, CANCELLED = (
 
 def after_migrate():
     from tlc_hr.infrastructure.customizing import engine
+    from tlc_hr.interface.native_entries import ensure as ensure_native_entries
 
     engine.apply()
+    ensure_native_entries()
     frappe.db.commit()

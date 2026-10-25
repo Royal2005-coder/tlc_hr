@@ -139,6 +139,19 @@ def ai_agents(context):
         frappe.destroy()
 
 
+@ai.command("shortcuts")
+@pass_context
+def ai_shortcuts(context):
+    """Put the TLC board, ledger and assistant into the native Recruitment / HR Setup / Home workspaces."""
+    from tlc_hr.interface.native_entries import ensure
+
+    connect(context)
+    try:
+        click.echo(json.dumps(ensure(), ensure_ascii=False))
+    finally:
+        frappe.destroy()
+
+
 @ai.command("channels")
 @pass_context
 def ai_channels(context):

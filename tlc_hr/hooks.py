@@ -230,5 +230,15 @@ doctype_js = {
 before_job = ["tlc_hr.interface.assistant.guard_job"]
 app_home = "/desk/tlc-hr"
 
+# The desk app switcher: the TLC screens sit next to ERPNext and Frappe HR instead of behind a typed URL.
+add_to_apps_screen = [
+    {
+        "name": "tlc_hr",
+        "logo": "/assets/tlc_hr/images/tlc-hr.svg",
+        "title": "TLC HR",
+        "route": "/desk/tlc-hr",
+    }
+]
+
 
 on_session_creation = ["tlc_hr.interface.role_navigation.on_session_creation"]
