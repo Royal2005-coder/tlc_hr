@@ -98,6 +98,14 @@ def guard(doc, method=None):
 
 # ---------------------------------------------------------------- TLC Attendance Period
 
+@frappe.whitelist()
+def period_open_items(name):
+    """Current blocking items of a period, read-only (the stored field is the snapshot of the last transition)."""
+    doc = frappe.get_doc("TLC Attendance Period", name)
+    doc.check_permission("read")
+    return {"name": name, "open_items": service().open_items(key_of(doc))}
+
+
 def key_of(doc):
     return PeriodKey(company=doc.company, scope=doc.scope, month=doc.period_month)
 

@@ -512,8 +512,12 @@ def deliver_payslips(name):
     from hrms.payroll.doctype.salary_slip.salary_slip import generate_password_for_pdf, enqueue_email_salary_slips
     for slip_name in names:
         slip = frappe.get_doc("Salary Slip", slip_name)
-        if not frappe.db.get_value("Employee", slip.employee, "prefered_email"):
-            frappe.throw(f"{slip.employee}: thiếu email ưu tiên.")
+        employee = frappe.get_doc("Employee", slip.employee)
+        if not employee.prefered_email:
+            address = employee.company_email or employee.personal_email or employee.user_id
+            if not address:
+                frappe.throw(f"{slip.employee}: thiếu email công ty/cá nhân để gửi phiếu lương.")
+            frappe.db.set_value("Employee", employee.name, "prefered_email", address, update_modified=False)
         if not generate_password_for_pdf(settings.password_policy, slip.employee):
             frappe.throw(f"{slip.employee}: Password Policy tạo mật khẩu rỗng.")
     if not names:
