@@ -84,14 +84,10 @@ PERSONA = (
 
 
 def _chat(messages, max_tokens=700):
-    key = os.environ.get("MISTRAL_API_KEY", "").strip()
-    if not key:
-        return None
+    from tlc_hr.interface import llm
+
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=key, base_url="https://api.mistral.ai/v1")
-        return (client.chat.completions.create(model=MODEL, temperature=0.1, max_tokens=max_tokens,
-                                                messages=messages).choices[0].message.content or "").strip()
+        return llm.chat(messages, max_tokens=max_tokens)
     except Exception:
         return None
 

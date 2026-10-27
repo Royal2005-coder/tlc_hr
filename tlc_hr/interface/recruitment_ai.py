@@ -26,7 +26,7 @@ def html_escape(value):
 
 
 TRACE = "TLC AI Trace Log"
-MODEL = os.environ.get("TLC_AI_MODEL", "ministral-14b-latest")
+MODEL = os.environ.get("TLC_AI_MODEL") or "openai (free gateway)"
 GROUPS = ("Chuyên môn", "Kinh nghiệm", "Kỹ năng", "Ngoại ngữ", "Học vấn", "Thái độ")
 RATINGS = {"Đạt": 1.0, "Một phần": 0.5, "Thiếu": 0.0}
 ACCENT = {"Đạt": "#16a34a", "Một phần": "#f59e0b", "Thiếu": "#ef4444"}
@@ -77,11 +77,10 @@ OFFER_SYSTEM = (
 # ------------------------------------------------------------------------------------------------------------- llm
 
 def _client():
-    key = os.environ.get("MISTRAL_API_KEY", "").strip()
-    if not key:
-        frappe.throw("Thiếu MISTRAL_API_KEY trong pod; không thể chạy trợ lý tuyển dụng.")
-    from openai import OpenAI
-    return OpenAI(api_key=key, base_url="https://api.mistral.ai/v1")
+    """The provider layer: the strong keyless gateway, with the demo's Mistral key as its fallback."""
+    from tlc_hr.interface import llm
+
+    return llm
 
 
 def _first_json(text):
@@ -96,27 +95,10 @@ def _first_json(text):
 
 
 def chat_json(system, user, keys, max_tokens=1400):
-    """One JSON answer from the assistant; a second pass turns prose into the object that was asked for."""
-    client = _client()
-    messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
-    raw = ""
-    for attempt in range(2):
-        kwargs = {"model": MODEL, "temperature": 0.1, "max_tokens": max_tokens, "messages": messages}
-        if attempt == 0:
-            kwargs["response_format"] = {"type": "json_object"}
-        try:
-            raw = (client.chat.completions.create(**kwargs).choices[0].message.content or "").strip()
-        except Exception:
-            if attempt == 0:
-                continue
-            raise
-        parsed = _first_json(re.sub(r"^```(?:json)?|```$", "", raw, flags=re.M).strip())
-        if isinstance(parsed, dict) and any(parsed.get(key) not in (None, "", []) for key in keys):
-            return parsed
-        messages = messages + [{"role": "assistant", "content": raw},
-                              {"role": "user", "content": "Chỉ trả lại đúng một JSON hợp lệ với các khóa "
-                               + ", ".join(keys) + ". Không thêm chữ nào khác."}]
-    frappe.throw("Trợ lý không trả JSON hợp lệ; thử lại hoặc kiểm tra hồ sơ.", frappe.ValidationError)
+    """One JSON answer through the provider layer; prose is asked again as an object."""
+    from tlc_hr.interface import llm
+
+    return llm.chat_json(system, user, keys, max_tokens=max_tokens)
 
 
 # ------------------------------------------------------------------------------------------------------------ ledger
