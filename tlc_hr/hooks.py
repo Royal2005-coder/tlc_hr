@@ -198,7 +198,8 @@ has_permission = {
     "TLC Survey Campaign": "tlc_hr.interface.survey.has_permission",
 }
 
-override_doctype_class = {"Attendance Request": "tlc_hr.interface.travel_adjustments.TravelAttendanceRequest"}
+override_doctype_class = {"Attendance Request": "tlc_hr.interface.travel_adjustments.TravelAttendanceRequest",
+                          "Salary Slip": "tlc_hr.interface.payroll_email.ResilientSalarySlip"}
 
 scheduler_events = {
     "all": ["tlc_hr.interface.recruitment_pipeline.poll_mailpit"],
