@@ -80,6 +80,39 @@ def ensure_links():
     return touched
 
 
+def sync_content():
+    """Put the shortcuts into the workspace layout itself.
+
+    The desk renders a workspace from the saved `content` blocks, not from the shortcut table, so a row added here is
+    invisible until a block names it — which is why HR Setup looked empty. Adding the block is what the "customise
+    workspace" screen does for a person, and it stays idempotent: a label already on the page is left alone.
+    """
+    import json
+    import random
+    import string
+
+    changed = 0
+    for parent in sorted({row[0] for row in ENTRIES}):
+        if not frappe.db.exists("Workspace", parent):
+            continue
+        raw = frappe.db.get_value("Workspace", parent, "content") or "[]"
+        try:
+            blocks = json.loads(raw)
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(blocks, list):
+            continue
+        present = {block.get("data", {}).get("shortcut_name") for block in blocks if block.get("type") == "shortcut"}
+        for label in (row[1] for row in ENTRIES if row[0] == parent):
+            if label in present:
+                continue
+            blocks.append({"id": "".join(random.choices(string.ascii_letters + string.digits, k=10)),
+                           "type": "shortcut", "data": {"shortcut_name": label, "col": 3}})
+            changed += 1
+        frappe.db.set_value("Workspace", parent, "content", json.dumps(blocks), update_modified=False)
+    return changed
+
+
 def ensure():
     """Create or repair the shortcut rows of the native workspaces; safe to run on every migrate."""
     touched, created, repaired = set(), 0, 0
@@ -99,6 +132,8 @@ def ensure():
             created += 1
         touched.add(parent)
     links = ensure_links()
+    blocks = sync_content()
     frappe.db.commit()
     frappe.clear_cache(doctype="Workspace")
-    return {"created": created, "duplicates_removed": repaired, "links": links, "workspaces": sorted(touched)}
+    return {"created": created, "duplicates_removed": repaired, "links": links, "blocks": blocks,
+            "workspaces": sorted(touched)}
