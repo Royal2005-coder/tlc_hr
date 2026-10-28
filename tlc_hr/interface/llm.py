@@ -152,9 +152,10 @@ def providers(test=False, max_tokens=60):
         if not row["key"]:
             row["state"] = "thiếu key"
         elif test:
+            # ask this provider alone: going through chat() would answer with whichever provider is first in the chain
             started = time.time()
             try:
-                row["answer"] = chat(probe, max_tokens=max_tokens, json_mode=True)
+                row["answer"] = _call(provider, probe, max_tokens, True)
                 row["state"] = "trả lời được"
             except Exception as exc:
                 row["answer"] = ""
