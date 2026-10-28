@@ -84,7 +84,7 @@ def configure():
                 "allow_bot_to_write_documents": 1, "enable_file_search": 0, "enable_code_interpreter": 0,
                 "use_google_document_parser": 0, "dynamic_instructions": 0, "debug_mode": 0, "temperature": 0.2,
                 "top_p": 1, "instruction": INSTRUCTION, "openai_assistant_id": None,
-                "file_sources": [], "bot_functions": []})
+                "file_sources": [], "bot_functions": [{"function": name} for name in FUNCTIONS]})
     bot.save()
     channels = provision_channels()
     from frappe.installer import update_site_config
