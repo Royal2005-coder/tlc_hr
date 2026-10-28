@@ -52,11 +52,35 @@ def query(topic, employee=None):
         return _service().query(AssistantQuery(topic=topic, employee=employee))
 
 
+# Words a person uses for a kind of rest, against the words a Leave Type is allowed to contain.
+LEAVE_TYPE_HINTS = {"ốm": ("ốm", "bệnh", "sick", "khám", "điều trị"), "năm": ("năm", "annual", "pappam", "hè")}
+
+
+def _leave_type(given, *hints):
+    """Read the leave type off the company's own list instead of interrogating the person who said "nghỉ vì bệnh"."""
+    names = [row["name"] for row in frappe.get_all("Leave Type", filters={"disabled": 0}, fields=["name"],
+                                                   order_by="name asc")]
+    if not names:
+        return given
+    wanted = (given or "").strip().casefold()
+    for name in names:
+        folded = name.casefold()
+        if wanted and (folded == wanted or wanted in folded or folded in wanted):
+            return name
+    text = " ".join([wanted] + [str(hint or "").casefold() for hint in hints])
+    for name in names:
+        folded = name.casefold()
+        for word, clues in LEAVE_TYPE_HINTS.items():
+            if word in folded and any(clue in text for clue in clues):
+                return name
+    return given or names[0]
+
+
 @frappe.whitelist(methods=["POST"])
 def draft_leave(leave_type, from_date, to_date, reason, employee=None):
     with domain_errors():
-        return _service().draft_leave(LeaveDraft(leave_type=leave_type, from_date=from_date, to_date=to_date,
-                                                reason=reason, employee=employee))
+        return _service().draft_leave(LeaveDraft(leave_type=_leave_type(leave_type, reason), from_date=from_date,
+                                                to_date=to_date, reason=reason, employee=employee))
 
 
 def _assistant_channel(channel):

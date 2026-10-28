@@ -521,6 +521,9 @@ def reset_payroll():
         if names:
             frappe.db.delete(table, {field: ["in", names]})
     frappe.db.commit()
+    # The compliance journey switches PDF encryption on; a reset returns the demo settings to their documented state.
+    frappe.db.set_single_value("Payroll Settings", "encrypt_salary_slips_in_emails", 0)
+    frappe.db.set_single_value("Payroll Settings", "password_policy", "")
     print(f"reset: {len(entries)} payroll entries, {len(slips)} payslips, {len(journals)} journal entries, {len(decisions)} salary decisions deleted")
 
 

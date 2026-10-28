@@ -15,11 +15,11 @@ import frappe
 from frappe.utils import flt, getdate, now_datetime
 
 from tlc_hr.contracts.assistant import AssistantQuery, LeaveDraft
+from tlc_hr.interface import llm
 
 READ, DRAFT, APPROVAL, FORBIDDEN = "read", "draft", "approval", "forbidden"
 STATE_PROPOSED, STATE_WAITING, STATE_DONE, STATE_REFUSED, STATE_FAILED = (
     "Đề xuất", "Chờ duyệt", "Đã thực hiện", "Từ chối", "Lỗi")
-MODEL = "ministral-14b-latest"
 
 # The closed tool surface. `service` is the only thing that touches documents, and it is chosen here, never by the model.
 TOOLS = {
@@ -84,12 +84,11 @@ PERSONA = (
 
 
 def _chat(messages, max_tokens=700):
-    from tlc_hr.interface import llm
-
+    """The planner's model call; an out-of-quota provider is reported, not hidden behind "tôi chưa hiểu"."""
     try:
-        return llm.chat(messages, max_tokens=max_tokens)
-    except Exception:
-        return None
+        return llm.chat(messages, max_tokens=max_tokens), ""
+    except Exception as exc:
+        return None, str(exc)[:200]
 
 
 def _json_object(text):
@@ -120,6 +119,19 @@ def employee_of(user=None):
     return frappe.db.get_value("Employee", {"user_id": user or frappe.session.user}, "name")
 
 
+def _clock():
+    """The model owns no calendar: without today it turns "30 và 31 tháng này" into a year that never happened."""
+    today = getdate()
+    month = f"{today.year}-{today.month:02d}"
+    return (f"Hôm nay là {today.isoformat()} (năm {today.year}). \"tháng này\" là {month}, \"ngày 30\" là {month}-30, "
+            f"\"ngày 31 tháng này\" là {month}-31. Không dùng năm nào khác {today.year} trừ khi người dùng nêu rõ.")
+
+
+def leave_type_names():
+    return ", ".join(row["name"] for row in frappe.get_all("Leave Type", filters={"disabled": 0},
+                                                            fields=["name"], limit=20, order_by="name asc"))
+
+
 # --------------------------------------------------------------------------------- planning (model) + routing
 
 @frappe.whitelist()
@@ -128,16 +140,21 @@ def plan(message, channel=None):
     user = frappe.session.user
     skills = [{"code": code, "title": tool["title"], "risk": tool["risk"], "description": tool["description"]}
               for code, tool in TOOLS.items()]
-    answer = _chat([
-        {"role": "system", "content": PERSONA + "\nChỉ trả JSON: {\"tool\": code hoặc null, \"args\": {...},"
-                                              " \"say\": \"một câu trả lời ngắn\"}"},
+    answer, failure = _chat([
+        {"role": "system", "content": PERSONA + "\n" + _clock()
+                                       + "\nCâu hỏi về hồ sơ, mã nhân viên, phép hay phiếu lương của chính người"
+                                         " hỏi là hrm.my_records — trả lời bằng số liệu thật, không hỏi lại."
+                                       + "\nChỉ trả JSON: {\"tool\": code hoặc null, \"args\": {...},"
+                                         " \"say\": \"một câu trả lời ngắn\"}"},
         {"role": "user", "content": f"Người dùng: {user}\nBộ công cụ: {json.dumps(skills, ensure_ascii=False)}\n"
+                                    f"Loại nghỉ có sẵn: {leave_type_names()}. \"bệnh\", \"ốm\" là loại nghỉ ốm;"
+                                    f" \"phép năm\" là loại hằng năm — tự chọn đúng loại, đừng hỏi lại tên loại nghỉ.\n"
                                     f"Tin nhắn: {message[:2000]}"},
     ])
     proposal = _json_object(answer) or {}
     tool = proposal.get("tool") if proposal.get("tool") in TOOLS else None
     return {"tool": tool, "args": proposal.get("args") or {}, "say": proposal.get("say") or "",
-            "planner": "model" if tool else "none"}
+            "planner": "model" if tool else "none", "error": failure}
 
 
 # -------------------------------------------------------------------------------------------------- the gateway
@@ -183,8 +200,12 @@ def _guard(tool_code, args, requester):
 def act(message, tool=None, args=None, case=None):
     """The chat entry point: reads answer now, drafts create unsubmitted records, controlled actions open a case."""
     requester = frappe.session.user
-    tool = tool or (plan(message).get("tool") if message else None)
+    planned = plan(message) if message else {"tool": None, "error": ""}
+    tool = tool or planned.get("tool")
     if not tool:
+        if planned.get("error"):
+            return {"state": "answered", "reply": f"Trợ lý đang không gọi được mô hình ({planned['error'][:120]}),"
+                                                  " nên chưa đọc được yêu cầu của bạn."}
         return {"state": "answered", "reply": "Tôi chưa hiểu yêu cầu. Hãy nói cụ thể hơn (ví dụ: soạn nháp đơn nghỉ ngày 12/11)."}
     spec = TOOLS[tool]
     arguments = args or {}
@@ -200,6 +221,10 @@ def act(message, tool=None, args=None, case=None):
     existing = frappe.db.get_value("TLC AI Case", {"case_key": key})
     if existing:
         doc = frappe.get_doc("TLC AI Case", existing)
+        if spec["risk"] == READ:
+            # A read changes nothing, so asking it twice must answer twice: handing back "the earlier request is in
+            # state ..." turns every repeated question about one's own code or balance into a non-answer.
+            return _run(doc, spec)
         # the same request already ran: hand back the record it produced, so a follow-up tool call can continue from it
         return {"state": doc.state, "case": doc.name, "reply": f"Yêu cầu trước đó đang ở trạng thái {doc.state} (case {doc.name}).",
                 "document_type": doc.document_type or "", "document_id": doc.document_id or ""}
@@ -260,11 +285,18 @@ def _run(record, spec):
 # ------------------------------------------------------------------------------------------------------ services
 
 def _my_records(record):
-    out = frappe.call("tlc_hr.interface.assistant.query", topic="profile")
-    balance = frappe.call("tlc_hr.interface.assistant.query", topic="leave")
-    return {"document_type": "Employee", "document_id": (out or {}).get("employee"),
-            "reply": f"Hồ sơ {json.dumps(out, ensure_ascii=False)[:400]} · phép {json.dumps(balance, ensure_ascii=False)[:400]}",
-            "profile": out, "leave": balance}
+    profile = frappe.call("tlc_hr.interface.assistant.query", topic="profile") or {}
+    leaves = frappe.call("tlc_hr.interface.assistant.query", topic="leave") or {}
+    person = (profile.get("records") or [{}])[0]
+    code = person.get("name") or profile.get("employee") or "chưa có mã"
+    waiting = [row for row in (leaves.get("records") or []) if not row.get("docstatus")]
+    reply = (f"Mã nhân viên của bạn là {code}"
+             + (f" — {person.get('employee_name')}, {person.get('department') or 'chưa có phòng ban'}."
+                if person.get("employee_name") else "."))
+    reply += (f" Đang có {len(waiting)} đơn phép nháp hoặc chờ duyệt."
+              if waiting else " Không có đơn phép nào đang chờ.")
+    return {"document_type": "Employee", "document_id": profile.get("employee"), "reply": reply,
+            "profile": profile, "leave": leaves}
 
 
 def _my_to_decide(record):
@@ -415,7 +447,7 @@ def provision():
         frappe.throw("Chỉ operator dựng được trợ lý.", frappe.PermissionError)
     if not frappe.db.exists("TLC AI Agent", "leo"):
         frappe.get_doc({"doctype": "TLC AI Agent", "agent_code": "leo", "agent_name": "@Leo (HR)", "is_front": 1,
-                        "model": MODEL, "enabled": 1, "persona": PERSONA}).insert(ignore_permissions=True)
+                        "model": llm.describe(), "enabled": 1, "persona": PERSONA}).insert(ignore_permissions=True)
     for code, spec in TOOLS.items():
         row = frappe.get_doc("TLC AI Tool", code) if frappe.db.exists("TLC AI Tool", code) else frappe.new_doc("TLC AI Tool")
         row.update({"tool_code": code, "title": spec["title"], "risk_class": spec["risk"], "enabled": 1,

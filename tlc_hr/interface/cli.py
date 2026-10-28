@@ -165,6 +165,29 @@ def ai_channels(context):
         frappe.destroy()
 
 
+@ai.command("providers")
+@click.option("--test", is_flag=True, help="Ask every usable provider one question and time the answer.")
+@pass_context
+def ai_providers(context, test):
+    """The model chain: who answers now, who needs a key, and where a person gets that key."""
+    from tlc_hr.interface.llm import describe, providers
+
+    connect(context)
+    try:
+        click.echo(f"Nhà cung cấp đang được chọn: {describe()}")
+        for row in providers(test=test):
+            line = f"{row['code']:<13} {row['state']:<18} {row['model']:<40} key={int(row['key'])}"
+            if test and row.get("seconds") is not None:
+                line += f" {row['seconds']}s"
+            if test and row.get("answer"):
+                line += f"  -> {row['answer'][:70]}"
+            if not row["key"] and row.get("signup"):
+                line += f"  -> {row['signup']}"
+            click.echo(line)
+    finally:
+        frappe.destroy()
+
+
 @tlc.command("seed")
 @click.argument("step", type=click.Choice(["run", "reset-leave", "reset-overtime", "reset-periods", "reset-payroll", "salary", "reset-travel", "organization",
                                           "recruitment", "reset-recruitment", "lifecycle", "reset-lifecycle", "people-ops",

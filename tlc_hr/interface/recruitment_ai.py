@@ -12,7 +12,6 @@ Ba việc của module này, đều đọc được trên chính hồ sơ ứng 
 
 import json
 import math
-import os
 import re
 from time import perf_counter
 
@@ -26,10 +25,16 @@ def html_escape(value):
 
 
 TRACE = "TLC AI Trace Log"
-MODEL = os.environ.get("TLC_AI_MODEL") or "openai (free gateway)"
 GROUPS = ("Chuyên môn", "Kinh nghiệm", "Kỹ năng", "Ngoại ngữ", "Học vấn", "Thái độ")
 RATINGS = {"Đạt": 1.0, "Một phần": 0.5, "Thiếu": 0.0}
 ACCENT = {"Đạt": "#16a34a", "Một phần": "#f59e0b", "Thiếu": "#ef4444"}
+
+
+def model_name():
+    """Name the provider that answered, so a ledger written under a stronger model never credits the old one."""
+    from tlc_hr.interface import llm
+
+    return llm.describe()
 EMAIL_KINDS = {
     "invitation": {"template": "TLC Thư mời phỏng vấn", "label": "Thư mời phỏng vấn", "title": "Soạn thư mời phỏng vấn",
                    "hint": "Nêu lịch hẹn, người phỏng vấn và điều ứng viên nên chuẩn bị."},
@@ -296,28 +301,28 @@ def verdict_of(score, missing):
 
 def run_screen(doc, cv, actor=None):
     """Steps 1-2 of the pipeline: read the CV, map it to the JD, and leave a ledger line for each move."""
-    trace(doc.name, "ai.screening.queued", f"Trợ lý nhận việc đối chiếu hồ sơ với mô tả công việc ({MODEL})",
-          actor=actor or frappe.session.user, model=MODEL, step=doc.tlc_step, status="queued")
+    trace(doc.name, "ai.screening.queued", f"Trợ lý nhận việc đối chiếu hồ sơ với mô tả công việc ({model_name()})",
+          actor=actor or frappe.session.user, model=model_name(), step=doc.tlc_step, status="queued")
     frappe.db.commit()
     trace(doc.name, "ai.screening.running", "Trích thông tin cá nhân và quá trình làm việc từ CV", actor="AI",
-          model=MODEL, step=doc.tlc_step, status="running")
+          model=model_name(), step=doc.tlc_step, status="running")
     frappe.db.commit()
     extracted = extract_profile(doc, cv)
-    trace(doc.name, "ai.profile.extracted", profile_brief(extracted["profile"]), actor="AI", model=MODEL,
+    trace(doc.name, "ai.profile.extracted", profile_brief(extracted["profile"]), actor="AI", model=model_name(),
           duration_ms=extracted["duration_ms"], step=doc.tlc_step)
     frappe.db.commit()
     match = match_criteria(doc, cv)
     trace(doc.name, "ai.criteria.matched", criteria_brief(match["criteria"], match["score"], match["missing"]),
-          actor="AI", model=MODEL, duration_ms=match["duration_ms"], step=doc.tlc_step)
+          actor="AI", model=model_name(), duration_ms=match["duration_ms"], step=doc.tlc_step)
     frappe.db.commit()
     verdict = verdict_of(match["score"], match["missing"])
     summary = match["summary"] or doc.tlc_ai_summary
     payload = {"profile": extracted["profile"], "criteria": match["criteria"], "score": match["score"],
                "verdict": verdict, "summary": summary, "risks": match["risks"], "questions": match["questions"],
-               "missing": match["missing"], "model": MODEL, "checked_on": format_datetime(now_datetime(), "dd/MM/yyyy HH:mm")}
+               "missing": match["missing"], "model": model_name(), "checked_on": format_datetime(now_datetime(), "dd/MM/yyyy HH:mm")}
     fields = {"tlc_ai_status": "Đã chấm", "tlc_ai_score": match["score"], "tlc_ai_verdict": verdict,
               "tlc_ai_summary": (summary or "")[:2000], "tlc_ai_risks": lines(match["risks"])[:2000],
-              "tlc_ai_questions": lines(match["questions"])[:4000], "tlc_ai_model": MODEL,
+              "tlc_ai_questions": lines(match["questions"])[:4000], "tlc_ai_model": model_name(),
               "tlc_ai_checked_on": now_datetime(), "tlc_cv_profile": json.dumps(payload["profile"], ensure_ascii=False),
               "tlc_jd_criteria": json.dumps(match["criteria"], ensure_ascii=False),
               "tlc_ai_match": match["score"], "tlc_ai_missing": lines(match["missing"], dash=False)[:2000]}
@@ -789,7 +794,7 @@ def interview_summary(name):
     doc.db_set({"tlc_interview_summary": text[:4000]}, commit=False)
     frappe.db.commit()
     trace(doc.name, "ai.interview.summarised", f"{(raw.get('verdict') or '').strip()} · {len(rows)} tiêu chí · {text[:400]}"[:1500],
-          actor="AI", model=MODEL, duration_ms=int((perf_counter() - started) * 1000))
+          actor="AI", model=model_name(), duration_ms=int((perf_counter() - started) * 1000))
     frappe.db.commit()
     return {"verdict": (raw.get("verdict") or "").strip(), "summary": text, "criteria": rows}
 
@@ -827,6 +832,6 @@ def offer_recommendation(name):
     doc.db_set({"tlc_offer_recommendation": advice[:2000]}, commit=False)
     frappe.db.commit()
     trace(doc.name, "ai.offer.recommended", f"Khuyến nghị {band['low']:,.0f}–{band['high']:,.0f} VND · {advice[:600]}",
-          actor="AI", model=MODEL, duration_ms=int((perf_counter() - started) * 1000))
+          actor="AI", model=model_name(), duration_ms=int((perf_counter() - started) * 1000))
     frappe.db.commit()
     return {"low": band["low"], "high": band["high"], "median": band["median"], "text": advice}

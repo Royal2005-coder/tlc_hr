@@ -12,7 +12,8 @@ class AssistantQuery(BaseModel):
 
 class LeaveDraft(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
-    leave_type: str = Field(min_length=1, max_length=140)
+    # The company's own Leave Type list decides this, so nobody is asked to name a type they did not name.
+    leave_type: str = Field(default="", max_length=140)
     from_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
     to_date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
     reason: str = Field(min_length=1, max_length=500)
