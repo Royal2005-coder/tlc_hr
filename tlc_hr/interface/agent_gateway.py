@@ -200,7 +200,8 @@ def _guard(tool_code, args, requester):
 def act(message, tool=None, args=None, case=None):
     """The chat entry point: reads answer now, drafts create unsubmitted records, controlled actions open a case."""
     requester = frappe.session.user
-    planned = plan(message) if message else {"tool": None, "error": ""}
+    # only plan when the caller did not name the tool: a Raven custom tool already knows what it wants
+    planned = plan(message) if (message and not tool) else {"tool": None, "error": ""}
     tool = tool or planned.get("tool")
     if not tool:
         if planned.get("error"):
