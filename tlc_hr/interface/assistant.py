@@ -58,8 +58,7 @@ LEAVE_TYPE_HINTS = {"ốm": ("ốm", "bệnh", "sick", "khám", "điều trị")
 
 def _leave_type(given, *hints):
     """Read the leave type off the company's own list instead of interrogating the person who said "nghỉ vì bệnh"."""
-    names = [row["name"] for row in frappe.get_all("Leave Type", filters={"disabled": 0}, fields=["name"],
-                                                   order_by="name asc")]
+    names = frappe.get_all("Leave Type", pluck="name", order_by="name asc")
     if not names:
         return given
     wanted = (given or "").strip().casefold()

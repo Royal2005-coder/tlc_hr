@@ -128,8 +128,7 @@ def _clock():
 
 
 def leave_type_names():
-    return ", ".join(row["name"] for row in frappe.get_all("Leave Type", filters={"disabled": 0},
-                                                            fields=["name"], limit=20, order_by="name asc"))
+    return ", ".join(frappe.get_all("Leave Type", pluck="name", limit=20, order_by="name asc"))
 
 
 # --------------------------------------------------------------------------------- planning (model) + routing
