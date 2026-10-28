@@ -137,7 +137,8 @@ doc_events = {
                                  "before_cancel": f"{ORG}.before_cancel"},
 
     # W7 assistant safety hooks (Raven doctypes exist once Raven is installed).
-    "Raven Message": {"validate": "tlc_hr.interface.assistant.guard_message"},
+    "Raven Message": {"validate": "tlc_hr.interface.assistant.guard_message",
+                      "after_insert": "tlc_hr.interface.assistant.answer_in_dm"},
     "Raven Bot": {"validate": "tlc_hr.interface.assistant.validate_bot"},
     "Raven AI Function": {"validate": "tlc_hr.interface.assistant.validate_function"},
 }

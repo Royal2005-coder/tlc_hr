@@ -93,6 +93,37 @@ def draft_leave(leave_type, from_date, to_date, reason, employee=None):
                                                 employee=employee))
 
 
+
+def answer_in_dm(doc, method=None):
+    """Answer a person's message in the assistant's channel with the gateway's own words.
+
+    Raven's AI bot rewrites a tool result before showing it, which is fine for prose and wrong for an HR system:
+    the number, the state and the link a person reads have to be the ones the server actually produced.
+    """
+    if doc.is_bot_message or doc.message_type != "Text" or not (doc.text or "").strip():
+        return
+    channel = frappe.db.get_value("Raven Channel", doc.channel_id,
+                                  ["name", "is_direct_message", "dm_user_1", "dm_user_2", "thread_bot"], as_dict=1)
+    if not channel or not _assistant_channel(channel):
+        return
+    frappe.enqueue("tlc_hr.interface.assistant.answer", queue="short", channel=doc.channel_id,
+                   message=doc.text[:2000], user=doc.owner)
+
+
+def answer(channel, message, user):
+    """Run one chat turn as the person who asked, then post the answer as the bot."""
+    from tlc_hr.interface import agent_gateway
+
+    frappe.set_user(user)
+    result = agent_gateway.act(message)
+    text = (result.get("reply") or "").strip()
+    if not text:
+        return
+    frappe.get_doc({"doctype": "Raven Message", "channel_id": channel, "message_type": "Text",
+                    "is_bot_message": 1, "bot": BOT_NAME, "text": text}).insert(ignore_permissions=True)
+    frappe.db.commit()
+
+
 def _assistant_channel(channel):
     if channel.get("thread_bot") == BOT_NAME:
         return True

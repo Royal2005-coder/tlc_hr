@@ -79,11 +79,12 @@ def configure():
         doc.update(data)
         doc.save()
     bot = frappe.get_doc("Raven Bot", BOT_NAME) if frappe.db.exists("Raven Bot", BOT_NAME) else frappe.new_doc("Raven Bot")
-    bot.update({"bot_name": BOT_NAME, "is_ai_bot": 1, "model_provider": "Local LLM", "model": "ministral-14b-latest",
+    # is_ai_bot stays off on purpose: the gateway answers in its own words, so no model gets to restate an HR record
+    bot.update({"bot_name": BOT_NAME, "is_ai_bot": 0, "model_provider": "Local LLM", "model": "ministral-14b-latest",
                 "allow_bot_to_write_documents": 1, "enable_file_search": 0, "enable_code_interpreter": 0,
                 "use_google_document_parser": 0, "dynamic_instructions": 0, "debug_mode": 0, "temperature": 0.2,
                 "top_p": 1, "instruction": INSTRUCTION, "openai_assistant_id": None,
-                "file_sources": [], "bot_functions": [{"function": name} for name in FUNCTIONS]})
+                "file_sources": [], "bot_functions": []})
     bot.save()
     channels = provision_channels()
     from frappe.installer import update_site_config
