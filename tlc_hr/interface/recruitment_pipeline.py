@@ -26,7 +26,6 @@ STEPS = (
 REJECTED, TALENT = "Từ chối", "Talent Pool"
 HR = {"TLC HR Lead", "TLC HR Officer", "System Manager"}
 DIRECTOR = {"TLC Director", "System Manager"}
-MODEL = ai.MODEL
 INTERVIEW_TYPE = "TLC Recruitment Final"
 NATIVE_STATUS = {"Pass": "Cleared", "Fail": "Rejected", "Hold": "Pending"}
 TRACE = ai.TRACE
@@ -103,7 +102,7 @@ def screen(name):
     _save(doc, tlc_step=step, tlc_step_owner=frappe.session.user, tlc_cv_text=cv[:20000],
           tlc_pipeline=NATIVE_STAGE.get(step, doc.tlc_pipeline), **fields)
     _trace(doc, "ai.screening.done", f"Điểm {payload['score']}/100 · {payload['verdict']} · bước {step}",
-           actor="AI", model=MODEL)
+           actor="AI", model=ai.model_name())
     frappe.db.commit()
     return {"name": doc.name, "score": payload["score"], "verdict": payload["verdict"], "step": step,
             "summary": payload["summary"], "questions": payload["questions"], "missing": payload["missing"]}
@@ -114,7 +113,7 @@ def _screen(doc, actor=None):
     cv = _cv_text(doc)
     if not cv:
         _trace(doc, "ai.screening.error", "Hồ sơ chưa có nội dung CV để chấm (đính kèm CV hoặc nhập CV text).",
-               actor="AI", model=MODEL, status="error")
+               actor="AI", model=ai.model_name(), status="error")
         frappe.db.commit()
         frappe.throw("Hồ sơ chưa có nội dung CV để chấm (đính kèm CV hoặc nhập CV text).")
     _save(doc, tlc_ai_status="Đang chấm")
@@ -122,7 +121,7 @@ def _screen(doc, actor=None):
         payload, fields = ai.run_screen(doc, cv, actor=actor)
     except Exception as exc:
         _save(doc, tlc_ai_status="Lỗi")
-        _trace(doc, "ai.screening.error", f"Lỗi gọi trợ lý: {str(exc)[:500]}", actor="AI", model=MODEL, status="error")
+        _trace(doc, "ai.screening.error", f"Lỗi gọi trợ lý: {str(exc)[:500]}", actor="AI", model=ai.model_name(), status="error")
         frappe.db.commit()
         raise
     _save(doc, **fields)
@@ -388,13 +387,13 @@ def poll_mailpit():
             ai.trace(applicant.name, "ai.screening.done",
                      f"Điểm {applicant.tlc_ai_score}/100 · {applicant.tlc_ai_verdict} · bước "
                      f"{STEPS[1] if applicant.tlc_step == STEPS[0] else applicant.tlc_step}",
-                     actor="AI", model=MODEL)
+                     actor="AI", model=ai.model_name())
             if applicant.tlc_step == STEPS[0]:
                 _save(applicant, tlc_step=STEPS[1], tlc_pipeline=NATIVE_STAGE[STEPS[1]])
                 ai.trace(applicant.name, "step.advanced", f"{STEPS[0]} → {STEPS[1]} do AI đối chiếu xong",
-                         actor="AI", model=MODEL)
+                         actor="AI", model=ai.model_name())
         except Exception as exc:
-            ai.trace(applicant.name, "ai.screening.error", f"AI lỗi: {str(exc)[:400]}", actor="AI", model=MODEL, status="error")
+            ai.trace(applicant.name, "ai.screening.error", f"AI lỗi: {str(exc)[:400]}", actor="AI", model=ai.model_name(), status="error")
         frappe.db.commit()
         created.append(applicant.name)
     frappe.db.commit()
