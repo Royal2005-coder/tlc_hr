@@ -17,6 +17,7 @@ from time import perf_counter
 
 import frappe
 from frappe.utils import cint, cstr, flt, format_datetime, get_url, now_datetime, strip_html
+from frappe.utils.messages import clear_messages
 
 
 def html_escape(value):
@@ -174,6 +175,9 @@ def extract_profile(doc, cv):
             "source": "ai",
         }
     except Exception:
+        # the fallback is the answer here: drop the provider's error from the message log so the desk
+        # does not pop it over a letter or a screening that was produced anyway
+        clear_messages()
         profile = heuristic_profile(doc, cv)
     profile["years_experience"] = max(0, min(60, flt(profile.get("years_experience"))))
     if not profile["education"] and doc.get("tlc_education"):
@@ -240,6 +244,7 @@ def match_criteria(doc, cv):
             raise frappe.ValidationError("empty criteria")
         summary, risks, questions = _clean(raw.get("summary")), _as_list(raw.get("risks")), _as_list(raw.get("questions"))
     except Exception:
+        clear_messages()
         criteria = fallback_criteria(jd, cv)
         summary, risks, questions = "", ["Trợ lý không đối chiếu được; HR tự cho điểm và ghi lý do."], []
     if not criteria:
@@ -655,7 +660,7 @@ def ai_lines(doc, kind, meta):
         if written:
             return written
     except Exception:
-        pass
+        clear_messages()
     return [f"Chào {doc.applicant_name}, Bộ phận Nhân sự {_company(doc)} đã xem hồ sơ ứng tuyển vị trí "
             f"{doc.job_title or doc.designation or ''} của bạn."]
 
