@@ -56,11 +56,20 @@ def query(topic, employee=None):
 LEAVE_TYPE_HINTS = {"ốm": ("ốm", "bệnh", "sick", "khám", "điều trị"), "năm": ("năm", "annual", "pappam", "hè")}
 
 
-def _leave_type(given, *hints):
-    """Read the leave type off the company's own list instead of interrogating the person who said "nghỉ vì bệnh"."""
+def _leave_type(given, *hints, employee=None):
+    """Read the leave type off the company's own list instead of interrogating the person who said "nghỉ vì bệnh".
+
+    Only types the person has a submitted allocation for are offered: a type nobody allocated would be refused by
+    HRMS as outside the allocation period, and the person would hear "lỗi" where an HR officer would say "để tôi
+    trừ vào phép năm".
+    """
     names = frappe.get_all("Leave Type", pluck="name", order_by="name asc")
     if not names:
         return given
+    employee = employee or frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+    allocated = set(frappe.get_all("Leave Allocation", filters={"employee": employee, "docstatus": 1},
+                                   pluck="leave_type")) if employee else set()
+    names = [name for name in names if name in allocated] or names
     wanted = (given or "").strip().casefold()
     for name in names:
         folded = name.casefold()
@@ -72,14 +81,16 @@ def _leave_type(given, *hints):
         for word, clues in LEAVE_TYPE_HINTS.items():
             if word in folded and any(clue in text for clue in clues):
                 return name
-    return given or names[0]
+    # the person named a type they cannot book here (no allocation); take the one they can and let the reply say so
+    return given if given in names else names[0]
 
 
 @frappe.whitelist(methods=["POST"])
 def draft_leave(leave_type, from_date, to_date, reason, employee=None):
     with domain_errors():
-        return _service().draft_leave(LeaveDraft(leave_type=_leave_type(leave_type, reason), from_date=from_date,
-                                                to_date=to_date, reason=reason, employee=employee))
+        return _service().draft_leave(LeaveDraft(leave_type=_leave_type(leave_type, reason, employee=employee),
+                                                from_date=from_date, to_date=to_date, reason=reason,
+                                                employee=employee))
 
 
 def _assistant_channel(channel):

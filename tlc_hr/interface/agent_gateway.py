@@ -21,6 +21,10 @@ READ, DRAFT, APPROVAL, FORBIDDEN = "read", "draft", "approval", "forbidden"
 STATE_PROPOSED, STATE_WAITING, STATE_DONE, STATE_REFUSED, STATE_FAILED = (
     "Đề xuất", "Chờ duyệt", "Đã thực hiện", "Từ chối", "Lỗi")
 
+# Tools that work on the caller's own records: their employee identity comes from the login, not from the model.
+SELF_TOOLS = ("hrm.draft_leave", "hrm.draft_travel", "hrm.draft_attendance_correction", "hrm.draft_overtime",
+              "hrm.submit_leave", "hrm.my_records", "hrm.my_to_decide")
+
 # The closed tool surface. `service` is the only thing that touches documents, and it is chosen here, never by the model.
 TOOLS = {
     "hrm.my_records": {
@@ -127,6 +131,16 @@ def _clock():
             f"\"ngày 31 tháng này\" là {month}-31. Không dùng năm nào khác {today.year} trừ khi người dùng nêu rõ.")
 
 
+def _arguments(contract):
+    """The fields the gateway will demand, in the shape it will accept them."""
+    properties = contract.model_json_schema().get("properties", {})
+    hints = {}
+    for name, spec in properties.items():
+        hint = spec.get("description") or spec.get("pattern") or spec.get("type") or ""
+        hints[name] = str(hint)[:60]
+    return hints
+
+
 def leave_type_names():
     return ", ".join(frappe.get_all("Leave Type", pluck="name", limit=20, order_by="name asc"))
 
@@ -137,10 +151,13 @@ def leave_type_names():
 def plan(message, channel=None):
     """Choose a tool and its arguments. The model proposes; the gateway decides and executes."""
     user = frappe.session.user
-    skills = [{"code": code, "title": tool["title"], "risk": tool["risk"], "description": tool["description"]}
+    skills = [{"code": code, "title": tool["title"], "risk": tool["risk"], "description": tool["description"],
+               **({"args": _arguments(tool["contract"])} if tool["contract"] else {})}
               for code, tool in TOOLS.items()]
-    answer, failure = _chat([
+    messages = [
         {"role": "system", "content": PERSONA + "\n" + _clock()
+                                       + "\nVới mỗi tool có args, điền đủ mọi khóa theo đúng định dạng đã nêu."
+                                         " Nếu người dùng không cho đủ, trả tool=null thay vì chọn tool để rồi bỏ trống args."
                                        + "\nCâu hỏi về hồ sơ, mã nhân viên, phép hay phiếu lương của chính người"
                                          " hỏi là hrm.my_records — trả lời bằng số liệu thật, không hỏi lại."
                                        + "\nChỉ trả JSON: {\"tool\": code hoặc null, \"args\": {...},"
@@ -149,10 +166,22 @@ def plan(message, channel=None):
                                     f"Loại nghỉ có sẵn: {leave_type_names()}. \"bệnh\", \"ốm\" là loại nghỉ ốm;"
                                     f" \"phép năm\" là loại hằng năm — tự chọn đúng loại, đừng hỏi lại tên loại nghỉ.\n"
                                     f"Tin nhắn: {message[:2000]}"},
-    ])
+    ]
+    answer, failure = _chat(messages)
     proposal = _json_object(answer) or {}
     tool = proposal.get("tool") if proposal.get("tool") in TOOLS else None
-    return {"tool": tool, "args": proposal.get("args") or {}, "say": proposal.get("say") or "",
+    arguments = proposal.get("args") or {}
+    if tool and TOOLS[tool]["contract"] is not None and not arguments:
+        # naming the tool and dropping its arguments is a half answer, not a refusal: ask once, pointing at the gap
+        retry, failure = _chat(messages + [{"role": "assistant", "content": (answer or "")[:600]},
+                                           {"role": "user", "content": f"Bạn vừa chọn {tool} nhưng để trống args."
+                                                                       " Hãy điền đủ args cho tool đó theo đúng các"
+                                                                       " khóa đã nêu; nếu người dùng thực sự chưa cho đủ"
+                                                                       " thì trả {\"tool\": null}. Chỉ trả JSON."}])
+        again = _json_object(retry) or {}
+        if again.get("tool") == tool and again.get("args"):
+            proposal, arguments, answer = again, again["args"], retry
+    return {"tool": tool, "args": arguments, "say": proposal.get("say") or "",
             "planner": "model" if tool else "none", "error": failure}
 
 
@@ -186,8 +215,7 @@ def _guard(tool_code, args, requester):
             args = tool["contract"].model_validate(args).model_dump()
         except Exception as exc:
             return _what_is_missing(exc)
-    if tool_code in ("hrm.draft_leave", "hrm.draft_travel", "hrm.draft_attendance_correction",
-                     "hrm.draft_overtime", "hrm.submit_leave", "hrm.my_records", "hrm.my_to_decide"):
+    if tool_code in SELF_TOOLS:
         if not employee_of(requester):
             return "Tài khoản này chưa gắn hồ sơ nhân viên nên không có dữ liệu để làm việc."
     if tool_code == "hrm.screen_cv" and not _require({"TLC HR Lead", "TLC HR Officer", "System Manager"}):
@@ -208,15 +236,20 @@ def act(message, tool=None, args=None, case=None):
                                                   " nên chưa đọc được yêu cầu của bạn."}
         return {"state": "answered", "reply": "Tôi chưa hiểu yêu cầu. Hãy nói cụ thể hơn (ví dụ: soạn nháp đơn nghỉ ngày 12/11)."}
     spec = TOOLS[tool]
-    arguments = args or {}
+    arguments = args or planned.get("args") or {}
     if isinstance(arguments, str):
         arguments = json.loads(arguments or "{}")
+    # a model fills an optional field with "" as readily as with null; the domain must not read that as another person
+    arguments = {key: value for key, value in arguments.items() if value not in ("", None)}
     blocked = _guard(tool, arguments, requester)
     if blocked:
         return {"state": "refused", "tool": tool, "reply": blocked}
     if spec["risk"] == FORBIDDEN:
         return {"state": "refused", "tool": tool,
                 "reply": f"{spec['title']}: {spec['description']}"}
+    if tool in SELF_TOOLS:
+        # a model that copies the login into `employee` must not turn a request about myself into one about someone else
+        arguments["employee"] = employee_of(requester)
     key = case or f"{requester.split('@')[0]}-{_fingerprint(tool, arguments)}-{getdate().isoformat()}"
     existing = frappe.db.get_value("TLC AI Case", {"case_key": key})
     if existing:
@@ -224,6 +257,9 @@ def act(message, tool=None, args=None, case=None):
         if spec["risk"] == READ:
             # A read changes nothing, so asking it twice must answer twice: handing back "the earlier request is in
             # state ..." turns every repeated question about one's own code or balance into a non-answer.
+            return _run(doc, spec)
+        if spec["risk"] == DRAFT and doc.state == STATE_FAILED:
+            # a draft that was never built leaves nothing behind; refusing to try again only hides the reason
             return _run(doc, spec)
         # the same request already ran: hand back the record it produced, so a follow-up tool call can continue from it
         return {"state": doc.state, "case": doc.name, "reply": f"Yêu cầu trước đó đang ở trạng thái {doc.state} (case {doc.name}).",
@@ -324,8 +360,10 @@ def _draft_leave(record):
     created = frappe.call("tlc_hr.interface.assistant.draft_leave", **args)
     # the assistant service answers with the desk payload of the new draft; the case stores only its name
     name = created.get("document_id") if isinstance(created, dict) else created
+    used = frappe.db.get_value("Leave Application", name, "leave_type") or args.get("leave_type") or "nghỉ phép"
     return {"document_type": "Leave Application", "document_id": name,
-            "reply": f"Đã tạo NHÁP đơn nghỉ phép {name}. Chưa gửi duyệt — bạn kiểm tra rồi bấm Gửi trên form."}
+            "reply": (f"Đã tạo NHÁP đơn {used} {name}."
+                      " Chưa gửi duyệt — bạn kiểm tra rồi bấm Gửi trên form.")}
 
 
 def _draft_by_doctype(record, doctype, builder):

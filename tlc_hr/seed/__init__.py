@@ -319,6 +319,9 @@ def leave(data):
                             "max_leaves_allowed": 12 if leave_type["code"] == "annual" else 0,
                             "include_holiday": 0, "is_lwp": 0}).insert()
     year = getdate(nowdate()).year
+    if not frappe.db.exists("Leave Period", {"company": COMPANY, "from_date": f"{year}-01-01"}):
+        frappe.get_doc({"doctype": "Leave Period", "company": COMPANY, "from_date": f"{year}-01-01",
+                        "to_date": f"{year}-12-31"}).insert()
     for allocation in data.get("allocations", []):
         leave_type = LEAVE_TYPE_NAMES.get(allocation["leave_type"], allocation["leave_type"])
         for employee in frappe.get_all("Employee", filters={"company": COMPANY, "status": "Active"}, pluck="name"):
