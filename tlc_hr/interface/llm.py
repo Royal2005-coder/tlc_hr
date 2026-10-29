@@ -79,8 +79,8 @@ def _post(url, payload, headers=None, timeout=90):
     import requests
 
     response = requests.post(url, json=payload, headers=headers or {}, timeout=timeout)
-    if response.status_code in (401, 403):
-        raise RuntimeError(f"bị từ chối {response.status_code}: {response.text[:120]}")
+    if response.status_code in (400, 401, 403):
+        raise RuntimeError(f"{response.status_code}: {response.text[:160]}")
     if response.status_code in (402, 429, 503):
         raise _Throttled(response.status_code)
     response.raise_for_status()
@@ -140,7 +140,7 @@ def _preview():
     return "không có nhà cung cấp nào"
 
 
-def providers(test=False, max_tokens=60):
+def providers(test=False, max_tokens=400):
     """Name each provider, whether this pod can call it, and — when asked — whether it really answers."""
     probe = [{"role": "system", "content": "Chỉ trả JSON."},
              {"role": "user", "content": f'Trả lời {{"ok":true,"year":<năm hiện tại>}}. Hôm nay là '
