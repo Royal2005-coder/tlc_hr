@@ -245,6 +245,8 @@ def act(message, tool=None, args=None, case=None):
         if planned.get("error"):
             return {"state": "answered", "reply": f"Trợ lý đang không gọi được mô hình ({planned['error'][:120]}),"
                                                   " nên chưa đọc được yêu cầu của bạn."}
+        if GREETING.match(message or ""):
+            return {"state": "answered", "reply": "Chào bạn. " + HELP}
         return {"state": "answered", "reply": "Tôi chưa hiểu yêu cầu. " + HELP}
     spec = TOOLS[tool]
     arguments = args or planned.get("args") or {}
@@ -453,9 +455,9 @@ def _submit_leave(record):
 
 
 LINKABLE = (
-    ("Leave Application", re.compile(r"HR-LAP-\d{4}-\d+", re.I)),
-    ("Travel Request", re.compile(r"HR-TRQ-\d{4}-\d+", re.I)),
-    ("TLC Overtime Request", re.compile(r"TLC-OT-\d{4}-\d+", re.I)),
+    ("Leave Application", re.compile(r"\bHR-LAP-\d{4}-\d+\b", re.I)),
+    ("Travel Request", re.compile(r"\bHR-TRQ-\d{4}-\d+\b", re.I)),
+    ("TLC Overtime Request", re.compile(r"\bTLC-OT-\d{4}-\d+\b", re.I)),
 )
 
 
