@@ -12,7 +12,7 @@ import os
 import re
 
 import frappe
-from frappe.utils import flt, getdate, now_datetime
+from frappe.utils import flt, get_url, getdate, now_datetime
 
 from tlc_hr.contracts.assistant import AssistantQuery, LeaveDraft
 from tlc_hr.interface import llm
@@ -23,7 +23,7 @@ STATE_PROPOSED, STATE_WAITING, STATE_DONE, STATE_REFUSED, STATE_FAILED = (
 
 # Tools that work on the caller's own records: their employee identity comes from the login, not from the model.
 SELF_TOOLS = ("hrm.draft_leave", "hrm.draft_travel", "hrm.draft_attendance_correction", "hrm.draft_overtime",
-              "hrm.submit_leave", "hrm.my_records", "hrm.my_to_decide")
+              "hrm.submit_leave", "hrm.my_records", "hrm.my_to_decide", "hrm.document_link")
 
 # The closed tool surface. `service` is the only thing that touches documents, and it is chosen here, never by the model.
 TOOLS = {
@@ -38,6 +38,10 @@ TOOLS = {
     "hrm.policy_search": {
         "title": "Tra chính sách đã duyệt", "risk": READ, "contract": None,
         "description": "Chỉ trả lời từ chính sách đã duyệt và hiển thị với vai trò của người hỏi.",
+    },
+    "hrm.document_link": {
+        "title": "Đường dẫn mở hồ sơ của chính tôi", "risk": READ, "contract": None,
+        "description": "Cho đường dẫn mở một hồ sơ của chính người đang nói chuyện khi họ nêu mã (HR-LAP-, HR-TRQ-, TLC-OT-).",
     },
     "hrm.draft_leave": {
         "title": "Soạn nháp đơn nghỉ phép", "risk": DRAFT, "contract": LeaveDraft,
@@ -76,6 +80,11 @@ TOOLS = {
         "description": "Không đổi vai trò, không sửa hoặc xóa hồ sơ đã ghi sổ.",
     },
 }
+
+GREETING = re.compile(r"^\s*(hi|hello|hey|helo|alo|chào|chao|xin chào)", re.I)
+HELP = ("Tôi có thể: đọc mã nhân viên, số dư phép, đơn đang chờ; cho đường dẫn mở một hồ sơ của bạn; "
+        "soạn nháp đơn nghỉ phép, công tác, giải trình công, tăng ca; chấm CV (HR). "
+        "Gửi duyệt và phê duyệt vẫn là việc của người.")
 
 PERSONA = (
     "Bạn là @Leo, nhân viên AI của phòng Nhân sự TLC, làm việc trong chat Frappe HR.\n"
@@ -158,6 +167,8 @@ def plan(message, channel=None):
         {"role": "system", "content": PERSONA + "\n" + _clock()
                                        + "\nVới mỗi tool có args, điền đủ mọi khóa theo đúng định dạng đã nêu."
                                          " Nếu người dùng không cho đủ, trả tool=null thay vì chọn tool để rồi bỏ trống args."
+                                       + "\nXin đường dẫn/link tới một hồ sơ đã có mã (HR-LAP-, HR-TRQ-, TLC-OT-) là"
+                                       + " hrm.document_link; lời chào thì trả tool=null và để hệ thống chào lại."
                                        + "\nCâu hỏi về hồ sơ, mã nhân viên, phép hay phiếu lương của chính người"
                                          " hỏi là hrm.my_records — trả lời bằng số liệu thật, không hỏi lại."
                                        + "\nChỉ trả JSON: {\"tool\": code hoặc null, \"args\": {...},"
@@ -234,7 +245,7 @@ def act(message, tool=None, args=None, case=None):
         if planned.get("error"):
             return {"state": "answered", "reply": f"Trợ lý đang không gọi được mô hình ({planned['error'][:120]}),"
                                                   " nên chưa đọc được yêu cầu của bạn."}
-        return {"state": "answered", "reply": "Tôi chưa hiểu yêu cầu. Hãy nói cụ thể hơn (ví dụ: soạn nháp đơn nghỉ ngày 12/11)."}
+        return {"state": "answered", "reply": "Tôi chưa hiểu yêu cầu. " + HELP}
     spec = TOOLS[tool]
     arguments = args or planned.get("args") or {}
     if isinstance(arguments, str):
@@ -441,7 +452,32 @@ def _submit_leave(record):
             "reply": f"Đã gửi duyệt đơn {name} (trạng thái {doc.get('workflow_state') or 'đã gửi'})."}
 
 
+LINKABLE = (
+    ("Leave Application", re.compile(r"HR-LAP-\d{4}-\d+", re.I)),
+    ("Travel Request", re.compile(r"HR-TRQ-\d{4}-\d+", re.I)),
+    ("TLC Overtime Request", re.compile(r"TLC-OT-\d{4}-\d+", re.I)),
+)
+
+
+def _document_link(record):
+    """A link to a record the person already owns, taken from the code they typed rather than from the model."""
+    mine = employee_of(record.requester)
+    for doctype, pattern in LINKABLE:
+        found = pattern.search(record.message or "")
+        if not found:
+            continue
+        name = found.group(0).upper()
+        if not frappe.db.exists(doctype, name):
+            return {"reply": f"Không tìm thấy hồ sơ {name} trong hệ thống."}
+        if frappe.db.get_value(doctype, name, "employee") != mine:
+            return {"reply": f"Hồ sơ {name} không thuộc về bạn, nên tôi không mở được."}
+        url = get_url(f"/desk/{frappe.scrub(doctype).replace('_', '-')}/{name}")
+        return {"document_type": doctype, "document_id": name, "reply": f"Đây là đường dẫn mở {name}: {url}"}
+    return {"reply": "Bạn gửi giúp tôi mã hồ sơ (ví dụ HR-LAP-2026-00370) để tôi đưa đúng đường dẫn mở hồ sơ đó."}
+
+
 SERVICES = {"hrm.my_records": _my_records, "hrm.my_to_decide": _my_to_decide, "hrm.policy_search": _policy_search,
+            "hrm.document_link": _document_link,
             "hrm.draft_leave": _draft_leave, "hrm.draft_travel": _draft_travel,
             "hrm.draft_attendance_correction": _draft_attendance_correction, "hrm.draft_overtime": _draft_overtime,
             "hrm.screen_cv": _screen_cv, "hrm.submit_leave": _submit_leave}
