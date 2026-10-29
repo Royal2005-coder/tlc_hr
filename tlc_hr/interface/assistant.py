@@ -102,6 +102,9 @@ def answer_in_dm(doc, method=None):
     """
     if doc.is_bot_message or doc.message_type != "Text" or not (doc.text or "").strip():
         return
+    if frappe.db.get_value("Raven Bot", BOT_NAME, "is_ai_bot"):
+        # Raven's own AI bot is answering this channel; a second reply from here would be a duplicate
+        return
     channel = frappe.db.get_value("Raven Channel", doc.channel_id,
                                   ["name", "is_direct_message", "dm_user_1", "dm_user_2", "thread_bot"], as_dict=1)
     if not channel or not _assistant_channel(channel):
