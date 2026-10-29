@@ -48,6 +48,7 @@ frappe.ui.form.on("Job Applicant", {
 				},
 			});
 			d.show();
+			return d;
 		};
 		const inStep = (...steps) => steps.includes(step);
 
@@ -141,20 +142,28 @@ frappe.ui.form.on("Job Applicant", {
 		}
 		if (inStep(STEPS[4]) && frappe.user.has_role(["TLC Director", "System Manager"])) {
 			frm.add_custom_button(__("Quyết định offer"), () => {
-				ai_call("offer_recommendation", { name: frm.doc.name }, __("Trợ lý đang tính khoảng lương đề xuất"), (advice) => {
-					const mid = advice && advice.high ? Math.round((advice.low + advice.high) / 2 / 1000) * 1000 : 0;
-					dialog(__("Giám đốc quyết định offer"), [
-						{ fieldname: "salary", label: __("Lương chính thức (VND)"), fieldtype: "Currency", reqd: 1, default: mid },
-						{ fieldname: "joining_date", label: __("Ngày vào làm"), fieldtype: "Date", reqd: 1 },
-						{ fieldname: "designation", label: __("Chức danh"), fieldtype: "Link", options: "Designation" },
-						{ fieldname: "department", label: __("Bộ phận"), fieldtype: "Link", options: "Department" },
-						{ fieldname: "reason", label: __("Căn cứ quyết định"), fieldtype: "Small Text" },
-						{ fieldname: "advice_html", fieldtype: "HTML",
-							options: advice && advice.text
-								? `<div style="font-size:12px"><b>${__("Khuyến nghị của trợ lý")}:</b> ${advice.text}<br>` +
-								  `${__("Khoảng đề xuất")}: ${format_money(advice.low)} – ${format_money(advice.high)} VND</div>`
-								: "" },
-					], "offer");
+				// the decision belongs to the director: the form opens at once and the advice arrives into it
+				const d = dialog(__("Giám đốc quyết định offer"), [
+					{ fieldname: "salary", label: __("Lương chính thức (VND)"), fieldtype: "Currency", reqd: 1 },
+					{ fieldname: "joining_date", label: __("Ngày vào làm"), fieldtype: "Date", reqd: 1 },
+					{ fieldname: "designation", label: __("Chức danh"), fieldtype: "Link", options: "Designation" },
+					{ fieldname: "department", label: __("Bộ phận"), fieldtype: "Link", options: "Department" },
+					{ fieldname: "reason", label: __("Căn cứ quyết định"), fieldtype: "Small Text" },
+					{ fieldname: "advice_html", fieldtype: "HTML", options: `<div style="font-size:12px" class="text-muted">${__("Trợ lý đang tính khoảng lương đề xuất…")}</div>` },
+				], "offer");
+				frappe.call({
+					method: "tlc_hr.interface.recruitment_ai.offer_recommendation",
+					args: { name: frm.doc.name },
+					callback: ({ message: advice }) => {
+						if (!advice) return;
+						if (advice.high && !d.get_value("salary")) {
+							d.set_value("salary", Math.round((advice.low + advice.high) / 2 / 1000) * 1000);
+						}
+						d.fields_dict.advice_html.$wrapper.html(advice.text
+							? `<div style="font-size:12px"><b>${__("Khuyến nghị của trợ lý")}:</b> ${advice.text}<br>` +
+							`${__("Khoảng đề xuất")}: ${format_money(advice.low)} – ${format_money(advice.high)} VND</div>`
+							: "");
+					},
 				});
 			}, AI);
 		}
