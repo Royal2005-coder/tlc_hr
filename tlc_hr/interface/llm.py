@@ -17,8 +17,8 @@ import frappe
 PROVIDERS = (
     {"code": "llm7", "label": "LLM7 — free key, no card", "url": "https://api.llm7.io/v1/chat/completions",
      "model": "DeepSeek-V4.1-Flash", "key_env": "LLM7_API_KEY", "signup": "https://token.llm7.io"},
-    {"code": "groq", "label": "Groq — free tier, 30 rpm", "url": "https://api.groq.com/openai/v1/chat/completions",
-     "model": "llama-3.3-70b-versatile", "key_env": "GROQ_API_KEY", "signup": "https://console.groq.com/keys"},
+    {"code": "groq", "label": "Groq — free tier, fast inference", "url": "https://api.groq.com/openai/v1/chat/completions",
+     "model": "openai/gpt-oss-120b", "key_env": "GROQ_API_KEY", "signup": "https://console.groq.com/keys"},
     {"code": "openrouter", "label": "OpenRouter — :free models", "url": "https://openrouter.ai/api/v1/chat/completions",
      "model": "nvidia/nemotron-3-ultra-550b-a55b:free", "key_env": "OPENROUTER_API_KEY",
      "signup": "https://openrouter.ai/workspaces/default/keys"},
